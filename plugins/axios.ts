@@ -1,5 +1,6 @@
-import Vue from 'vue'
 import { Api } from "~/services/api"
+
+import { Plugin } from '@nuxt/types'
 
 declare module 'vue/types/vue' {
   interface Vue {
@@ -7,5 +8,9 @@ declare module 'vue/types/vue' {
   }
 }
 
-const axios = Vue.prototype.$axios;
-Vue.prototype.$api = new Api(axios)
+const api: Plugin = (context, inject) => {
+  const api = new Api(context.$axios)
+  inject('api', api)
+}
+
+export default api

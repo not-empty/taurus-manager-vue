@@ -83,10 +83,8 @@ export default Vue.extend({
       ],
     };
   },
-  methods: {
-    exampleApi() {
-      this.$api.queue.getAll();
-    },
+  mounted() {
+    this.$api.user.getAll()
   },
 });
 </script>
