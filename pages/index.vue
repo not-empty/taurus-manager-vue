@@ -41,46 +41,52 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'IndexPage',
+<script lang="ts">
+import Vue from "vue";
+export default Vue.extend({
+  name: "IndexPage",
   data() {
     return {
       dashboardData: [
         {
-          "group": {
-            "id": "2daeeb0d-9c01-4499-82e2-add16cbfa682",
-            "name": "arktis",
-            "description": "",
-            "createdAt": "2021-11-08T20:04:50.000Z",
-            "updatedAt": "2021-11-08T20:04:50.000Z",
-            "deletedAt": null
+          group: {
+            id: "2daeeb0d-9c01-4499-82e2-add16cbfa682",
+            name: "arktis",
+            description: "",
+            createdAt: "2021-11-08T20:04:50.000Z",
+            updatedAt: "2021-11-08T20:04:50.000Z",
+            deletedAt: null,
           },
-          "queues": [
+          queues: [
             {
-              "id": "6c4fe4ac-f137-4b3c-849f-a43d70f12119",
-              "name": "random-event",
-              "description": "",
-              "host": "cache.com",
-              "port": 6379,
-              "groupId": "2daeeb0d-9c01-4499-82e2-add16cbfa682",
-              "createdAt": "2021-11-08T20:11:48.000Z",
-              "updatedAt": "2021-11-08T20:11:48.000Z",
-              "deletedAt": null,
-              "status": "running",
-              "jobCounts": {
-                "waiting": 0,
-                "active": 8,
-                "completed": 100,
-                "failed": 0,
-                "delayed": 0,
-                "paused": 0
-              }
-            }
-          ]
-        }
-      ]
-    }
-  }
-}
+              id: "6c4fe4ac-f137-4b3c-849f-a43d70f12119",
+              name: "random-event",
+              description: "",
+              host: "cache.com",
+              port: 6379,
+              groupId: "2daeeb0d-9c01-4499-82e2-add16cbfa682",
+              createdAt: "2021-11-08T20:11:48.000Z",
+              updatedAt: "2021-11-08T20:11:48.000Z",
+              deletedAt: null,
+              status: "running",
+              jobCounts: {
+                waiting: 0,
+                active: 8,
+                completed: 100,
+                failed: 0,
+                delayed: 0,
+                paused: 0,
+              },
+            },
+          ],
+        },
+      ],
+    };
+  },
+  methods: {
+    exampleApi() {
+      this.$api.queue.getAll();
+    },
+  },
+});
 </script>
