@@ -1,9 +1,6 @@
 <template>
   <v-app dark>
     <v-app-bar fixed app>
-      <v-btn icon @click.stop="clipped = !clipped">
-        <v-icon>mdi-application</v-icon>
-      </v-btn>
       <v-toolbar-title v-text="title" />
       <v-spacer />
       Person
@@ -21,7 +18,7 @@ export default {
   name: 'DefaultLayout',
   data() {
     return {
-      title: 'Constallation'
+      title: 'Constellation'
     }
   }
 }

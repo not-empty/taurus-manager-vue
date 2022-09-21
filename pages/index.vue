@@ -84,7 +84,7 @@ export default Vue.extend({
     };
   },
   mounted() {
-    this.$api.user.getAll()
+    
   },
 });
 </script>
