@@ -16,24 +16,7 @@ export interface ApiListLink {
   active: boolean;
 }
 
-export interface ApiListData<T> {
-  current_page: number;
-  data: T[],
-  first_page_url: string;
-  from: number;
-  last_page: number;
-  last_page_url: string;
-  links: ApiListLink[];
-  next_page_url: string | null;
-  path: string;
-  per_page: number
-  prev_page_url: string | null;
-  to: number;
-  total: number;
-}
-
-export type ApiDetailResponse<T> = ApiResponse<T>;
-export type ApiListResponse<T> = ApiResponse<ApiListData<T>>;
+export type ApiListResponse<T> = ApiResponse<T>;
 export type ApiAddResponse<T> = ApiResponse<T>;
 export type ApiPutResponse<T> = ApiResponse<T>;
 
@@ -60,17 +43,3 @@ export interface Order {
   type?: 'desc' | 'asc';
 }
 
-export interface Pagination {
-  page: number;
-  perPage: number;
-  totalPages: number;
-  filters: Record<string, Filter>;
-  order: Order;
-}
-
-export type PaginationPayload = Omit<Pagination, 'totalPages'>;
-
-export interface PaginationResult<T> {
-  data: T[];
-  pagination: Partial<Pagination>;
-}
