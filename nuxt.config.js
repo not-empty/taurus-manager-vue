@@ -39,12 +39,33 @@ export default {
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
   ],
- 
+
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: ['@nuxtjs/axios'],
+  modules: [
+    '@nuxtjs/axios',
+    '@nuxtjs/auth-next'
+  ],
   plugins: ['~/plugins/axios.ts'],
   axios: {
-    baseURL: 'http://localhost:3001',
+    baseURL: 'http://localhost:3000',
+  },
+  auth: {
+    strategies: {
+      constelation: { 
+        scheme: '~/schemes/constelation.ts',
+        token: {
+          property: 'token',
+          global: true,
+        },
+        user: {
+          property: 'user',
+          autoFetch: false
+        },
+        endpoints: {
+          login: { url: '/session', method: 'post' }
+        }
+      },
+    },
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
