@@ -79,8 +79,9 @@ export default Vue.extend({
       ],
     };
   },
-  mounted() {
-    this.$api
+  async mounted() {
+    const group = await this.$api.group.getById(this.$route.params.id)
+    console.log(group)
   },
 });
 </script>

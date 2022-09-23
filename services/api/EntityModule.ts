@@ -17,6 +17,12 @@ export class EntityModule<T> extends Module {
     return result.data;
   }
 
+  public async getById(id: string): Promise<T> {
+    const result = await this.api.$get<ApiListResponse<T>>(`/${this.path}/${id}`);
+
+    return result.data;
+  }
+
   public async post(payload: Omit<T, 'id'>): Promise<T> {
     const result = await this.api.$post<ApiAddResponse<T>>(`/${this.path}/`, payload);
 
