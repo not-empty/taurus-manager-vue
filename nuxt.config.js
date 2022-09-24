@@ -51,21 +51,24 @@ export default {
   },
   auth: {
     strategies: {
-      constelation: { 
-        scheme: '~/schemes/constelation.ts',
+      constelation: {
+        scheme: '~/schemes/constelation',
         token: {
           property: 'token',
+          maxAge: 1800,
           global: true,
+          type: 'Bearer'
         },
         user: {
           property: 'user',
           autoFetch: false
         },
         endpoints: {
-          login: { url: '/session', method: 'post' }
-        }
-      },
-    },
+          login: { url: '/session', method: 'post' },
+          user: { url: '/user', method: 'get' }
+        },
+      }
+    }
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify

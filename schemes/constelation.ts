@@ -24,4 +24,11 @@ export default class Constelation extends LocalScheme {
       this.$auth.setUser(response.data.user)
       return response;
   }
+  async setUserToken(token: string): Promise<HTTPResponse | void> {
+    this.token.set(token)
+    return
+  };
+
+  async mounted() {
+  }
 }

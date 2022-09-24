@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h1>{{logado}}</h1>
     <v-row>
       <v-col sm="12" md="12" lg="12">
         <h2>DashBoard</h2>
@@ -47,6 +48,7 @@ export default Vue.extend({
   name: "IndexPage",
   data() {
     return {
+      logado: '',
       dashboardData: [
         {
           group: {
@@ -84,7 +86,6 @@ export default Vue.extend({
     };
   },
   mounted() {
-    this.$api
   },
 });
 </script>

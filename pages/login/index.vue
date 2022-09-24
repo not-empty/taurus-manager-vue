@@ -22,9 +22,12 @@ export default Vue.extend({
     }
   },
   methods: {
-    async submit() {
-      // const user = this.$auth.strategies ('local', {data: {email: this.email, password: this.password}})
-      console.log(this.$auth.strategies) 
+    submit() {
+      this.$auth.
+        loginWith('constelation', {data: {email: this.email, password: this.password}})
+        .then((res) => {
+          console.log(res)
+        })
     }
   },
 })
