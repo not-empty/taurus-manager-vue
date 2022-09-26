@@ -17,7 +17,7 @@ export class Api{
     this.client = $axios
     this.token = null;
     this.user = this.getEntity('user');
-    this.group = this.getEntity('group');
+    this.group = this.getEntity('group/dashboard');
     this.queue = this.getEntity('queue');
     this.session = this.getSession();
   }
