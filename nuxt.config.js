@@ -47,7 +47,7 @@ export default {
   ],
   plugins: ['~/plugins/axios.ts'],
   axios: {
-    baseURL: 'http://localhost:3000',
+    baseURL: process.env.BACKEND_URL,
   },
   auth: {
     strategies: {

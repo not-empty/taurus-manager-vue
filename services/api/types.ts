@@ -3,7 +3,14 @@ import { ISession } from "~/types/session";
 export interface ApiResponse<T> {
   data: T;
   profiler: number;
-  token: string;
+}
+
+export interface ApiResponsePaginated<T> {
+  data: {
+    total: number
+    queues: T
+  };
+  profiler: number;
 }
 
 export interface ApiSessionResponse {
