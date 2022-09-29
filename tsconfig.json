@@ -28,6 +28,7 @@
       "@types/node",
       "@nuxtjs/axios",
       "@nuxtjs/auth-next",
+      "@pinia/nuxt"
     ]
   },
   "exclude": [

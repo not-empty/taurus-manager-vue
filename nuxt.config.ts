@@ -1,6 +1,6 @@
-import colors from 'vuetify/es5/util/colors'
+import { NuxtConfig } from '@nuxt/types'
 
-export default {
+const config: NuxtConfig = {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
 
@@ -38,39 +38,25 @@ export default {
     '@nuxt/typescript-build',
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
-  ],
+    '@pinia/nuxt',
+  ],  
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     '@nuxtjs/axios',
-    '@nuxtjs/auth-next'
+    [
+      '@pinia/nuxt',
+      {
+        autoImports: [
+          'defineStore'
+        ],
+      }
+    ]
   ],
   plugins: ['~/plugins/axios.ts'],
   axios: {
     baseURL: process.env.BACKEND_URL,
   },
-  auth: {
-    strategies: {
-      constelation: {
-        scheme: '~/schemes/constelation',
-        token: {
-          property: 'token',
-          maxAge: 1800,
-          global: true,
-          type: 'Bearer'
-        },
-        user: {
-          property: 'user',
-          autoFetch: false
-        },
-        endpoints: {
-          login: { url: '/session', method: 'post' },
-          user: { url: '/user', method: 'get' }
-        },
-      }
-    }
-  },
-
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
@@ -78,13 +64,13 @@ export default {
       dark: true,
       themes: {
         dark: {
-          primary: colors.blue.darken2,
-          accent: colors.grey.darken3,
-          secondary: colors.amber.darken3,
-          info: colors.teal.lighten1,
-          warning: colors.amber.base,
-          error: colors.deepOrange.accent4,
-          success: colors.green.accent3
+          primary: "#616161",
+          accent: "#424242",
+          secondary: "#FF8F00",
+          info: "#26A69A",
+          warning: "#FFC107",
+          error: "#DD2C00",
+          success: "#00E676"
         }
       }
     }
@@ -94,3 +80,5 @@ export default {
   build: {
   }
 }
+
+export default config
