@@ -9,6 +9,7 @@
       "DOM"
     ],
     "esModuleInterop": true,
+    "jsx": "preserve",
     "allowJs": true,
     "sourceMap": true,
     "strict": true,
@@ -25,7 +26,8 @@
     "types": [
       "@nuxt/types",
       "@types/node",
-      "@nuxtjs/axios"
+      "@nuxtjs/axios",
+      "@nuxtjs/auth-next",
     ]
   },
   "exclude": [

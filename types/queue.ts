@@ -2,7 +2,7 @@ export interface IQueue {
   id: string;
   name: string;
   description: string;
-  compliance: string;
+  compliance: string | null;
   host: string;
   port: number;
   groupId: string;

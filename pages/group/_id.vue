@@ -1,13 +1,12 @@
 <template>
   <div>
-    <h1>{{logado}}</h1>
     <v-row>
       <v-col sm="12" md="12" lg="12">
         <h2>DashBoard</h2>
       </v-col>
     </v-row>
-    <div v-for="group in dashboardData" :key="group.group.id">
-      <h3>{{ group.group.name }}</h3>
+    <div>
+      <h3>{{ group.name }}</h3>
       <v-row>
         <v-col sm="12" md="12" lg="12">
           <v-simple-table>
@@ -24,7 +23,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in group.queues" :key="item.id">
+                <tr v-for="item in queues" :key="item.id">
                   <td>{{ item.name }}</td>
                   <td>{{ item.status }}</td>
                   <td>{{ item.jobCounts.waiting }}</td>
@@ -48,44 +47,41 @@ export default Vue.extend({
   name: "IndexPage",
   data() {
     return {
-      logado: '',
-      dashboardData: [
+      group: {
+        id: "2daeeb0d-9c01-4499-82e2-add16cbfa682",
+        name: "Group Name",
+        description: "",
+        createdAt: "2021-11-08T20:04:50.000Z",
+        updatedAt: "2021-11-08T20:04:50.000Z",
+        deletedAt: null,
+      },
+      queues: [
         {
-          group: {
-            id: "2daeeb0d-9c01-4499-82e2-add16cbfa682",
-            name: "arktis",
-            description: "",
-            createdAt: "2021-11-08T20:04:50.000Z",
-            updatedAt: "2021-11-08T20:04:50.000Z",
-            deletedAt: null,
+          id: "6c4fe4ac-f137-4b3c-849f-a43d70f12119",
+          name: "random-event",
+          description: "",
+          host: "cache.com",
+          port: 6379,
+          groupId: "2daeeb0d-9c01-4499-82e2-add16cbfa682",
+          createdAt: "2021-11-08T20:11:48.000Z",
+          updatedAt: "2021-11-08T20:11:48.000Z",
+          deletedAt: null,
+          status: "running",
+          jobCounts: {
+            waiting: 0,
+            active: 8,
+            completed: 100,
+            failed: 0,
+            delayed: 0,
+            paused: 0,
           },
-          queues: [
-            {
-              id: "6c4fe4ac-f137-4b3c-849f-a43d70f12119",
-              name: "random-event",
-              description: "",
-              host: "cache.com",
-              port: 6379,
-              groupId: "2daeeb0d-9c01-4499-82e2-add16cbfa682",
-              createdAt: "2021-11-08T20:11:48.000Z",
-              updatedAt: "2021-11-08T20:11:48.000Z",
-              deletedAt: null,
-              status: "running",
-              jobCounts: {
-                waiting: 0,
-                active: 8,
-                completed: 100,
-                failed: 0,
-                delayed: 0,
-                paused: 0,
-              },
-            },
-          ],
         },
       ],
     };
   },
-  mounted() {
+  async mounted() {
+    const group = await this.$api.group.getById(this.$route.params.id)
+    console.log(group)
   },
 });
 </script>

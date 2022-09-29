@@ -6,6 +6,6 @@ export class Module {
 
   constructor(axios: NuxtAxiosInstance, path: string) {
     this.api = axios;
-    this.path = path
+    this.path = path;
   }
 }
