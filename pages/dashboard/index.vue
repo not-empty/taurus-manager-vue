@@ -44,17 +44,19 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { DashGroup } from "~/types/group";
 export default Vue.extend({
-  // middleware: 'auth',
+  middleware: 'auth',
   name: "IndexPage",
   data() {
     return {
       logado: '',
-      dashboardData: {},
+      dashboardData: [] as DashGroup[]
+      ,
     };
   },
-  created() {
-    this.dashboardData = this.$api.dashboard.groupDash()
+  async created() {
+    this.dashboardData = await this.$api.dashboard.groupDash()
   },
 });
 </script>

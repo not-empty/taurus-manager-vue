@@ -38,20 +38,11 @@ const config: NuxtConfig = {
     '@nuxt/typescript-build',
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
-    '@pinia/nuxt',
   ],  
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     '@nuxtjs/axios',
-    [
-      '@pinia/nuxt',
-      {
-        autoImports: [
-          'defineStore'
-        ],
-      }
-    ]
   ],
   plugins: ['~/plugins/axios.ts'],
   axios: {

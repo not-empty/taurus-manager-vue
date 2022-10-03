@@ -11,8 +11,8 @@ interface SessionPayload {
 
 export class SessionModule extends Module {
   public async post(payload: SessionPayload): Promise<ISession> {
-    const result = await this.api.$post<ApiSessionResponse>(`/${this.path}`, payload);
+    const result = await this.api.$post<ISession>(`/${this.path}`, payload);
 
-    return result.data;
+    return result;
   }
 }

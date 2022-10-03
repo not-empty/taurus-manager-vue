@@ -1,15 +1,10 @@
-import { Module } from './modules';
 import {
   ApiListResponse
 } from './types';
-import { IGroup } from '~/types/group'
+
 import { IQueue } from '~/types/queue';
 import { NuxtAxiosInstance } from '@nuxtjs/axios';
-
-interface DashGroup {
-  group: IGroup 
-  queues: IQueue[];
-}
+import { DashGroup } from '~/types/group';
 
 interface DashQueue extends IQueue {
   jobCounts: {
@@ -36,14 +31,13 @@ export class DashModule {
   }
 
   public async groupDash(): Promise<DashGroup[]> {
-    const result = await this.api.$get<ApiListResponse<DashGroup[]>>('/group/dashboard/');
+    const result = await this.api.$get<DashGroup[]>('/group/dashboard');
 
-    return result.data;
+    return result;
   }
 
   public async queueDash(id: string): Promise<DashQueue> {
     const result = await this.api.$get<ApiListResponse<DashQueue>>(`/queue/${id}/dashboard`);
-
     return result.data;
   }
 }

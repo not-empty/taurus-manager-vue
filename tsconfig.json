@@ -27,8 +27,7 @@
       "@nuxt/types",
       "@types/node",
       "@nuxtjs/axios",
-      "@nuxtjs/auth-next",
-      "@pinia/nuxt"
+      "@nuxtjs/auth-next"
     ]
   },
   "exclude": [

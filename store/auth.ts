@@ -1,11 +1,18 @@
 import { GetterTree, ActionTree, MutationTree } from 'vuex'
 import { authStore } from '~/types/authStore'
+import { ISession } from '~/types/session'
 import { IUser } from '~/types/user'
 
-export const state = (): authStore => ({
-  token: "",
-  user: null
-})
+export const state = (): authStore => {
+  const session = localStorage.getItem('session')
+  if (session) {
+    return JSON.parse(session)
+  }
+  return {
+    token: "",
+    user: null
+  }
+}
 
 export type RootState = ReturnType<typeof state>
 
@@ -20,7 +27,13 @@ export const mutations: MutationTree<RootState> = {
 }
 
 export const actions: ActionTree<RootState, RootState> = {
-  setToken({ commit }) {
-    commit('CHANGE_NAME', 'Novo nome')
+  setSession({ commit }, session: ISession) {
+    localStorage.setItem('session', JSON.stringify(session));
+    commit('CHANGE_TOKEN', session.token)
+    commit('CHANGE_USER', session.user)
   },
+  removeSession({commit}) {
+    commit('CHANGE_TOKEN', "")
+    commit('CHANGE_USER', null)
+  }
 }
