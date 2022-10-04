@@ -33,6 +33,7 @@ export const actions: ActionTree<RootState, RootState> = {
     commit('CHANGE_USER', session.user)
   },
   removeSession({commit}) {
+    localStorage.removeItem('session')
     commit('CHANGE_TOKEN', "")
     commit('CHANGE_USER', null)
   }
