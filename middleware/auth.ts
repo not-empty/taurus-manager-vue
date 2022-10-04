@@ -13,7 +13,6 @@ export default function (context: Context) {
   const state = context.store.state as AuthState
   const decodedToken = decode(state.auth.token)
   if(!checkExpire(decodedToken)) {
-    console.log('token invalido')
     localStorage.removeItem('session')
     context.store.dispatch('auth/removeSession')
     context.redirect('/')
