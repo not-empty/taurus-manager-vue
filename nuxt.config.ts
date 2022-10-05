@@ -1,13 +1,8 @@
 import { NuxtConfig } from '@nuxt/types'
 
 const config: NuxtConfig = {
-  // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
-
-  // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
-
-  // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     titleTemplate: '%s - constellation-front',
     title: 'constellation-front',
@@ -24,23 +19,11 @@ const config: NuxtConfig = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
-
-  // Global CSS: https://go.nuxtjs.dev/config-css
-  css: [
-  ],
-
-  // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
-
-  // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
-    // https://go.nuxtjs.dev/typescript
     '@nuxt/typescript-build',
-    // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
-  ],  
-
-  // Modules: https://go.nuxtjs.dev/config-modules
+  ],
   modules: [
     '@nuxtjs/axios',
   ],
@@ -48,7 +31,6 @@ const config: NuxtConfig = {
   axios: {
     baseURL: process.env.BACKEND_URL,
   },
-  // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
     theme: {
@@ -66,9 +48,8 @@ const config: NuxtConfig = {
       }
     }
   },
-
-  // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    postcss: false,
   }
 }
 
