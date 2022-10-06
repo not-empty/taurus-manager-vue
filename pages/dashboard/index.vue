@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>{{logado}}</h1>
     <v-row>
       <v-col sm="12" md="12" lg="12">
         <h2>DashBoard</h2>
