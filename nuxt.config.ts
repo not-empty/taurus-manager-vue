@@ -49,7 +49,7 @@ const config: NuxtConfig = {
     }
   },
   build: {
-    postcss: false,
+    postcss: false
   }
 }
 
