@@ -6,11 +6,8 @@ export interface ApiResponse<T> {
 }
 
 export interface ApiResponsePaginated<T> {
-  data: {
-    total: number
-    queues: T
-  };
-  profiler: number;
+  total: number
+  queues: T
 }
 
 export interface ApiSessionResponse {

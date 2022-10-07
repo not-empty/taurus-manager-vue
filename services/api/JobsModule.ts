@@ -18,50 +18,50 @@ interface payloadCreateJobRetryJob {
 export class DashModule extends Module {
 
   public async createJob(id: string, payload: payloadCreateJob): Promise<boolean> {
-    const result = await this.api.$post<ApiListResponse<boolean>>(`${this.path}/${id}/job`, payload);
+    const result = await this.api.$post<boolean>(`${this.path}/${id}/job`, payload);
 
-    return result.data;
+    return result;
   }
 
   public async cloneJob(queueId: string, jobId: string): Promise<boolean> {
-    const result = await this.api.$post<ApiListResponse<boolean>>(`${this.path}/${queueId}/job/${jobId}/clone`);
+    const result = await this.api.$post<boolean>(`${this.path}/${queueId}/job/${jobId}/clone`);
 
-    return result.data;
+    return result;
   }
 
   public async retryJob(queueId: string, payload: payloadCreateJobRetryJob): Promise<boolean> {
-    const result = await this.api.$post<ApiListResponse<boolean>>(`${this.path}/${queueId}/job/retry`, payload);
+    const result = await this.api.$post<boolean>(`${this.path}/${queueId}/job/retry`, payload);
 
-    return result.data;
+    return result;
   }
 
   public async retryAllJob(queueId: string): Promise<boolean> {
-    const result = await this.api.$post<ApiListResponse<boolean>>(`${this.path}/${queueId}/job/retry-all`);
+    const result = await this.api.$post<boolean>(`${this.path}/${queueId}/job/retry-all`);
 
-    return result.data;
+    return result;
   }
 
   public async getJob(queueId: string, jobId: string): Promise<IJob> {
-    const result = await this.api.$get<ApiListResponse<IJob>>(`${this.path}/${queueId}/job/${jobId}`);
+    const result = await this.api.$get<IJob>(`${this.path}/${queueId}/job/${jobId}`);
 
-    return result.data;
+    return result;
   }
 
-  public async getJobPaginate(queueId: string, page: number, size: number, state: string) {
+  public async getJobPaginate(queueId: string, page: number, size: number, state: string): Promise<ApiResponsePaginated<IJob>> {
     const result = await this.api.$get<ApiResponsePaginated<IJob>>(`${this.path}/${queueId}/job?state=${state}&page=${page}&size=${size}`);
 
-    return result.data;
+    return result;
   }
 
   public async exportJob(queueId: string, jobId: string): Promise<IJob> {
-    const result = await this.api.$get<ApiListResponse<IJob>>(`${this.path}/${queueId}/job/${jobId}/export`);
+    const result = await this.api.$get<IJob>(`${this.path}/${queueId}/job/${jobId}/export`);
 
-    return result.data;
+    return result;
   }
 
-  public async deleteJob(queueId: string, jobsIds: Omit<payloadCreateJobRetryJob, "state">) {
-    const result = await this.api.$delete<ApiListResponse<boolean>>(`${this.path}/${queueId}/job`, { data:jobsIds });
+  public async deleteJob(queueId: string, jobsIds: Omit<payloadCreateJobRetryJob, "state">): Promise<boolean> {
+    const result = await this.api.$delete<boolean>(`${this.path}/${queueId}/job`, { data:jobsIds });
 
-    return result.data;
+    return result;
   }
 }
