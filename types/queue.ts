@@ -10,3 +10,13 @@ export interface IQueue {
   updatedAt: Date;
   deletedAt: Date;
 }
+export interface DashQueue extends IQueue {
+  jobCounts: {
+    waiting: number
+    active: number
+    completed: number
+    failed: number
+    delayed: number
+    paused: number
+  }
+}

@@ -2,20 +2,9 @@ import {
   ApiListResponse
 } from './types';
 
-import { IQueue } from '~/types/queue';
+import { DashQueue } from '~/types/queue';
 import { NuxtAxiosInstance } from '@nuxtjs/axios';
 import { DashGroup } from '~/types/group';
-
-interface DashQueue extends IQueue {
-  jobCounts: {
-    waiting: number
-    active: number
-    completed: number
-    failed: number
-    delayed: number
-    paused: number
-  }
-}
 
 export class DashModule {
   public api: NuxtAxiosInstance;

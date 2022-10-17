@@ -5,7 +5,7 @@
         <h2>DashBoard</h2>
       </v-col>
     </v-row>
-    <div v-for="group in dashboardData" :key="group.group.id">
+    <div v-for="group in dashboardData" :key="group.group.id" @click="openToPage(group.group.id)">
       <h3>{{ group.group.name }}</h3>
       <v-row>
         <v-col sm="12" md="12" lg="12">
@@ -57,5 +57,10 @@ export default Vue.extend({
   async created() {
     this.dashboardData = await this.$api.dashboard.groupDash()
   },
+  methods: {
+    openToPage(id:string) {
+      this.$router.push("/dashboard/queue/" + id);
+    }
+  }
 });
 </script>
