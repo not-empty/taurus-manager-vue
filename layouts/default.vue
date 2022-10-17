@@ -2,13 +2,38 @@
   <v-app dark>
     <v-app-bar fixed app>
       <v-toolbar-title>
-        <v-img src="horus.png" contain max-height="60px" max-width="60px"></v-img>
+        <v-img
+          src="horus.png"
+          contain
+          max-height="60px"
+          max-width="60px"
+        ></v-img>
       </v-toolbar-title>
-      <v-btn v-for="menu in menuItems" color="white" plain class="ml-1" :to="menu.url" :key="menu.title">
+      <v-btn
+        v-for="menu in menuItems"
+        color="white"
+        plain
+        class="ml-1"
+        :to="menu.url"
+        :key="menu.title"
+        :loading="loader"
+      >
         {{ menu.title }}
       </v-btn>
       <v-spacer />
-      {{ userName }}
+      <v-menu
+        ><template v-slot:activator="{ on, attrs }">
+          <v-btn color="primary" dark v-bind="attrs" v-on="on">
+            {{ userName }}
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item @click="logout">
+            <v-list-item-title>Sair</v-list-item-title>
+          </v-list-item>
+        </v-list>
+        </v-menu
+      >
     </v-app-bar>
     <v-main>
       <v-container>
@@ -38,6 +63,7 @@ export default Vue.extend({
           url: "/groups",
         },
       ],
+      loader: false,
     };
   },
   created() {
@@ -46,5 +72,13 @@ export default Vue.extend({
       this.userName = session.auth.user.name;
     }
   },
+  methods: {
+    logout() {
+      this.loader = true;
+      this.$store.dispatch("auth/removeSession").then(() => {
+        this.$router.push("/")
+      });
+    }
+  }
 });
 </script>
