@@ -59,7 +59,7 @@ export default Vue.extend({
   },
   methods: {
     openToPage(id:string) {
-      this.$router.push("/dashboard/queue/57a915c8-365c-4331-b75f-e9f5bb8a1ad0");
+      this.$router.push("/dashboard/queue/" + id);
     }
   }
 });

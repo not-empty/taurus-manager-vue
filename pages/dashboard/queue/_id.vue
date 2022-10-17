@@ -2,7 +2,10 @@
   <div>
     <v-row>
       <v-col v-if="loader" v-for="(countsLoad,keyLoad) in dashQueueData.jobCounts" :key="'load' + keyLoad" sm="6" md="12" lg="3">
-        <v-skeleton-loader height="250" type="card"></v-skeleton-loader>
+        <v-skeleton-loader 
+          height="102" 
+          type="card">
+        </v-skeleton-loader>
       </v-col>
       <template v-if="!loader">
         <v-col v-for="(counts,key) in dashQueueData.jobCounts" :key="'data' + key" sm="6" md="12" lg="3">
