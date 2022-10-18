@@ -3,7 +3,7 @@
     <v-app-bar fixed app>
       <v-toolbar-title>
         <v-img
-          src="horus.png"
+          src="/horus.png"
           contain
           max-height="60px"
           max-width="60px"
@@ -21,7 +21,7 @@
         {{ menu.title }}
       </v-btn>
       <v-spacer />
-      <v-menu
+      <v-menu offset-y
         ><template v-slot:activator="{ on, attrs }">
           <v-btn color="primary" dark v-bind="attrs" v-on="on">
             {{ userName }}
@@ -32,7 +32,7 @@
             <v-list-item-title>Sair</v-list-item-title>
           </v-list-item>
         </v-list>
-        </v-menu
+      </v-menu
       >
     </v-app-bar>
     <v-main>
