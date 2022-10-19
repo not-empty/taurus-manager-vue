@@ -10,6 +10,11 @@ export interface ApiResponsePaginated<T> {
   queues: T
 }
 
+export interface ApiGroupResponsePaginated<T> {
+  total: number
+  groups: T
+}
+
 export interface ApiResponseJobsPaginated<T> {
   total: number
   jobs: T
