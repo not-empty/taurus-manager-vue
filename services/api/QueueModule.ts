@@ -21,8 +21,8 @@ export class QueueModule extends Module {
     return result;
   }
 
-  public async getPaginated(page: number, size: number): Promise<IQueue[]> {
-    const result = await this.api.$get<IQueue[]>(`/${this.path}?page=${page}&size=${size}`);
+  public async getPaginated(page: number, size: number): Promise<ApiResponsePaginated<IQueue[]>> {
+    const result = await this.api.$get<ApiResponsePaginated<IQueue[]>>(`/${this.path}?page=${page}&size=${size}`);
 
     return result;
   }

@@ -9,17 +9,19 @@
           max-width="60px"
         ></v-img>
       </v-toolbar-title>
-      <v-btn
-        v-for="menu in menuItems"
-        color="white"
-        plain
-        class="ml-1"
-        :to="menu.url"
-        :key="menu.title"
-        :loading="loader"
-      >
-        {{ menu.title }}
-      </v-btn>
+      <template v-for="menu in menuItems">
+        <v-btn
+          v-if="hasRole(menu.permission)"
+          color="white"
+          plain
+          class="ml-1"
+          :to="menu.url"
+          :key="menu.title"
+          :loading="loader"
+        >
+          {{ menu.title }}
+        </v-btn>
+      </template>
       <v-spacer />
       <v-menu offset-y
         ><template v-slot:activator="{ on, attrs }">
@@ -32,8 +34,7 @@
             <v-list-item-title>Sair</v-list-item-title>
           </v-list-item>
         </v-list>
-      </v-menu
-      >
+      </v-menu>
     </v-app-bar>
     <v-main>
       <v-container>
@@ -58,6 +59,11 @@ export default Vue.extend({
           title: "Dashboard",
           url: "/dashboard",
         },
+        {
+          title: "Filas",
+          url: "/queue",
+          permission: "administrator",
+        },
       ],
       loader: false,
     };
@@ -72,9 +78,19 @@ export default Vue.extend({
     logout() {
       this.loader = true;
       this.$store.dispatch("auth/removeSession").then(() => {
-        this.$router.push("/")
+        this.$router.push("/");
       });
-    }
-  }
+    },
+    hasRole(role: string) {
+      const session = this.$store.state as { auth: authStore };
+      if(session.auth.user?.role == role) {
+        return true;
+      }
+      if(!role) {
+        return true;
+      }
+      return false;
+    },
+  },
 });
 </script>
