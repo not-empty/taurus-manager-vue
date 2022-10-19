@@ -11,8 +11,8 @@ interface PayloadWithId<T> {
 }
 
 export class EntityModule<T> extends Module {
-  public async get(): Promise<T> {
-    const result = await this.api.$get<T>(`/${this.path}/`);
+  public async get(): Promise<T[]> {
+    const result = await this.api.$get<T[]>(`/${this.path}/`);
 
     return result;
   }
