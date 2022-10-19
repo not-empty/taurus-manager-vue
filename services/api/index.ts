@@ -5,6 +5,7 @@ import { IUser } from '../../types/user';
 import { IGroup } from '../../types/group';
 import { QueueModule } from "./QueueModule";
 import { DashModule } from "./DashModule";
+import { JobsModule } from "./JobsModule";
 
 export class Api{
   private client: NuxtAxiosInstance
@@ -14,6 +15,7 @@ export class Api{
   public queue: QueueModule
   public session: SessionModule
   public dashboard: DashModule
+  public jobs: JobsModule
 
   constructor($axios: NuxtAxiosInstance) {
     this.client = $axios
@@ -23,6 +25,7 @@ export class Api{
     this.queue = this.getQueues();
     this.dashboard = this.getDash();
     this.session = this.getSession();
+    this.jobs = this.getJobs();
   }
 
   private getEntity<T>(path: string): EntityModule<T> {
@@ -39,5 +42,9 @@ export class Api{
 
   private getDash(): DashModule {
     return new DashModule(this.client)
+  }
+
+  private getJobs(): JobsModule {
+    return new JobsModule(this.client, 'queue')
   }
 }

@@ -58,10 +58,6 @@ export default Vue.extend({
           title: "Dashboard",
           url: "/dashboard",
         },
-        {
-          title: "Groups",
-          url: "/groups",
-        },
       ],
       loader: false,
     };
