@@ -4,6 +4,13 @@ import {
   ApiUsersResponsePaginated
 } from './types';
 
+interface userPayload {
+  name: string,
+  email: string,
+  role?: string,
+  password?: string
+}
+
 export class UserModule extends Module {
   public async getPaginated(page: number, size: number): Promise<ApiUsersResponsePaginated<IUser[]>> {
     const result = await this.api.$get<ApiUsersResponsePaginated<IUser[]>>(`/user?page=${page}&size=${size}`);
@@ -17,7 +24,18 @@ export class UserModule extends Module {
     return result;
   }
 
+
   public async post(payload: Omit<IUser, 'id'>): Promise<IUser> {
+    const UserData: userPayload = {
+      name: payload.name,
+      email: payload.email,
+    }
+    if(payload.password) {
+      UserData.password = payload.password
+    }
+    if(payload.role) {
+      UserData.role = payload.role
+    }
     const result = await this.api.$post<IUser>(`/user/`, payload);
 
     return result;
