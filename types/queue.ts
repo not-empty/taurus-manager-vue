@@ -11,6 +11,7 @@ export interface IQueue {
   deletedAt: Date;
 }
 export interface DashQueue extends IQueue {
+  status: string
   jobCounts: {
     waiting: number
     active: number

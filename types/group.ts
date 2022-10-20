@@ -1,4 +1,4 @@
-import { IQueue } from "./queue";
+import { DashQueue } from "./queue";
 
 export interface IGroup {
   id: string;
@@ -11,5 +11,5 @@ export interface IGroup {
 
 export interface DashGroup {
   group: IGroup 
-  queues: IQueue[];
+  queues: DashQueue[];
 }

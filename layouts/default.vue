@@ -81,7 +81,7 @@ export default Vue.extend({
         this.$router.push("/");
       });
     },
-    hasRole(role: string) {
+    hasRole(role: string | undefined) {
       const session = this.$store.state as { auth: authStore };
       if(session.auth.user?.role == role) {
         return true;
