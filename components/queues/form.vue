@@ -55,7 +55,7 @@ import { IQueue, QueuePayload } from "~/types/queue";
 export default defineComponent({
   name: "QueueForm",
   props: {
-    queue: {} as PropType<IQueue>,
+    queue: {} as PropType<IQueue | null>,
   },
   data() {
     return {
@@ -67,6 +67,9 @@ export default defineComponent({
   },
   created() {
     this.getGroups(1)
+    if (this.queue) {
+      this.queueData = JSON.parse(JSON.stringify(this.queue))
+    }
   },
   methods: {
     closeDialog() {
@@ -79,6 +82,22 @@ export default defineComponent({
       })
     },
     submitForm() {
+      if (this.queue) {
+        this.$api.queue.edit(this.queue.id, this.queueData).then(() => {
+          this.queueData = {
+            compliance: "",
+            description: "",
+            groupId: "",
+            host: "",
+            name: "",
+            port: "",
+          }
+          this.closeDialog()
+        })
+
+        return
+      }
+
       this.$api.queue.create(this.queueData).then(() => {
         this.queueData = {
           compliance: "",
@@ -90,7 +109,6 @@ export default defineComponent({
         }
         this.closeDialog()
       })
-
     }
   }
 });
