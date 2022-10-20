@@ -16,6 +16,7 @@
                   <th class="text-left">Name</th>
                   <th class="text-left">Email</th>
                   <th class="text-left">Role</th>
+                  <th class="text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -23,6 +24,10 @@
                   <td>{{ item.name }}</td>
                   <td>{{ item.email }}</td>
                   <td>{{ item.role }}</td>
+                  <td>
+                      <v-icon class="mr-4" @click="editUser(item)">mdi-pencil</v-icon>
+                      <v-icon @click="deleteUser(item)">mdi-delete</v-icon>
+                    </td>
                 </tr>
               </tbody>
             </template>
@@ -53,11 +58,24 @@ export default Vue.extend({
       edit: {} as IUser | null
     };
   },
-  async created() {
-    this.$api.user.getPaginated(1, 25)
-      .then(response => this.users = response.users);
+  created() {
+    this.getUsers()
   },
-  methods: {},
+  methods: {
+    getUsers() {
+      this.$api.user.getPaginated(1, 25)
+      .then(response => this.users = response.users);
+    },
+    editUser(user: IUser) {
+      this.edit = user
+      this.dialog = true
+    },
+    deleteUser(user: IUser) {
+      this.$api.user.deleteById(user.id).then(() => {
+        this.getUsers()
+      })
+    },
+  },
 });
 </script>
   

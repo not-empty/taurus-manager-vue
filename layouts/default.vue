@@ -69,6 +69,11 @@ export default Vue.extend({
           url: "/groups",
           permission: "administrator",
         },
+        {
+          title: "Usuarios",
+          url: "/users",
+          permission: "administrator",
+        },
       ],
       loader: false,
     };
