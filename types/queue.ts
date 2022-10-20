@@ -1,3 +1,5 @@
+import { IGroup } from "./group";
+
 export interface IQueue {
   id: string;
   name: string;
@@ -6,6 +8,7 @@ export interface IQueue {
   host: string;
   port: number;
   groupId: string;
+  group: IGroup;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;

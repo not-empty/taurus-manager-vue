@@ -6,28 +6,39 @@
       </v-col>
     </v-row>
 
-    <v-card v-for="queue in queues" :key="queue.id" class="mb-5">
+    <v-card class="mb-5">
       <v-container>
         <v-row>
-          <v-col sm="12" md="6" lg="3">
-            <span>Name:</span>
-            <v-text-field readonly outlined v-model="queue.name"></v-text-field>
-          </v-col>
-          <v-col sm="12" md="6" lg="3">
-            <span>Host:</span>
-            <v-text-field readonly outlined v-model="queue.host"></v-text-field>
-          </v-col>
-          <v-col sm="12" md="6" lg="3">
-            <span>Port:</span>
-            <v-text-field readonly outlined v-model="queue.port"></v-text-field>
-          </v-col>
-          <v-col sm="12" md="6" lg="3">
-            <span>Description:</span>
-            <v-text-field readonly outlined v-model="queue.description"></v-text-field>
-          </v-col>
-          <v-col sm="12" md="6" lg="3">
-            <span>Compliance:</span>
-            <v-text-field readonly outlined v-model="queue.compliance"></v-text-field>
+          <v-col sm="12" md="12" lg="12">
+            <v-simple-table>
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left">Name</th>
+                    <th class="text-left">Host</th>
+                    <th class="text-left">Port</th>
+                    <th class="text-left">Group</th>
+                    <th class="text-left">Description</th>
+                    <th class="text-left">Compliance</th>
+                    <th class="text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="queue in queues" :key="queue.id">
+                    <td>{{ queue.name }}</td>
+                    <td>{{ queue.host }}</td>
+                    <td>{{ queue.port }}</td>
+                    <td>{{ queue.group.name }}</td>
+                    <td>{{ queue.description }}</td>
+                    <td>{{ queue.compliance }}</td>
+                    <td>
+                      <v-icon class="mr-4" @click="editQueue(queue)">mdi-pencil</v-icon>
+                      <v-icon @click="deleteQueue(queue)">mdi-delete</v-icon>
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
           </v-col>
         </v-row>
       </v-container>
@@ -38,7 +49,7 @@
           Nova Fila
         </v-btn>
       </template>
-      <QueueForm @close="dialog=false"></QueueForm>
+      <QueueForm @close="close()" :queue="edit"></QueueForm>
     </v-dialog>
   </div>
 
@@ -57,12 +68,31 @@ export default Vue.extend({
       logado: "",
       queues: [] as IQueue[],
       dialog: false,
+      edit: {} as IQueue | null,
     };
   },
   async created() {
-    let queues = await this.$api.queue.getPaginated(1, 20);
-    this.queues = queues.queues;
+    this.getQueues()
   },
-  methods: {},
+  methods: {
+    editQueue(queue: IQueue) {
+      this.edit = queue
+      this.dialog = true
+    },
+    close() {
+      this.edit = null
+      this.dialog = false
+    },
+    deleteQueue(queue: IQueue) {
+      this.$api.queue.delete(queue.id).then(() => {
+        this.getQueues()
+      })
+    },
+    getQueues() {
+      this.$api.queue.getPaginated(1, 20).then((response) => {
+        this.queues = response.queues
+      })
+    }
+  },
 });
 </script>
