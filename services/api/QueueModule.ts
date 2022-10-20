@@ -3,16 +3,7 @@ import {
   ApiResponse,
   ApiResponsePaginated
 } from './types';
-import { IQueue } from '~/types/queue';
-
-interface QueuePayload {
-  name: string
-  host: string
-  port: string
-  groupId: string
-  description: string
-  compliance: string | null
-}
+import { IQueue, QueuePayload } from '~/types/queue';
 
 export class QueueModule extends Module {
   public async create(payload: QueuePayload): Promise<IQueue> {

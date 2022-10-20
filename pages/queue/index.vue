@@ -2,7 +2,7 @@
   <div>
     <v-row>
       <v-col sm="12" md="12" lg="12">
-        <h2>Filas</h2>
+        <h2 class="mb-4">Filas</h2>
       </v-col>
     </v-row>
 
@@ -23,36 +23,40 @@
           </v-col>
           <v-col sm="12" md="6" lg="3">
             <span>Description:</span>
-            <v-text-field
-              readonly
-              outlined
-              v-model="queue.description"
-            ></v-text-field>
+            <v-text-field readonly outlined v-model="queue.description"></v-text-field>
           </v-col>
           <v-col sm="12" md="6" lg="3">
             <span>Compliance:</span>
-            <v-text-field
-              readonly
-              outlined
-              v-model="queue.compliance"
-            ></v-text-field>
+            <v-text-field readonly outlined v-model="queue.compliance"></v-text-field>
           </v-col>
         </v-row>
       </v-container>
     </v-card>
+    <v-dialog v-model="dialog" persistent max-width="600px">
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn color="primary" dark v-bind="attrs" v-on="on">
+          Nova Fila
+        </v-btn>
+      </template>
+      <QueueForm @close="dialog=false"></QueueForm>
+    </v-dialog>
   </div>
+
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { IQueue } from "~/types/queue";
+import QueueForm from "~/components/queues/form.vue"
 export default Vue.extend({
   middleware: "auth",
   name: "IndexPage",
+  components: { QueueForm },
   data() {
     return {
       logado: "",
       queues: [] as IQueue[],
+      dialog: false,
     };
   },
   async created() {
