@@ -43,12 +43,10 @@
         </v-row>
       </v-container>
     </v-card>
-    <v-dialog v-model="dialog" persistent max-width="600px">
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn color="primary" dark v-bind="attrs" v-on="on">
-          Nova Fila
-        </v-btn>
-      </template>
+    <v-btn color="primary" dark @click="dialog = true">
+      Nova Fila
+    </v-btn>
+    <v-dialog v-model="dialog" persistent max-width="600px" v-if="dialog">
       <QueueForm @close="close()" :queue="edit"></QueueForm>
     </v-dialog>
   </div>

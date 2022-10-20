@@ -65,7 +65,7 @@ export default defineComponent({
       valid: true,
     };
   },
-  created() {
+  mounted() {
     this.getGroups(1)
     if (this.queue) {
       this.queueData = JSON.parse(JSON.stringify(this.queue))
@@ -73,6 +73,14 @@ export default defineComponent({
   },
   methods: {
     closeDialog() {
+      this.queueData = {
+        compliance: "",
+        description: "",
+        groupId: "",
+        host: "",
+        name: "",
+        port: "",
+      }
       this.$emit("close")
     },
     getGroups(page: number) {
@@ -84,14 +92,6 @@ export default defineComponent({
     submitForm() {
       if (this.queue) {
         this.$api.queue.edit(this.queue.id, this.queueData).then(() => {
-          this.queueData = {
-            compliance: "",
-            description: "",
-            groupId: "",
-            host: "",
-            name: "",
-            port: "",
-          }
           this.closeDialog()
         })
 
@@ -99,14 +99,6 @@ export default defineComponent({
       }
 
       this.$api.queue.create(this.queueData).then(() => {
-        this.queueData = {
-          compliance: "",
-          description: "",
-          groupId: "",
-          host: "",
-          name: "",
-          port: "",
-        }
         this.closeDialog()
       })
     }
