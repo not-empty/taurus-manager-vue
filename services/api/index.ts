@@ -1,5 +1,5 @@
 import { NuxtAxiosInstance } from "@nuxtjs/axios";
-import { EntityModule } from './EntityModule';
+import { UserModule } from './UserModule';
 import { SessionModule } from './SessionModule';
 import { IUser } from '../../types/user';
 import { IGroup } from '../../types/group';
@@ -11,7 +11,7 @@ import { GroupModule } from "./GroupModule";
 export class Api{
   private client: NuxtAxiosInstance;
   public token: string | null;
-  public user: EntityModule<IUser>;
+  public user: UserModule;
   public group: GroupModule;
   public queue: QueueModule;
   public session: SessionModule;
@@ -21,7 +21,7 @@ export class Api{
   constructor($axios: NuxtAxiosInstance) {
     this.client = $axios
     this.token = null;
-    this.user = this.getEntity('user');
+    this.user = this.getUser();
     this.group = this.getGroups();
     this.queue = this.getQueues();
     this.dashboard = this.getDash();
@@ -29,8 +29,8 @@ export class Api{
     this.jobs = this.getJobs();
   }
 
-  private getEntity<T>(path: string): EntityModule<T> {
-    return new EntityModule<T>(this.client, path);
+  private getUser(): UserModule {
+    return new UserModule(this.client, 'user');
   }
 
   private getSession(): SessionModule {

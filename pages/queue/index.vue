@@ -1,10 +1,11 @@
 <template>
   <div>
-    <v-row>
-      <v-col sm="12" md="12" lg="12">
-        <h2 class="mb-4">Filas</h2>
-      </v-col>
-    </v-row>
+    <div class="d-flex justify-space-between">
+      <h2 class="mb-4">Filas</h2>
+      <v-btn color="primary" dark @click="dialog = true">
+        Nova Fila
+      </v-btn>
+    </div>
 
     <v-card class="mb-5">
       <v-container>
@@ -43,9 +44,6 @@
         </v-row>
       </v-container>
     </v-card>
-    <v-btn color="primary" dark @click="dialog = true">
-      Nova Fila
-    </v-btn>
     <v-dialog v-model="dialog" persistent max-width="600px" v-if="dialog">
       <QueueForm @close="close()" :queue="edit"></QueueForm>
     </v-dialog>

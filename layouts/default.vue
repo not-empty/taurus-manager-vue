@@ -64,6 +64,11 @@ export default Vue.extend({
           url: "/queue",
           permission: "administrator",
         },
+        {
+          title: "Grupos",
+          url: "/groups",
+          permission: "administrator",
+        },
       ],
       loader: false,
     };

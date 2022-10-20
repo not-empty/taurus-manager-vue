@@ -15,6 +15,11 @@ export interface ApiGroupResponsePaginated<T> {
   groups: T
 }
 
+export interface ApiUsersResponsePaginated<T> {
+  total: number
+  users: T
+}
+
 export interface ApiResponseJobsPaginated<T> {
   total: number
   jobs: T

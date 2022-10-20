@@ -2,7 +2,7 @@
   <div>
     <v-row>
       <v-col sm="12" md="12" lg="12">
-        <h2>Groups</h2>
+        <h2>Grupos</h2>
       </v-col>
     </v-row>
     <div>

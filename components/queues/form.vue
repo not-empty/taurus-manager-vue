@@ -67,7 +67,7 @@ export default defineComponent({
   },
   mounted() {
     this.getGroups(1)
-    if (this.queue) {
+    if (this.queue && this.queue.id) {
       this.queueData = JSON.parse(JSON.stringify(this.queue))
     }
   },
@@ -90,7 +90,7 @@ export default defineComponent({
       })
     },
     submitForm() {
-      if (this.queue) {
+      if (this.queue && this.queue.id) {
         this.$api.queue.edit(this.queue.id, this.queueData).then(() => {
           this.closeDialog()
         })
