@@ -6,7 +6,7 @@
       </v-col>
     </v-row>
     <div v-for="group in dashboardData" :key="group.group.id" @click="openToPage(group.group.id)">
-      <h3>{{ group.group.name }}</h3>
+      <h3 class="my-4" >{{ group.group.name }}</h3>
       <v-row>
         <v-col sm="12" md="12" lg="12">
           <v-simple-table>

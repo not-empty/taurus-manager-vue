@@ -21,3 +21,12 @@ export interface DashQueue extends IQueue {
     paused: number
   }
 }
+
+export interface QueuePayload {
+  name: string
+  host: string
+  port: string
+  groupId: string
+  description: string
+  compliance: string | null
+}
