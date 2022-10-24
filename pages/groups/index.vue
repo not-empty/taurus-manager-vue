@@ -10,6 +10,16 @@
     <v-card class="mb-5">
       <v-container>
         <v-row>
+          <v-col sm="11" class="my-auto">
+            <div class="d-flex justify-start align-center">
+              <v-pagination v-model="page" :length="lenght"></v-pagination>
+            </div>
+          </v-col>
+          <v-col sm="1" class="my-auto">
+            <v-select class="" :items="items" label="items" hide-details v-model="pageLenght" filled></v-select>
+          </v-col>
+        </v-row>
+        <v-row>
           <v-col sm="12" md="12" lg="12">
             <v-simple-table>
               <template v-slot:default>
@@ -34,6 +44,16 @@
             </v-simple-table>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col sm="11" class="my-auto">
+            <div class="d-flex justify-start align-center">
+              <v-pagination v-model="page" :length="lenght"></v-pagination>
+            </div>
+          </v-col>
+          <v-col sm="1" class="my-auto">
+            <v-select class="" :items="items" label="items" hide-details v-model="pageLenght" filled></v-select>
+          </v-col>
+        </v-row>
       </v-container>
     </v-card>
     <v-dialog v-model="dialog" persistent max-width="600px" v-if="dialog">
@@ -55,6 +75,10 @@ export default Vue.extend({
       groups: [] as IGroup[],
       dialog: false,
       edit: {} as IGroup | null,
+      page: 1,
+      lenght: 1,
+      pageLenght: 20,
+      items: [20, 100, 500, 1000],
     };
   },
   async created() {
@@ -76,10 +100,19 @@ export default Vue.extend({
       })
     },
     getGroups() {
-      this.$api.group.getPaginated(1, 20).then((response) => {
+      this.$api.group.getPaginated(this.page, this.pageLenght).then((response) => {
         this.groups = response.groups
+        this.lenght = response.total
       })
     }
+  },
+  watch: {
+    "page": function () {
+      this.getGroups()
+    },
+    "pageLenght": function () {
+      this.getGroups()
+    },
   },
 });
 </script>

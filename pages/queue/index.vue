@@ -10,6 +10,16 @@
     <v-card class="mb-5">
       <v-container>
         <v-row>
+          <v-col sm="11" class="my-auto">
+            <div class="d-flex justify-start align-center">
+              <v-pagination v-model="page" :length="lenght"></v-pagination>
+            </div>
+          </v-col>
+          <v-col sm="1" class="my-auto">
+            <v-select class="" :items="items" label="items" hide-details v-model="pageLenght" filled></v-select>
+          </v-col>
+        </v-row>
+        <v-row>
           <v-col sm="12" md="12" lg="12">
             <v-simple-table>
               <template v-slot:default>
@@ -42,6 +52,16 @@
             </v-simple-table>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col sm="11" class="my-auto">
+            <div class="d-flex justify-start align-center">
+              <v-pagination v-model="page" :length="lenght"></v-pagination>
+            </div>
+          </v-col>
+          <v-col sm="1" class="my-auto">
+            <v-select class="" :items="items" label="items" hide-details v-model="pageLenght" filled></v-select>
+          </v-col>
+        </v-row>
       </v-container>
     </v-card>
     <v-dialog v-model="dialog" persistent max-width="600px" v-if="dialog">
@@ -64,6 +84,10 @@ export default Vue.extend({
       queues: [] as IQueue[],
       dialog: false,
       edit: {} as IQueue | null,
+      page: 1,
+      lenght: 1,
+      pageLenght: 20,
+      items: [20, 100, 500, 1000],
     };
   },
   async created() {
@@ -84,10 +108,19 @@ export default Vue.extend({
       })
     },
     getQueues() {
-      this.$api.queue.getPaginated(1, 20).then((response) => {
+      this.$api.queue.getPaginated(this.page, this.pageLenght).then((response) => {
         this.queues = response.queues
+        this.lenght = response.total
       })
     }
+  },
+  watch: {
+    "page": function () {
+      this.getQueues()
+    },
+    "pageLenght": function() {
+      this.getQueues()
+    },
   },
 });
 </script>
