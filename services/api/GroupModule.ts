@@ -2,19 +2,11 @@ import { Module } from './modules';
 import {
   ApiGroupResponsePaginated
 } from './types';
-import { IGroup } from '~/types/group';
+import { GroupPayload, IGroup } from '~/types/group';
 
-interface QueuePayload {
-  name: string
-  host: string
-  port: string
-  groupId: string
-  description: string
-  compliance: string | null
-}
 
 export class GroupModule extends Module {
-  public async create(payload: QueuePayload): Promise<IGroup> {
+  public async create(payload: GroupPayload): Promise<IGroup> {
     const result = await this.api.$post<IGroup>(`/${this.path}`, payload);
 
     return result;
@@ -38,7 +30,7 @@ export class GroupModule extends Module {
     return result;
   }
 
-  public async edit(id: string, payload: QueuePayload): Promise<IGroup> {
+  public async edit(id: string, payload: GroupPayload): Promise<IGroup> {
     const result = await this.api.$put<IGroup>(`/${this.path}/${id}`, payload);
 
     return result;

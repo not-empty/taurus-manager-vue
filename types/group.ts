@@ -9,6 +9,11 @@ export interface IGroup {
   deletedAt: Date;
 }
 
+export interface GroupPayload {
+  name: string;
+  description: string;
+}
+
 export interface DashGroup {
   group: IGroup 
   queues: DashQueue[];

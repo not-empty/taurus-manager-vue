@@ -61,7 +61,6 @@ export default Vue.extend({
   components: { QueueForm },
   data() {
     return {
-      logado: "",
       queues: [] as IQueue[],
       dialog: false,
       edit: {} as IQueue | null,
