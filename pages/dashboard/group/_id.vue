@@ -1,12 +1,16 @@
 <template>
   <div>
+    <v-breadcrumbs
+      :items="items"
+      divider="/"
+    ></v-breadcrumbs>
     <v-row>
       <v-col sm="12" md="12" lg="12">
         <h2>DashBoard</h2>
       </v-col>
     </v-row>
-    <div v-for="group in dashboardData" :key="group.group.id">
-      <h3 class="my-4" @click="openGroup(group.group.id)">{{ group.group.name }}</h3>
+    <div v-if="dashboardData.group">
+      <h3 class="my-4" >{{ dashboardData.group.name }}</h3>
       <v-row>
         <v-col sm="12" md="12" lg="12">
           <v-simple-table>
@@ -23,7 +27,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in group.queues" :key="item.id" @click="openQueue(item.id)">
+                <tr v-for="item in dashboardData.queues" :key="item.id">
                   <td>{{ item.name }}</td>
                   <td>{{ item.status }}</td>
                   <td>{{ item.jobCounts.waiting }}</td>
@@ -50,19 +54,31 @@ export default Vue.extend({
   data() {
     return {
       logado: '',
-      dashboardData: [] as DashGroup[]
-      ,
+      dashboardData: {} as DashGroup,
+      items: [
+        {
+          text: 'Dashboard',
+          disabled: false,
+          href: '/dashboard',
+        },
+        {
+          text: '',
+          disabled: false,
+          href: '',
+        },
+      ],
     };
   },
-  async created() {
-    this.dashboardData = await this.$api.dashboard.groupDash()
+  created() {
+    this.$api.dashboard.groupDashById(this.$route.params.id).then(((res) => {
+      this.dashboardData = res
+      this.items[1].text = res.group.name
+      this.items[1].href = '/dashboard/group/'+res.group.id
+    }))
   },
   methods: {
-    openQueue(id:string) {
+    openToPage(id:string) {
       this.$router.push("/dashboard/queue/" + id);
-    },
-    openGroup(id: string) {
-      this.$router.push("/dashboard/group/" + id);
     }
   }
 });

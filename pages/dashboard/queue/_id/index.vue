@@ -1,5 +1,9 @@
 <template lang="">
   <div>
+    <v-breadcrumbs
+      :items="items"
+      divider="/"
+    ></v-breadcrumbs>
     <div v-if="!loader">
       <!-- <h2  class="my-4">{{dashQueueData.name}}</h2> -->
         <v-simple-table>
@@ -55,9 +59,32 @@ export default Vue.extend({
       loader: true,
       state: "running",
       jobs: [] as IJob[],
+      items: [
+        {
+          text: 'Dashboard',
+          disabled: false,
+          href: '/dashboard',
+        },
+        {
+          text: '',
+          disabled: false,
+          href: '',
+        },
+        {
+          text: '',
+          disabled: true,
+          href: '',
+        },
+      ],
     };
   },
   created() {
+    this.$api.queue.getById(this.$route.params.id).then((res) => {
+      this.items[1].text = res.groupId
+      this.items[1].href = '/dashboard/group/'+res.groupId
+      this.items[2].text = res.name
+      this.items[2].disabled = true
+    })
     this.$api.jobs
       .getJobPaginate(this.$route.params.id, 1, 25, this.state)
       .then((res) => {
