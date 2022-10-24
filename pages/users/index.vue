@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex justify-space-between">
       <h2 class="mb-4">User</h2>
-      <v-btn color="primary" dark @click="dialog = true">
+      <v-btn color="primary" dark @click="newUser()">
         Novo Usuário
       </v-btn>
     </div>
@@ -65,6 +65,15 @@ export default Vue.extend({
     getUsers() {
       this.$api.user.getPaginated(1, 25)
       .then(response => this.users = response.users);
+    },
+    newUser() {
+      this.edit = {
+        id: "",
+        name: "",
+        email: "",
+        role: ""
+      }
+      this.dialog = true;
     },
     editUser(user: IUser) {
       this.edit = user
