@@ -4,8 +4,8 @@ const config: NuxtConfig = {
   ssr: false,
   target: 'static',
   head: {
-    titleTemplate: '%s - constellation-front',
-    title: 'constellation-front',
+    titleTemplate: '%s - Queue controller',
+    title: 'Horus',
     htmlAttrs: {
       lang: 'en'
     },
