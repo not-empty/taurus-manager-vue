@@ -110,7 +110,8 @@ export default Vue.extend({
     getQueues() {
       this.$api.queue.getPaginated(this.page, this.pageLenght).then((response) => {
         this.queues = response.queues
-        this.lenght = response.total
+        let pages = response.total / this.pageLenght
+        this.lenght = Math.ceil(pages)
       })
     }
   },

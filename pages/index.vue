@@ -3,7 +3,7 @@
     <v-row justify="center" align="center">
       <v-col lg="6">
         <form>
-          <v-text-field v-model="sessionPayload.email" label="E-mail" required outlined >
+          <v-text-field v-model="sessionPayload.email" label="E-mail" required outlined>
           </v-text-field>
 
           <v-text-field

@@ -102,7 +102,8 @@ export default Vue.extend({
     getGroups() {
       this.$api.group.getPaginated(this.page, this.pageLenght).then((response) => {
         this.groups = response.groups
-        this.lenght = response.total
+        let pages = response.total / this.pageLenght
+        this.lenght = Math.ceil(pages)
       })
     }
   },
