@@ -41,12 +41,12 @@
       </div>
     </template>
     <div v-else>
-      <v-sheet v-for="group in dashboardData" class="rounded my-4">
+      <v-sheet v-for="group in dashboardData" class="rounded my-4" :key="group.group.id">
         <v-toolbar flat class="pointer" @click="openGroup(group.group.id)">
           <v-toolbar-title>{{ group.group.name }}</v-toolbar-title>
         </v-toolbar>
         <v-divider></v-divider>
-        <v-sheet v-for="queue in group.queues">
+        <v-sheet v-for="queue in group.queues" :key="queue.id">
           <v-toolbar flat class="pointer" @click="openQueue(queue.id)">
             <v-toolbar-title>{{ queue.name }}</v-toolbar-title>
             <v-chip outlined class="pointer ml-4" color="green">
