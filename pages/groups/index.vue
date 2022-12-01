@@ -1,61 +1,26 @@
 <template>
   <div>
-    <div class="d-flex justify-space-between">
-      <h2 class="mb-4">Grupos</h2>
-      <v-btn color="primary" dark @click="dialog = true">
-        Novo grupo
-      </v-btn>
-    </div>
+    <v-data-table
+      :headers="groupHeaders"
+      :items="groups"
+      sort-by="name"
+      class="rounded my-4"
+    >
+      <template v-slot:top>
+        <v-toolbar flat>
+          <v-toolbar-title>Grupos</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" dark @click="dialog = true">
+            Novo grupo
+          </v-btn>
+        </v-toolbar>
+      </template>
+      <template v-slot:item.actions="{ item }">
+        <v-icon class="mr-4" @click="editGroups(item)">mdi-pencil</v-icon>
+        <v-icon @click="deleteGroups(item)">mdi-delete</v-icon>
+      </template>
+    </v-data-table>
 
-    <v-card class="mb-5">
-      <v-container>
-        <v-row>
-          <v-col sm="11" class="my-auto">
-            <div class="d-flex justify-start align-center">
-              <v-pagination v-model="page" :length="lenght"></v-pagination>
-            </div>
-          </v-col>
-          <v-col sm="1" class="my-auto">
-            <v-select class="" :items="items" label="items" hide-details v-model="pageLenght" filled></v-select>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col sm="12" md="12" lg="12">
-            <v-simple-table>
-              <template v-slot:default>
-                <thead>
-                  <tr>
-                    <th class="text-left">Name</th>
-                    <th class="text-left">Description</th>
-                    <th class="text-left">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="item in groups" :key="item.id">
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.description }}</td>
-                    <td>
-                      <v-icon class="mr-4" @click="editGroups(item)">mdi-pencil</v-icon>
-                      <v-icon @click="deleteGroups(item)">mdi-delete</v-icon>
-                    </td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col sm="11" class="my-auto">
-            <div class="d-flex justify-start align-center">
-              <v-pagination v-model="page" :length="lenght"></v-pagination>
-            </div>
-          </v-col>
-          <v-col sm="1" class="my-auto">
-            <v-select class="" :items="items" label="items" hide-details v-model="pageLenght" filled></v-select>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card>
     <v-dialog v-model="dialog" persistent max-width="600px" v-if="dialog">
       <GroupForm @close="close()" :group="edit"></GroupForm>
     </v-dialog>
@@ -73,6 +38,22 @@ export default Vue.extend({
   data() {
     return {
       groups: [] as IGroup[],
+      groupHeaders: [
+        {
+          text: "Name",
+          value: "name",
+        },
+        {
+          text: "Description",
+          value: "description",
+        },
+        {
+          text: "Actions",
+          value: "actions",
+          align: "end",
+          sortable: false,
+        },
+      ],
       dialog: false,
       edit: {} as IGroup | null,
       page: 1,

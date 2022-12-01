@@ -1,40 +1,26 @@
 <template>
   <div>
-    <div class="d-flex justify-space-between">
-      <h2 class="mb-4">User</h2>
-      <v-btn color="primary" dark @click="newUser()">
-        Novo Usuário
-      </v-btn>
-    </div>
-    <div>
-      <v-row>
-        <v-col sm="12" md="12" lg="12">
-          <v-simple-table v-if="users">
-            <template v-slot:default>
-              <thead>
-                <tr>
-                  <th class="text-left">Name</th>
-                  <th class="text-left">Email</th>
-                  <th class="text-left">Role</th>
-                  <th class="text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in users" :key="item.id">
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.email }}</td>
-                  <td>{{ item.role }}</td>
-                  <td>
-                      <v-icon class="mr-4" @click="editUser(item)">mdi-pencil</v-icon>
-                      <v-icon @click="deleteUser(item)">mdi-delete</v-icon>
-                    </td>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
-        </v-col>
-      </v-row>
-    </div>
+    <v-data-table
+      :headers="userHeaders"
+      :items="users"
+      sort-by="name"
+      class="rounded my-4"
+    >
+      <template v-slot:top>
+        <v-toolbar flat>
+          <v-toolbar-title>Users</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" dark @click="newUser()">
+            Novo Usuário
+          </v-btn>
+        </v-toolbar>
+      </template>
+      <template v-slot:item.actions="{ item }">
+        <v-icon class="mr-4" @click="editUser(item)">mdi-pencil</v-icon>
+        <v-icon @click="deleteUser(item)">mdi-delete</v-icon>
+      </template>
+    </v-data-table>
+
     <v-dialog v-model="dialog" persistent max-width="600px" v-if="dialog">
       <UsersFrom @close="dialog = false" :user="edit"></UsersFrom>
     </v-dialog>
@@ -54,6 +40,26 @@ export default Vue.extend({
   data() {
     return {
       users: [] as IUser[],
+      userHeaders: [
+        {
+          text: "Name",
+          value: "name",
+        },
+        {
+          text: "Email",
+          value: "email",
+        },
+        {
+          text: "Role",
+          value: "role",
+        },
+        {
+          text: "Actions",
+          value: "actions",
+          align: "end",
+          sortable: false,
+        },
+      ],
       dialog: false,
       edit: {} as IUser | null
     };
