@@ -10,37 +10,30 @@
       </v-col>
     </v-row>
     <div v-if="dashboardData.group">
-      <h3 class="my-4" >{{ dashboardData.group.name }}</h3>
-      <v-row>
-        <v-col sm="12" md="12" lg="12">
-          <v-simple-table>
-            <template v-slot:default>
-              <thead>
-                <tr>
-                  <th class="text-left">Name</th>
-                  <th class="text-left">Status</th>
-                  <th class="text-left">Waiting</th>
-                  <th class="text-left">Paused</th>
-                  <th class="text-left">Active</th>
-                  <th class="text-left">Delayed</th>
-                  <th class="text-left">Failed</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in dashboardData.queues" :key="item.id">
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.status }}</td>
-                  <td>{{ item.jobCounts.waiting }}</td>
-                  <td>{{ item.jobCounts.paused }}</td>
-                  <td>{{ item.jobCounts.active }}</td>
-                  <td>{{ item.jobCounts.delayed }}</td>
-                  <td>{{ item.jobCounts.failed }}</td>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
-        </v-col>
-      </v-row>
+      <v-data-table
+        hide-default-footer
+        :headers="queuesHeaders"
+        :items="dashboardData.queues"
+        sort-by="createAt"
+        class="rounded my-4"
+      >
+        <template v-slot:top>
+          <v-toolbar flat>
+            <v-toolbar-title>{{ dashboardData.group.name }}</v-toolbar-title>
+          </v-toolbar>
+        </template>
+        <template v-slot:item="{ item }">
+            <tr class="pointer">
+              <td>{{ item.name }}</td>
+              <td>{{ item.status }}</td>
+              <td>{{ item.jobCounts.waiting }}</td>
+              <td>{{ item.jobCounts.paused }}</td>
+              <td>{{ item.jobCounts.active }}</td>
+              <td>{{ item.jobCounts.delayed }}</td>
+              <td>{{ item.jobCounts.failed }}</td>
+            </tr>
+          </template>
+      </v-data-table>
     </div>
   </div>
 </template>
@@ -55,6 +48,35 @@ export default Vue.extend({
     return {
       logado: '',
       dashboardData: {} as DashGroup,
+      queuesHeaders: [
+        {
+          text: "Name",
+          value: "name",
+        },
+        {
+          text: "Status",
+          value: "status",
+        },
+        {
+          text: "Waiting",
+          value: "jobCounts.waiting",
+        },{
+          text: "Paused",
+          value: "jobCounts.paused",
+        }
+        ,{
+          text: "Active",
+          value: "jobCounts.active",
+        },
+        {
+          text: "Delayed",
+          value: "jobCounts.delayed",
+        },
+        {
+          text: "Failed",
+          value: "jobCounts.failed",
+        },
+      ],
       items: [
         {
           text: 'Dashboard',

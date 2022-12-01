@@ -1,79 +1,102 @@
 <template>
   <div>
-    <v-row>
-      <v-col sm="6" md="6" lg="6">
-        <h2>DashBoard</h2>
-      </v-col>
-      <v-col sm="6" md="6" lg="6" class="d-flex justify-end">
-        <v-btn @click="useCards = !useCards">
-          <v-icon> {{ useCards ? "mdi-view-list" : "mdi-table" }}</v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
-    <div v-for="group in dashboardData" :key="group.group.id" v-if="!useCards">
-      <h3 class="my-4" @click="openGroup(group.group.id)">{{ group.group.name }}</h3>
-      <v-row>
-        <v-col sm="12" md="12" lg="12">
-          <v-simple-table>
-            <template v-slot:default>
-              <thead>
-                <tr>
-                  <th class="text-left">Name</th>
-                  <th class="text-left">Status</th>
-                  <th class="text-left">Waiting</th>
-                  <th class="text-left">Paused</th>
-                  <th class="text-left">Active</th>
-                  <th class="text-left">Delayed</th>
-                  <th class="text-left">Failed</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in group.queues" :key="item.id" @click="openQueue(item.id)">
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.status }}</td>
-                  <td>{{ item.jobCounts.waiting }}</td>
-                  <td>{{ item.jobCounts.paused }}</td>
-                  <td>{{ item.jobCounts.active }}</td>
-                  <td>{{ item.jobCounts.delayed }}</td>
-                  <td>{{ item.jobCounts.failed }}</td>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
-        </v-col>
-      </v-row>
-    </div>
+    <v-toolbar flat>
+      <v-toolbar-title>DashBoard</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn color="primary" @click="useCards = !useCards">
+        <v-icon>{{ useCards ? "mdi-view-list" : "mdi-table" }}</v-icon>
+      </v-btn>
+    </v-toolbar>
+
+    <template v-if="!useCards">
+      <div v-for="group in dashboardData" :key="group.group.id">
+        <v-data-table
+          hide-default-footer
+          :headers="queuesHeaders"
+          :items="group.queues"
+          sort-by="createAt"
+          class="rounded my-4"
+        >
+          <template v-slot:top>
+            <v-toolbar flat class="pointer" @click="openGroup(group.group.id)">
+              <v-toolbar-title>{{ group.group.name }}</v-toolbar-title>
+            </v-toolbar>
+          </template>
+          <template v-slot:item="{ item }">
+            <tr class="pointer" @click="openQueue(item.id)">
+              <td>{{ item.name }}</td>
+              <td>
+                <v-chip outlined class="pointer" color="green">
+                  {{ item.status }}
+                </v-chip>
+              </td>
+              <td>{{ item.jobCounts.waiting }}</td>
+              <td>{{ item.jobCounts.paused }}</td>
+              <td>{{ item.jobCounts.active }}</td>
+              <td>{{ item.jobCounts.delayed }}</td>
+              <td>{{ item.jobCounts.failed }}</td>
+            </tr>
+          </template>
+        </v-data-table>
+      </div>
+    </template>
     <div v-else>
-      <v-card v-for="group in dashboardData" :key="group.group.id" class="my-3 px-3 py-3">
-        <h3 class="py-3">{{ group.group.name }}</h3>
-        <div v-for="queue, index in group.queues" @click="openQueue(queue.id)" :key="queue.id" class="mb-3 pb-2" :class="(index +1) != group.queues.length ? 'card-border': ''">
-          <h4>{{ queue.name }}</h4>
-          <div class="d-flex justify-space-around">
-            <div>
-              <h5>Waiting</h5>
-              <h1>{{ queue.jobCounts.waiting }}</h1>
-            </div>
-            <div>
-              <h5>Paused</h5>
-              <h1>{{ queue.jobCounts.paused }}</h1>
-            </div>
-            <div>
-              <h5>Active</h5>
-              <h1>{{ queue.jobCounts.active }}</h1>
-            </div>
-            <div>
-              <h5>Delayed</h5>
-              <h1>{{ queue.jobCounts.delayed }}</h1>
-            </div>
-            <div>
-              <h5>Failed</h5>
-              <h1>{{ queue.jobCounts.failed }}</h1>
-            </div>
-          </div>
-        </div>
-
-
-      </v-card>
+      <v-sheet v-for="group in dashboardData" class="rounded my-4">
+        <v-toolbar flat class="pointer" @click="openGroup(group.group.id)">
+          <v-toolbar-title>{{ group.group.name }}</v-toolbar-title>
+        </v-toolbar>
+        <v-divider></v-divider>
+        <v-sheet v-for="queue in group.queues">
+          <v-toolbar flat class="pointer" @click="openQueue(queue.id)">
+            <v-toolbar-title>{{ queue.name }}</v-toolbar-title>
+            <v-chip outlined class="pointer ml-4" color="green">
+              {{ queue.status }}
+            </v-chip>
+          </v-toolbar>
+          <v-sheet class="d-flex">
+            <v-card tile width="100%">
+              <v-card-text class="text-center">
+                <span>Waiting</span>
+                <p class="text-h4 text--primary">
+                  {{ queue.jobCounts.waiting }}
+                </p>
+              </v-card-text>
+            </v-card>
+            <v-card tile width="100%">
+              <v-card-text class="text-center">
+                <span>Paused</span>
+                <p class="text-h4 text--primary">
+                  {{ queue.jobCounts.paused }}
+                </p>
+              </v-card-text>
+            </v-card>
+            <v-card tile width="100%">
+              <v-card-text class="text-center">
+                <span>Active</span>
+                <p class="text-h4 text--primary">
+                  {{ queue.jobCounts.active }}
+                </p>
+              </v-card-text>
+            </v-card>
+            <v-card tile width="100%">
+              <v-card-text class="text-center">
+                <span>Delayed</span>
+                <p class="text-h4 text--primary">
+                  {{ queue.jobCounts.delayed }}
+                </p>
+              </v-card-text>
+            </v-card>
+            <v-card tile width="100%">
+              <v-card-text class="text-center">
+                <span>Failed</span>
+                <p class="text-h4 text--primary">
+                  {{ queue.jobCounts.failed }}
+                </p>
+              </v-card-text>
+            </v-card>
+          </v-sheet>
+        </v-sheet>
+      </v-sheet>
     </div>
   </div>
 </template>
@@ -88,6 +111,36 @@ export default Vue.extend({
     return {
       logado: '',
       dashboardData: [] as DashGroup[],
+      queuesHeaders: [
+        {
+          text: "Name",
+          value: "name",
+        },
+        {
+          text: "",
+          value: "status",
+          sortable: false,
+        },
+        {
+          text: "Waiting",
+          value: "jobCounts.waiting",
+        },{
+          text: "Paused",
+          value: "jobCounts.paused",
+        }
+        ,{
+          text: "Active",
+          value: "jobCounts.active",
+        },
+        {
+          text: "Delayed",
+          value: "jobCounts.delayed",
+        },
+        {
+          text: "Failed",
+          value: "jobCounts.failed",
+        },
+      ],
       useCards: false
     };
   },
@@ -108,5 +161,8 @@ export default Vue.extend({
 <style>
 .card-border {
   border-bottom: 1px solid #cccccc50;
+}
+.pointer {
+  cursor: pointer;
 }
 </style>

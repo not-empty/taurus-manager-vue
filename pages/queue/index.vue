@@ -1,69 +1,26 @@
 <template>
   <div>
-    <div class="d-flex justify-space-between">
-      <h2 class="mb-4">Filas</h2>
-      <v-btn color="primary" dark @click="dialog = true">
-        Nova Fila
-      </v-btn>
-    </div>
+    <v-data-table
+      :headers="queueHeaders"
+      :items="queues"
+      sort-by="name"
+      class="rounded my-4"
+    >
+      <template v-slot:top>
+        <v-toolbar flat>
+          <v-toolbar-title>Filas</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" dark @click="dialog = true">
+            Nova Fila
+          </v-btn>
+        </v-toolbar>
+      </template>
+      <template v-slot:item.actions="{ item }">
+        <v-icon class="mr-4" @click="editQueue(item)">mdi-pencil</v-icon>
+        <v-icon @click="deleteQueue(item)">mdi-delete</v-icon>
+      </template>
+    </v-data-table>
 
-    <v-card class="mb-5">
-      <v-container>
-        <v-row>
-          <v-col sm="11" class="my-auto">
-            <div class="d-flex justify-start align-center">
-              <v-pagination v-model="page" :length="lenght"></v-pagination>
-            </div>
-          </v-col>
-          <v-col sm="1" class="my-auto">
-            <v-select class="" :items="items" label="items" hide-details v-model="pageLenght" filled></v-select>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col sm="12" md="12" lg="12">
-            <v-simple-table>
-              <template v-slot:default>
-                <thead>
-                  <tr>
-                    <th class="text-left">Name</th>
-                    <th class="text-left">Host</th>
-                    <th class="text-left">Port</th>
-                    <th class="text-left">Group</th>
-                    <th class="text-left">Description</th>
-                    <th class="text-left">Compliance</th>
-                    <th class="text-left">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="queue in queues" :key="queue.id">
-                    <td>{{ queue.name }}</td>
-                    <td>{{ queue.host }}</td>
-                    <td>{{ queue.port }}</td>
-                    <td>{{ queue.group.name }}</td>
-                    <td>{{ queue.description }}</td>
-                    <td>{{ queue.compliance }}</td>
-                    <td>
-                      <v-icon class="mr-4" @click="editQueue(queue)">mdi-pencil</v-icon>
-                      <v-icon @click="deleteQueue(queue)">mdi-delete</v-icon>
-                    </td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col sm="11" class="my-auto">
-            <div class="d-flex justify-start align-center">
-              <v-pagination v-model="page" :length="lenght"></v-pagination>
-            </div>
-          </v-col>
-          <v-col sm="1" class="my-auto">
-            <v-select class="" :items="items" label="items" hide-details v-model="pageLenght" filled></v-select>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card>
     <v-dialog v-model="dialog" persistent max-width="600px" v-if="dialog">
       <QueueForm @close="close()" :queue="edit"></QueueForm>
     </v-dialog>
@@ -82,6 +39,38 @@ export default Vue.extend({
   data() {
     return {
       queues: [] as IQueue[],
+      queueHeaders: [
+        {
+          text: "Name",
+          value: "name",
+        },
+        {
+          text: "Host",
+          value: "host",
+        },
+        {
+          text: "Port",
+          value: "port",
+        },
+        {
+          text: "Group",
+          value: "group.name",
+        },
+        {
+          text: "Description",
+          value: "description",
+        },
+        {
+          text: "Compliance",
+          value: "compliance",
+        },
+        {
+          text: "Actions",
+          value: "actions",
+          align: "end",
+          sortable: false,
+        },
+      ],
       dialog: false,
       edit: {} as IQueue | null,
       page: 1,
