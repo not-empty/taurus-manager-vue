@@ -3,16 +3,31 @@
     <v-breadcrumbs :items="items" divider="/" />
     <v-data-table
       hide-default-footer
+      show-select
+      v-model="jobsSelected"
       :loading="loader"
       :headers="jobHeaders"
       :items="jobs"
       sort-by="createAt"
       class="rounded"
+      @click:row="openJob"
     >
       <template v-slot:top>
         <template v-if="queueData.jobCounts">
           <v-toolbar flat>
             <v-toolbar-title>{{ queueData.name }}</v-toolbar-title>
+            <v-chip outlined class="pointer ml-4" color="green">
+              {{ queueData.status }}
+            </v-chip>
+            <v-spacer></v-spacer>
+            <v-btn v-if="queueData.status === 'running'" color="primary" @click="pauseQueue">
+              Pause
+              <v-icon right>mdi-pause</v-icon>
+            </v-btn>
+            <v-btn v-else color="primary" @click="resumeQueue">
+              Resume
+              <v-icon right>mdi-play</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-sheet class="d-flex">
             <v-card
@@ -97,17 +112,16 @@
         </template>
         <v-toolbar flat>
           <v-toolbar-title>Jobs</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-4" color="primary" :disabled="!hasJobsSelected" @click="retryJobs">
+            Retry
+            <v-icon right>mdi-reload</v-icon>
+          </v-btn>
+          <v-btn color="primary" :disabled="!hasJobsSelected" @click="removeJobs">
+            Remove
+            <v-icon right>mdi-delete</v-icon>
+          </v-btn>
         </v-toolbar>
-      </template>
-      <template v-slot:item="{ item }">
-        <tr class="pointer" @click="$router.push('/dashboard/queue/' + $route.params.id + '/jobs/'+ item.id)">
-          <td>{{ item.id }}</td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.attemptsMade }}</td>
-          <td>{{ item.createdAt }}</td>
-          <td>{{ item.processedAt }}</td>
-          <td>{{ item.finishedAt }}</td>
-        </tr>
       </template>
     </v-data-table>
   </div>
@@ -124,6 +138,7 @@ export default Vue.extend({
     return {
       loader: false,
       state: "waiting",
+      jobsSelected: [] as string[],
       jobs: [] as IJob[],
       jobHeaders: [
         {
@@ -176,6 +191,11 @@ export default Vue.extend({
       this.filterJobs();
     },
   },
+  computed: {
+    hasJobsSelected() {
+      return this.jobsSelected.length > 0;
+    },
+  },
   created() {
     this.filterJobs();
     this.$api.dashboard.queueDash(this.$route.params.id).then((res) => {
@@ -197,7 +217,33 @@ export default Vue.extend({
         .finally(() => {
           this.loader = false;
         });
-    }
+    },
+    openJob({ id }: IJob) {
+      this.$router.push(`/dashboard/queue/${this.$route.params.id}/jobs/${id}`);
+    },
+    pauseQueue() {
+      this.$api.queue.pause(this.$route.params.id);
+    },
+    resumeQueue() {
+      this.$api.queue.resume(this.$route.params.id);
+    },
+    retryJobs() {
+      this.$api.jobs.retryJob(this.$route.params.id, {
+        jobIds: this.jobsSelected,
+        state: this.state,
+      });
+
+      this.jobsSelected = [];
+      this.filterJobs();
+    },
+    removeJobs() {
+      this.$api.jobs.deleteJob(this.$route.params.id, {
+        jobIds: this.jobsSelected,
+      });
+
+      this.jobsSelected = [];
+      this.filterJobs();
+    },
   },
 });
 </script>
