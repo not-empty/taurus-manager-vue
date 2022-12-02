@@ -12,6 +12,8 @@
     <div v-if="dashboardData.group">
       <v-data-table
         hide-default-footer
+        show-select
+        v-model="jobsSelected"
         :headers="queuesHeaders"
         :items="dashboardData.queues"
         sort-by="createAt"
@@ -22,17 +24,14 @@
             <v-toolbar-title>{{ dashboardData.group.name }}</v-toolbar-title>
           </v-toolbar>
         </template>
-        <template v-slot:item="{ item }">
-            <tr class="pointer">
-              <td>{{ item.name }}</td>
-              <td>{{ item.status }}</td>
-              <td>{{ item.jobCounts.waiting }}</td>
-              <td>{{ item.jobCounts.paused }}</td>
-              <td>{{ item.jobCounts.active }}</td>
-              <td>{{ item.jobCounts.delayed }}</td>
-              <td>{{ item.jobCounts.failed }}</td>
-            </tr>
-          </template>
+        <template v-slot:item.actions="{ item }">
+          <v-icon v-if="item.status === 'running'" @click.stop="pauseQueue(item.id)">
+            mdi-pause
+          </v-icon>
+          <v-icon v-else @click.stop="resumeQueue(item.id)">
+            mdi-play
+          </v-icon>
+        </template>
       </v-data-table>
     </div>
   </div>
@@ -47,6 +46,7 @@ export default Vue.extend({
   data() {
     return {
       logado: '',
+      jobsSelected: [] as string [],
       dashboardData: {} as DashGroup,
       queuesHeaders: [
         {
@@ -101,7 +101,13 @@ export default Vue.extend({
   methods: {
     openToPage(id:string) {
       this.$router.push("/dashboard/queue/" + id);
-    }
+    },
+    pauseQueue(id: string) {
+      this.$api.queue.pause(id);
+    },
+    resumeQueue(id: string) {
+      this.$api.queue.resume(id);
+    },
   }
 });
 </script>
