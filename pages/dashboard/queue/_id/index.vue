@@ -16,6 +16,9 @@
         <template v-if="queueData.jobCounts">
           <v-toolbar flat>
             <v-toolbar-title>{{ queueData.name }}</v-toolbar-title>
+            <v-chip outlined class="pointer ml-4" color="green">
+              {{ queueData.status }}
+            </v-chip>
             <v-spacer></v-spacer>
             <v-btn v-if="queueData.status === 'running'" color="primary" @click="pauseQueue">
               Pause
