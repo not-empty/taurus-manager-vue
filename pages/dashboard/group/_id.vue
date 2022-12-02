@@ -12,8 +12,6 @@
     <div v-if="dashboardData.group">
       <v-data-table
         hide-default-footer
-        show-select
-        v-model="jobsSelected"
         :headers="queuesHeaders"
         :items="dashboardData.queues"
         sort-by="createAt"
@@ -46,7 +44,6 @@ export default Vue.extend({
   data() {
     return {
       logado: '',
-      jobsSelected: [] as string [],
       dashboardData: {} as DashGroup,
       queuesHeaders: [
         {
