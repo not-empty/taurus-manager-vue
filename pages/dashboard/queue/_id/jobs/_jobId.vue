@@ -1,47 +1,75 @@
 <template lang="">
   <div>
-    <v-card v-if="!loader">
-      <v-container>
-        <v-row>
-          <v-col sm="4" class="d-flex flex-column align-center">
+    <v-breadcrumbs :items="items" divider="/" />
+    <v-sheet v-if="!loader">
+      <v-toolbar flat>
+        <v-toolbar-title>Job</v-toolbar-title>
+      </v-toolbar>
+      <v-sheet class="d-flex">
+        <v-card tile width="40%">
+          <v-card-text class="text-center">
             <span>ID</span>
-            <span>{{job.id}}</span>
-          </v-col>
-          <v-col sm="4" class="d-flex flex-column align-center">
-            <span>STATE</span>
-            <span>{{job.state}}</span>
-          </v-col>
-          <v-col sm="4" class="d-flex flex-column align-center">
-            <span>ATTEMPTS MADE</span>
-            <span>{{job.attemptsMade}}</span>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col sm="4" class="d-flex flex-column align-center">
-            <span>CREATED AT</span>
-            <span>{{job.createdAt}}</span>
-          </v-col>
-          <v-col sm="4" class="d-flex flex-column align-center">
-            <span>PROCESSED AT</span>
-            <span>{{job.processedAt}}</span>
-          </v-col>
-          <v-col sm="4" class="d-flex flex-column align-center">
-            <span>FINISHED AT</span>
-            <span>{{job.finishedAt}}</span>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col sm="12" class="d-flex flex-column">
-            <span>DATA</span>
-            <code class="language-markup"><pre class="language-markup">{{job.data}}</pre></code>
-          </v-col>
-          <v-col sm="12" class="d-flex flex-column" v-if="job.stacktrace">
-            <span>TRACE</span>
-            <code class="language-markup"><pre class="language-markup">{{job.stacktrace}}</pre></code>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card>
+            <p class="text-h6 text--primary">
+              {{ job.id }}
+            </p>
+          </v-card-text>
+        </v-card>
+        <v-card tile width="30%">
+          <v-card-text class="text-center">
+            <span>State</span>
+            <p class="text-h6 text--primary">
+              {{ job.state }}
+            </p>
+          </v-card-text>
+        </v-card>
+        <v-card tile width="30%">
+          <v-card-text class="text-center">
+            <span>Attempts Made</span>
+            <p class="text-h6 text--primary">
+              {{ job.attemptsMade }}
+            </p>
+          </v-card-text>
+        </v-card>
+      </v-sheet>
+      <v-sheet class="d-flex">
+        <v-card tile width="100%">
+          <v-card-text class="text-center">
+            <span>Created At</span>
+            <p class="text-h6 text--primary">
+              {{ job.createdAt }}
+            </p>
+          </v-card-text>
+        </v-card>
+        <v-card tile width="100%">
+          <v-card-text class="text-center">
+            <span>Processed At</span>
+            <p class="text-h6 text--primary">
+              {{ job.processedAt }}
+            </p>
+          </v-card-text>
+        </v-card>
+        <v-card tile width="100%">
+          <v-card-text class="text-center">
+            <span>Finished At</span>
+            <p class="text-h6 text--primary">
+              {{ job.finishedAt }}
+            </p>
+          </v-card-text>
+        </v-card>
+      </v-sheet>
+      <v-toolbar flat>
+        <v-toolbar-title>Data</v-toolbar-title>
+      </v-toolbar>
+      <code class="language-markup d-flex py-1 rounded-0">
+        <pre class="language-markup">{{ job.data }}</pre>
+      </code>
+      <v-toolbar flat>
+        <v-toolbar-title>Trace</v-toolbar-title>
+      </v-toolbar>
+      <code class="language-markup d-flex py-1 rounded-0">
+        <pre class="language-markup">{{ job.stacktrace }}</pre>
+      </code>
+    </v-sheet>
   </div>
 </template>
 
@@ -56,12 +84,32 @@ export default Vue.extend({
       loader: true,
       state: "running",
       job: {} as IJob,
+      items: [
+        {
+          text: 'Dashboard',
+          disabled: false,
+          href: '/dashboard',
+        },
+        {
+          text: '',
+          disabled: false,
+          href: '',
+        },
+        {
+          text: '',
+          disabled: true,
+          href: '',
+        },
+      ],
     };
   },
   created() {
     this.$api.jobs
       .getJob(this.$route.params.id, this.$route.params.jobId)
       .then((res) => {
+        this.items[1].text = this.$route.params.id;
+        this.items[1].href = "/dashboard/queue/" + this.$route.params.id;
+        this.items[2].text = res.id;
         this.job = res;
       })
       .finally(() => {

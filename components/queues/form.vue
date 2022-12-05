@@ -26,7 +26,7 @@
                 required></v-select>
             </v-col>
             <v-col cols="12" sm="12" lg="12">
-              <v-textarea label="Descrição" rows="3" auto-grow v-model="queueData.description"></v-textarea>
+              <v-textarea label="Descrição" rows="1" auto-grow v-model="queueData.description"></v-textarea>
             </v-col>
             <v-col>
               <v-text-field label="Compliance" v-model="queueData.compliance"></v-text-field>

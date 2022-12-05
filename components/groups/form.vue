@@ -13,7 +13,7 @@
             </v-row>
             <v-row>
               <v-col cols="12" sm="12" lg="12">
-                <v-textarea label="Descrição" rows="3" auto-grow v-model="groupData.description"></v-textarea>
+                <v-textarea label="Descrição" rows="1" auto-grow v-model="groupData.description"></v-textarea>
               </v-col>
             </v-row>
           </v-container>
