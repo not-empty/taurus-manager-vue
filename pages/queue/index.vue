@@ -1,19 +1,21 @@
 <template>
   <div>
     <v-data-table
+      hide-default-footer
       :headers="queueHeaders"
       :items="queues"
       sort-by="name"
-      class="rounded my-4"
+      class="accent"
     >
       <template v-slot:top>
-        <v-toolbar flat>
-          <v-toolbar-title>Filas</v-toolbar-title>
+        <v-flex class="d-flex align-center px-4 py-4">
+          <span class="font-weight-bold text-h6">Filas</span>
           <v-spacer></v-spacer>
-          <v-btn color="primary" dark @click="dialog = true">
-            Nova Fila
+          <v-btn text color="primary" @click="dialog = true">
+            <v-icon left>mdi-tray-plus</v-icon>
+            <span>Nova Fila</span>
           </v-btn>
-        </v-toolbar>
+        </v-flex>
       </template>
       <template v-slot:item.actions="{ item }">
         <v-icon class="mr-4" @click="editQueue(item)">mdi-pencil</v-icon>
@@ -25,13 +27,12 @@
       <QueueForm @close="close()" :queue="edit"></QueueForm>
     </v-dialog>
   </div>
-
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { IQueue } from "~/types/queue";
-import QueueForm from "~/components/queues/form.vue"
+import QueueForm from "~/components/queues/form.vue";
 export default Vue.extend({
   middleware: "auth",
   name: "IndexPage",
@@ -80,36 +81,38 @@ export default Vue.extend({
     };
   },
   async created() {
-    this.getQueues()
+    this.getQueues();
   },
   methods: {
     editQueue(queue: IQueue) {
-      this.edit = queue
-      this.dialog = true
+      this.edit = queue;
+      this.dialog = true;
     },
     close() {
-      this.edit = null
-      this.dialog = false
+      this.edit = null;
+      this.dialog = false;
     },
     deleteQueue(queue: IQueue) {
       this.$api.queue.delete(queue.id).then(() => {
-        this.getQueues()
-      })
+        this.getQueues();
+      });
     },
     getQueues() {
-      this.$api.queue.getPaginated(this.page, this.pageLenght).then((response) => {
-        this.queues = response.queues
-        let pages = response.total / this.pageLenght
-        this.lenght = Math.ceil(pages)
-      })
-    }
+      this.$api.queue
+        .getPaginated(this.page, this.pageLenght)
+        .then((response) => {
+          this.queues = response.queues;
+          let pages = response.total / this.pageLenght;
+          this.lenght = Math.ceil(pages);
+        });
+    },
   },
   watch: {
-    "page": function () {
-      this.getQueues()
+    page: function () {
+      this.getQueues();
     },
-    "pageLenght": function() {
-      this.getQueues()
+    pageLenght: function () {
+      this.getQueues();
     },
   },
 });

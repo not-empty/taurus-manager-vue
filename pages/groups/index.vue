@@ -1,19 +1,21 @@
 <template>
   <div>
     <v-data-table
+      hide-default-footer
       :headers="groupHeaders"
       :items="groups"
       sort-by="name"
-      class="rounded my-4"
+      class="accent"
     >
       <template v-slot:top>
-        <v-toolbar flat>
-          <v-toolbar-title>Grupos</v-toolbar-title>
+        <v-flex class="d-flex align-center px-4 py-4">
+          <span class="font-weight-bold text-h6">Grupos</span>
           <v-spacer></v-spacer>
-          <v-btn color="primary" dark @click="dialog = true">
-            Novo grupo
+          <v-btn text color="primary" @click="dialog = true">
+            <v-icon left>mdi-archive-plus</v-icon>
+            <span>Novo grupo</span>
           </v-btn>
-        </v-toolbar>
+        </v-flex>
       </template>
       <template v-slot:item.actions="{ item }">
         <v-icon class="mr-4" @click="editGroups(item)">mdi-pencil</v-icon>
@@ -26,7 +28,7 @@
     </v-dialog>
   </div>
 </template>
-  
+
 <script lang="ts">
 import Vue from "vue";
 import { IGroup } from "~/types/group";
@@ -63,39 +65,41 @@ export default Vue.extend({
     };
   },
   async created() {
-    this.$api.group.getPaginated(1, 25)
-      .then(response => this.groups = response.groups);
+    this.$api.group
+      .getPaginated(1, 25)
+      .then((response) => (this.groups = response.groups));
   },
   methods: {
     editGroups(group: IGroup) {
-      this.edit = group
-      this.dialog = true
+      this.edit = group;
+      this.dialog = true;
     },
     close() {
-      this.edit = null
-      this.dialog = false
+      this.edit = null;
+      this.dialog = false;
     },
     deleteGroups(group: IGroup) {
       this.$api.group.delete(group.id).then(() => {
-        this.getGroups()
-      })
+        this.getGroups();
+      });
     },
     getGroups() {
-      this.$api.group.getPaginated(this.page, this.pageLenght).then((response) => {
-        this.groups = response.groups
-        let pages = response.total / this.pageLenght
-        this.lenght = Math.ceil(pages)
-      })
-    }
+      this.$api.group
+        .getPaginated(this.page, this.pageLenght)
+        .then((response) => {
+          this.groups = response.groups;
+          let pages = response.total / this.pageLenght;
+          this.lenght = Math.ceil(pages);
+        });
+    },
   },
   watch: {
-    "page": function () {
-      this.getGroups()
+    page: function () {
+      this.getGroups();
     },
-    "pageLenght": function () {
-      this.getGroups()
+    pageLenght: function () {
+      this.getGroups();
     },
   },
 });
 </script>
-  
