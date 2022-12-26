@@ -1,28 +1,53 @@
 <template>
   <div>
-    <template v-for="x in Array(5)">
-      <div v-for="group in dashboardData" :key="group.group.id">
-        <v-data-table
-          hide-default-footer
-          show-select
-          :headers="queuesHeaders"
-          :items="group.queues"
-          sort-by="name"
-          class="accent mb-8"
-        >
-          <template v-slot:top>
-            <p class="px-4 py-4 font-weight-bold text-h6">
-              {{ group.group.name }}
-            </p>
-          </template>
-          <template v-slot:item.status="{ item }">
-            <v-chip small color="green">
-              {{ item.status }}
-            </v-chip>
-          </template>
-        </v-data-table>
-      </div>
-    </template>
+    <v-sheet class="d-flex px-4 py-4 accent align-center mb-2">
+      <span class="font-weight-bold text-h6">Dashboard</span>
+      <v-spacer></v-spacer>
+      <v-btn
+        text
+        :disabled="!jobsSelected.length"
+        color="secondary"
+        @click="pauseQueue"
+      >
+        <v-icon left>mdi-pause</v-icon>
+        <span>Pause</span>
+      </v-btn>
+      <v-btn
+        text
+        :disabled="!jobsSelected.length"
+        color="secondary"
+        @click="pauseQueue"
+      >
+        <v-icon left>mdi-play</v-icon>
+        <span>Resume</span>
+      </v-btn>
+    </v-sheet>
+    <div v-for="group in dashboardData" :key="group.group.id">
+      <v-data-table
+        hide-default-footer
+        show-select
+        v-model="jobsSelected"
+        :headers="queuesHeaders"
+        :items="group.queues"
+        sort-by="name"
+        class="accent mb-8"
+        @click:row="openQueue"
+      >
+        <template v-slot:top>
+          <p
+            class="px-4 py-4 font-weight-bold text-h6"
+            @click="openGroup(group.group.id)"
+          >
+            {{ group.group.name }}
+          </p>
+        </template>
+        <template v-slot:item.status="{ item }">
+          <v-chip small color="green">
+            {{ item.status }}
+          </v-chip>
+        </template>
+      </v-data-table>
+    </div>
   </div>
 </template>
 
@@ -36,6 +61,7 @@ export default Vue.extend({
   data() {
     return {
       logado: "",
+      jobsSelected: [] as string[],
       dashboardData: [] as DashGroup[],
       queuesHeaders: [
         {
@@ -80,21 +106,12 @@ export default Vue.extend({
     openGroup(id: string) {
       this.$router.push("/dashboard/group/" + id);
     },
-    pauseQueue(id: string) {
-      this.$api.queue.pause(id);
+    pauseQueue() {
+      this.$api.queue.pauseBulk(this.jobsSelected);
     },
-    resumeQueue(id: string) {
-      this.$api.queue.resume(id);
+    resumeQueue() {
+      this.$api.queue.resumeBulk(this.jobsSelected);
     },
   },
 });
 </script>
-
-<style>
-.card-border {
-  border-bottom: 1px solid #cccccc50;
-}
-.pointer {
-  cursor: pointer;
-}
-</style>

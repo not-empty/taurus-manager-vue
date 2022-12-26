@@ -5,7 +5,7 @@
 }
 .space {
   display: block;
-  height: 0.2rem;
+  height: 25px;
 }
 </style>
 

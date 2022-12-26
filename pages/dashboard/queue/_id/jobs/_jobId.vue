@@ -1,75 +1,72 @@
-<template lang="">
+<template>
   <div>
-    <v-breadcrumbs :items="items" divider="/" />
-    <v-sheet v-if="!loader">
-      <v-toolbar flat>
-        <v-toolbar-title>Job</v-toolbar-title>
-      </v-toolbar>
-      <v-sheet class="d-flex">
-        <v-card tile width="40%">
-          <v-card-text class="text-center">
-            <span>ID</span>
-            <p class="text-h6 text--primary">
-              {{ job.id }}
-            </p>
-          </v-card-text>
-        </v-card>
-        <v-card tile width="30%">
-          <v-card-text class="text-center">
-            <span>State</span>
-            <p class="text-h6 text--primary">
-              {{ job.state }}
-            </p>
-          </v-card-text>
-        </v-card>
-        <v-card tile width="30%">
-          <v-card-text class="text-center">
-            <span>Attempts Made</span>
-            <p class="text-h6 text--primary">
-              {{ job.attemptsMade }}
-            </p>
-          </v-card-text>
-        </v-card>
-      </v-sheet>
-      <v-sheet class="d-flex">
-        <v-card tile width="100%">
-          <v-card-text class="text-center">
-            <span>Created At</span>
-            <p class="text-h6 text--primary">
-              {{ job.createdAt }}
-            </p>
-          </v-card-text>
-        </v-card>
-        <v-card tile width="100%">
-          <v-card-text class="text-center">
-            <span>Processed At</span>
-            <p class="text-h6 text--primary">
-              {{ job.processedAt }}
-            </p>
-          </v-card-text>
-        </v-card>
-        <v-card tile width="100%">
-          <v-card-text class="text-center">
-            <span>Finished At</span>
-            <p class="text-h6 text--primary">
-              {{ job.finishedAt }}
-            </p>
-          </v-card-text>
-        </v-card>
-      </v-sheet>
-      <v-toolbar flat>
-        <v-toolbar-title>Data</v-toolbar-title>
-      </v-toolbar>
-      <code class="language-markup d-flex py-1 rounded-0">
-        <pre class="language-markup">{{ job.data }}</pre>
-      </code>
-      <v-toolbar flat>
-        <v-toolbar-title>Trace</v-toolbar-title>
-      </v-toolbar>
-      <code class="language-markup d-flex py-1 rounded-0">
-        <pre class="language-markup">{{ job.stacktrace }}</pre>
-      </code>
+    <v-sheet class="px-4 py-4 accent">
+      <span class="font-weight-bold text-h6">Jobs</span>
     </v-sheet>
+    <v-flex class="d-flex">
+      <v-card tile width="100%" color="accent">
+        <v-card-text class="text-center">
+          <span>Id</span>
+          <p class="text-h6 text--primary">
+            {{ job.id }}
+          </p>
+        </v-card-text>
+      </v-card>
+      <v-card tile width="100%" color="accent">
+        <v-card-text class="text-center">
+          <span>State</span>
+          <p class="text-h6 text--primary">
+            {{ job.state }}
+          </p>
+        </v-card-text>
+      </v-card>
+      <v-card tile width="100%" color="accent">
+        <v-card-text class="text-center">
+          <span>AttemptsMade</span>
+          <p class="text-h6 text--primary">
+            {{ job.attemptsMade }}
+          </p>
+        </v-card-text>
+      </v-card>
+    </v-flex>
+    <v-flex class="d-flex">
+      <v-card tile width="100%" color="accent" class="pt-4 px-4">
+        <v-card-text class="text-center">
+          <span>CreatedAt</span>
+          <p class="text-h6 text--primary">
+            {{ job.createdAt }}
+          </p>
+        </v-card-text>
+      </v-card>
+      <v-card tile width="100%" color="accent" class="pt-4 px-4">
+        <v-card-text class="text-center">
+          <span>ProcessedAt</span>
+          <p class="text-h6 text--primary">
+            {{ job.processedAt }}
+          </p>
+        </v-card-text>
+      </v-card>
+      <v-card tile width="100%" color="accent" class="pt-4 px-4">
+        <v-card-text class="text-center">
+          <span>FinishedAt</span>
+          <p class="text-h6 text--primary">
+            {{ job.finishedAt }}
+          </p>
+        </v-card-text>
+      </v-card>
+    </v-flex>
+    <v-sheet class="px-4 py-4 accent">
+      <span class="font-weight-bold text-h6">Data</span>
+    </v-sheet>
+    <code class="d-flex py-1 rounded-0 code-border">
+      <pre class="language-markup">{{ job.data }}</pre>
+    </code>
+    <v-sheet class="px-4 py-4 accent">
+      <span class="font-weight-bold text-h6">Trace</span>
+    </v-sheet>
+    <code class="d-flex py-1 rounded-0 code-border">
+      <pre class="language-markup">{{ job.stacktrace }}</pre>
+    </code>
   </div>
 </template>
 
@@ -86,19 +83,19 @@ export default Vue.extend({
       job: {} as IJob,
       items: [
         {
-          text: 'Dashboard',
+          text: "Dashboard",
           disabled: false,
-          href: '/dashboard',
+          href: "/dashboard",
         },
         {
-          text: '',
+          text: "",
           disabled: false,
-          href: '',
+          href: "",
         },
         {
-          text: '',
+          text: "",
           disabled: true,
-          href: '',
+          href: "",
         },
       ],
     };
@@ -121,7 +118,7 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.pointer {
-  cursor: pointer;
+.code-border {
+  border-left: 2px solid #db1e72;
 }
 </style>

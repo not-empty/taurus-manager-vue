@@ -38,10 +38,10 @@ const config: NuxtConfig = {
       dark: true,
       themes: {
         dark: {
-          primary: "#db1e72",
+          primary: "#ffffff",
           accent: "#1E1F24",
-          secondary: "#FF8F00",
-          info: "#26A69A",
+          secondary: "#db1e72",
+          info: "#25262c",
           warning: "#FFC107",
           error: "#DD2C00",
           success: "#00E676"

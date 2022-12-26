@@ -2,14 +2,10 @@
 .list {
   list-style: none;
 }
-.link {
-  font-size: 16px;
+.list a {
   text-decoration: none;
-  color: #fff;
-  display: flex;
-  align-items: center;
 }
-.link:hover > * {
+.list a:hover > * {
   color: #db1e72;
 }
 </style>
@@ -21,7 +17,7 @@
     </header>
     <ul class="list pl-0">
       <li v-for="link in links" class="my-4">
-        <NuxtLink :to="link.to" class="link">
+        <NuxtLink :to="link.to" class="d-flex align-center text-subtitle-1">
           <v-icon left>{{ link.icon }}</v-icon>
           <span v-if="isExtend">{{ link.title }}</span>
         </NuxtLink>

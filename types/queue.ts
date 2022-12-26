@@ -13,16 +13,19 @@ export interface IQueue {
   updatedAt: Date;
   deletedAt: Date;
 }
+
+export interface JobCounts {
+  waiting: number
+  active: number
+  completed: number
+  failed: number
+  delayed: number
+  paused: number
+}
+
 export interface DashQueue extends IQueue {
   status: string
-  jobCounts: {
-    waiting: number
-    active: number
-    completed: number
-    failed: number
-    delayed: number
-    paused: number
-  }
+  jobCounts: JobCounts
 }
 
 export interface QueuePayload {

@@ -11,7 +11,7 @@
         <v-flex class="d-flex align-center px-4 py-4">
           <span class="font-weight-bold text-h6">Filas</span>
           <v-spacer></v-spacer>
-          <v-btn text color="primary" @click="dialog = true">
+          <v-btn text color="secondary" @click="dialog = true">
             <v-icon left>mdi-tray-plus</v-icon>
             <span>Nova Fila</span>
           </v-btn>

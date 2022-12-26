@@ -1,6 +1,5 @@
 <template>
   <div>
-    <v-breadcrumbs :items="items" divider="/" />
     <v-data-table
       hide-default-footer
       show-select
@@ -9,119 +8,77 @@
       :headers="jobHeaders"
       :items="jobs"
       sort-by="createAt"
-      class="rounded"
+      class="accent"
       @click:row="openJob"
     >
       <template v-slot:top>
         <template v-if="queueData.jobCounts">
-          <v-toolbar flat>
-            <v-toolbar-title>{{ queueData.name }}</v-toolbar-title>
-            <v-chip outlined class="ml-4" color="green">
-              {{ queueData.status }}
-            </v-chip>
-            <v-spacer></v-spacer>
-            <v-btn v-if="queueData.status === 'running'" color="primary" @click="pauseQueue">
-              Pause
-              <v-icon right>mdi-pause</v-icon>
-            </v-btn>
-            <v-btn v-else color="primary" @click="resumeQueue">
-              Resume
-              <v-icon right>mdi-play</v-icon>
-            </v-btn>
-          </v-toolbar>
+          <v-sheet class="d-flex accent">
+            <v-flex class="d-flex align-center px-4 py-4">
+              <span class="font-weight-bold text-h6">
+                {{ queueData.name }}
+              </span>
+              <v-chip small class="ml-4" color="green">
+                {{ queueData.status }}
+              </v-chip>
+              <v-spacer></v-spacer>
+              <v-btn
+                v-if="queueData.status === 'running'"
+                text
+                color="secondary"
+                @click="pauseQueue"
+              >
+                <v-icon left>mdi-pause</v-icon>
+                <span>Pause</span>
+              </v-btn>
+              <v-btn v-else text color="secondary" @click="resumeQueue">
+                <v-icon left>mdi-play</v-icon>
+                <span>Resume</span>
+              </v-btn>
+            </v-flex>
+          </v-sheet>
           <v-sheet class="d-flex">
             <v-card
+              v-for="name in status"
               tile
               width="100%"
-              :color="state === 'waiting' ? '#272727' : null"
-              @click="state = 'waiting'"
+              :key="name"
+              :color="state === name ? 'info' : 'accent'"
+              @click="state = name"
             >
               <v-card-text class="text-center">
-                <span>Waiting</span>
+                <span>{{ captalize(name) }}</span>
                 <p class="text-h4 text--primary">
-                  {{ queueData.jobCounts.waiting }}
-                </p>
-              </v-card-text>
-            </v-card>
-            <v-card
-              tile
-              width="100%"
-              :color="state === 'paused' ? '#272727' : null"
-              @click="state = 'paused'"
-            >
-              <v-card-text class="text-center">
-                <span>Paused</span>
-                <p class="text-h4 text--primary">
-                  {{ queueData.jobCounts.paused }}
-                </p>
-              </v-card-text>
-            </v-card>
-            <v-card
-              tile
-              width="100%"
-              :color="state === 'active' ? '#272727' : null"
-              @click="state = 'active'"
-            >
-              <v-card-text class="text-center">
-                <span>Active</span>
-                <p class="text-h4 text--primary">
-                  {{ queueData.jobCounts.active }}
-                </p>
-              </v-card-text>
-            </v-card>
-            <v-card
-              tile
-              width="100%"
-              :color="state === 'delayed' ? '#272727' : null"
-              @click="state = 'delayed'"
-            >
-              <v-card-text class="text-center">
-                <span>Delayed</span>
-                <p class="text-h4 text--primary">
-                  {{ queueData.jobCounts.delayed }}
-                </p>
-              </v-card-text>
-            </v-card>
-            <v-card
-              tile
-              width="100%"
-              :color="state === 'failed' ? '#272727' : null"
-              @click="state = 'failed'"
-            >
-              <v-card-text class="text-center">
-                <span>Failed</span>
-                <p class="text-h4 text--primary">
-                  {{ queueData.jobCounts.failed }}
-                </p>
-              </v-card-text>
-            </v-card>
-            <v-card
-              tile
-              width="100%"
-              :color="state === 'completed' ? '#272727' : null"
-              @click="state = 'completed'"
-            >
-              <v-card-text class="text-center">
-                <span>Completed</span>
-                <p class="text-h4 text--primary">
-                  {{ queueData.jobCounts.completed }}
+                  {{ queueData.jobCounts[name] }}
                 </p>
               </v-card-text>
             </v-card>
           </v-sheet>
+          <v-sheet>
+            <v-sheet class="d-flex px-4 py-4 accent">
+              <p class="font-weight-bold text-h6">Jobs</p>
+              <v-spacer></v-spacer>
+              <v-btn
+                text
+                :disabled="!jobsSelected.length"
+                color="secondary"
+                @click="pauseQueue"
+              >
+                <v-icon left>mdi-reload</v-icon>
+                <span>Reload</span>
+              </v-btn>
+              <v-btn
+                text
+                :disabled="!jobsSelected.length"
+                color="secondary"
+                @click="pauseQueue"
+              >
+                <v-icon left>mdi-delete</v-icon>
+                <span>Remove</span>
+              </v-btn>
+            </v-sheet>
+          </v-sheet>
         </template>
-        <v-toolbar flat>
-          <v-toolbar-title>Jobs</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-btn class="mr-4" color="primary" :disabled="!hasJobsSelected" @click="retryJobs">
-            Retry
-            <v-icon right>mdi-reload</v-icon>
-          </v-btn>
-          <v-btn color="primary" :disabled="!hasJobsSelected" @click="removeJobs">
-            Remove
-            <v-icon right>mdi-delete</v-icon>
-          </v-btn>
-        </v-toolbar>
       </template>
     </v-data-table>
   </div>
@@ -130,7 +87,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { IJob } from "~/types/job";
-import { DashQueue } from "~/types/queue";
+import { DashQueue, JobCounts } from "~/types/queue";
 export default Vue.extend({
   middleware: "auth",
   name: "ViewQueue",
@@ -169,21 +126,29 @@ export default Vue.extend({
       queueData: {} as DashQueue,
       items: [
         {
-          text: 'Dashboard',
+          text: "Dashboard",
           disabled: false,
-          href: '/dashboard',
+          href: "/dashboard",
         },
         {
-          text: '',
+          text: "",
           disabled: false,
-          href: '',
+          href: "",
         },
         {
-          text: '',
+          text: "",
           disabled: true,
-          href: '',
+          href: "",
         },
       ],
+      status: [
+        "waiting",
+        "paused",
+        "active",
+        "delayed",
+        "failed",
+        "completed",
+      ] as (keyof JobCounts)[],
     };
   },
   watch: {
@@ -199,14 +164,17 @@ export default Vue.extend({
   created() {
     this.filterJobs();
     this.$api.dashboard.queueDash(this.$route.params.id).then((res) => {
-      this.items[1].text = res.groupId
-      this.items[1].href = '/dashboard/group/' + res.groupId
-      this.items[2].text = res.name
-      this.items[2].disabled = true
-      this.queueData = res
-    })
+      this.items[1].text = res.groupId;
+      this.items[1].href = "/dashboard/group/" + res.groupId;
+      this.items[2].text = res.name;
+      this.items[2].disabled = true;
+      this.queueData = res;
+    });
   },
   methods: {
+    captalize(str: string) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    },
     filterJobs() {
       this.loader = true;
       this.$api.jobs
