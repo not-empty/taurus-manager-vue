@@ -16,7 +16,7 @@
         text
         :disabled="!jobsSelected.length"
         color="secondary"
-        @click="pauseQueue"
+        @click="resumeQueue"
       >
         <v-icon left>mdi-play</v-icon>
         <span>Resume</span>
@@ -42,7 +42,7 @@
           </p>
         </template>
         <template v-slot:item.status="{ item }">
-          <v-chip small color="green">
+          <v-chip small :color="item.status == 'running' ? 'green' : 'yellow'">
             {{ item.status }}
           </v-chip>
         </template>
@@ -54,6 +54,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DashGroup } from "~/types/group";
+import { IJob } from "~/types/job";
 import { IQueue } from "~/types/queue";
 export default Vue.extend({
   middleware: "auth",
@@ -61,7 +62,7 @@ export default Vue.extend({
   data() {
     return {
       logado: "",
-      jobsSelected: [] as string[],
+      jobsSelected: [] as IJob[],
       dashboardData: [] as DashGroup[],
       queuesHeaders: [
         {
@@ -97,7 +98,7 @@ export default Vue.extend({
     };
   },
   async created() {
-    this.dashboardData = await this.$api.dashboard.groupDash();
+    this.getUpdatedData()
   },
   methods: {
     openQueue({ id }: IQueue) {
@@ -107,11 +108,25 @@ export default Vue.extend({
       this.$router.push("/dashboard/group/" + id);
     },
     pauseQueue() {
-      this.$api.queue.pauseBulk(this.jobsSelected);
+      this.$api.queue.pauseBulk(this.mapSelected()).then(() => {
+        this.getUpdatedData()
+      });
     },
     resumeQueue() {
-      this.$api.queue.resumeBulk(this.jobsSelected);
+      this.$api.queue.resumeBulk(this.mapSelected()).then(() => {
+        this.getUpdatedData()
+      });
     },
+    mapSelected(): string[] {
+      return this.jobsSelected.map(job => {
+        return job.id
+      });
+    },
+    getUpdatedData() {
+      this.$api.dashboard.groupDash().then((res) => {
+        this.dashboardData = res;
+      });
+    }
   },
 });
 </script>

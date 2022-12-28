@@ -3,6 +3,7 @@
   height: 100vh;
   overflow: auto;
 }
+
 .space {
   display: block;
   height: 25px;
@@ -11,15 +12,14 @@
 
 <template>
   <v-app dark>
-    <div class="d-flex">
-      <aside>
-        <Sidebar />
-      </aside>
-      <v-main class="scroll pt-6 px-2">
+    <v-navigation-drawer app color="accent" v-model="drawer" :mini-variant.sync="drawer" permanent>
+      <Sidebar @close="drawer = true"/>
+    </v-navigation-drawer>
+    <v-main>
+      <v-container>
         <Nuxt />
-        <div class="space"></div>
-      </v-main>
-    </div>
+      </v-container>
+    </v-main>
   </v-app>
 </template>
 
@@ -37,6 +37,8 @@ export default Vue.extend({
     return {
       title: "Constellation",
       userName: "",
+
+      drawer: true,
       menuItems: [
         {
           title: "Dashboard",
@@ -76,10 +78,10 @@ export default Vue.extend({
     },
     hasRole(role: string | undefined) {
       const session = this.$store.state as { auth: authStore };
-      if(session.auth.user?.role == role) {
+      if (session.auth.user?.role == role) {
         return true;
       }
-      if(!role) {
+      if (!role) {
         return true;
       }
       return false;

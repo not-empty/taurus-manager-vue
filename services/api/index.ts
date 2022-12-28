@@ -8,8 +8,9 @@ import { DashModule } from "./DashModule";
 import { JobsModule } from "./JobsModule";
 import { GroupModule } from "./GroupModule";
 
+
 export class Api{
-  private client: NuxtAxiosInstance;
+  public client: NuxtAxiosInstance;
   public token: string | null;
   public user: UserModule;
   public group: GroupModule;
@@ -51,5 +52,16 @@ export class Api{
 
   private getGroups(): GroupModule {
     return new GroupModule(this.client, 'group')
+  }
+
+  public setInterceptorResponseError(interceptor: any) {
+    this.client.interceptors.response.use(
+      response => response,
+      interceptor
+    );
+  }
+
+  public setInterceptorRequest(interceptor: any) {
+    this.client.interceptors.request.use(interceptor);
   }
 }

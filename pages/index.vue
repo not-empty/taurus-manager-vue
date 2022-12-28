@@ -24,7 +24,7 @@
 <script lang="ts">
 import Vue from "vue";
 export default Vue.extend({
-  layout: 'empty',
+  layout: 'emptyLayout',
   middleware: "guest",
   data() {
     return {

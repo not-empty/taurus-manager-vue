@@ -1,7 +1,11 @@
 <template>
   <div>
-    <v-sheet class="px-4 py-4 accent">
+    <v-sheet class="px-4 py-4 accent d-flex justify-space-between" >
       <span class="font-weight-bold text-h6">Jobs</span>
+      <v-btn text color="secondary">
+        <v-icon left>mdi-content-copy</v-icon>
+        <span>Clone Job</span>
+      </v-btn>
     </v-sheet>
     <v-flex class="d-flex">
       <v-card tile width="100%" color="accent">
@@ -58,13 +62,13 @@
     <v-sheet class="px-4 py-4 accent">
       <span class="font-weight-bold text-h6">Data</span>
     </v-sheet>
-    <code class="d-flex py-1 rounded-0 code-border">
+    <code class="d-flex py-1 rounded-0 code-border overflow">
       <pre class="language-markup">{{ job.data }}</pre>
     </code>
     <v-sheet class="px-4 py-4 accent">
       <span class="font-weight-bold text-h6">Trace</span>
     </v-sheet>
-    <code class="d-flex py-1 rounded-0 code-border">
+    <code class="d-flex py-1 rounded-0 code-border overflow">
       <pre class="language-markup">{{ job.stacktrace }}</pre>
     </code>
   </div>
@@ -120,5 +124,10 @@ export default Vue.extend({
 <style scoped>
 .code-border {
   border-left: 2px solid #db1e72;
+}
+
+.overflow {
+  overflow: auto;
+  max-width: 100%;
 }
 </style>

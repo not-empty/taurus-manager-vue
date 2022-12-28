@@ -2,28 +2,41 @@
 .list {
   list-style: none;
 }
-.list a {
-  text-decoration: none;
+
+.list:hover {
+  color: #db1e72 !important;
 }
-.list a:hover > * {
-  color: #db1e72;
+
+.list:hover i {
+  color: #db1e72 !important;
 }
 </style>
 
 <template>
-  <nav class="px-8 py-6">
-    <header class="mb-4">
-      <img src="/horus.png" alt="Horus" />
-    </header>
-    <ul class="list pl-0">
-      <li v-for="link in links" class="my-4">
-        <NuxtLink :to="link.to" class="d-flex align-center text-subtitle-1">
-          <v-icon left>{{ link.icon }}</v-icon>
-          <span v-if="isExtend">{{ link.title }}</span>
-        </NuxtLink>
-      </li>
-    </ul>
-  </nav>
+  <div>
+    <v-list>
+      <v-list-item class="px-3">
+        <v-list-item-avatar>
+          <v-img src="/horus.png"></v-img>
+        </v-list-item-avatar>
+        <v-list-item-content>
+          <v-list-item-title class="title">Horus</v-list-item-title>
+
+        </v-list-item-content>
+        <v-btn icon @click.stop="$emit('close')">
+          <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+      </v-list-item>
+    </v-list>
+    <v-list>
+      <v-list-item v-for="link in links" :key="link.to" :href="link.to" class="list px-3">
+        <v-list-item-icon><v-icon>{{ link.icon }}</v-icon></v-list-item-icon>
+        <v-list-item-content nuxt>
+          <v-list-item-title v-text="link.title"></v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
+  </div>
 </template>
 
 <script lang="ts">
@@ -33,6 +46,8 @@ export default defineComponent({
   name: "Sidebar",
   data: () => ({
     isExtend: true,
+
+    drawer: false,
     links: [
       {
         icon: "mdi-view-dashboard",

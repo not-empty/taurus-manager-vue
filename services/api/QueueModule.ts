@@ -49,13 +49,13 @@ export class QueueModule extends Module {
   }
 
   public async pauseBulk(payload: string[]): Promise<boolean> {
-    const result = await this.api.$put<boolean>(`/${this.path}/pause`, payload);
+    const result = await this.api.$put<boolean>(`/${this.path}/pause`, {ids: payload});
 
     return result;
   }
 
   public async resumeBulk(payload: string[]): Promise<boolean> {
-    const result = await this.api.$put<boolean>(`/${this.path}/resume`, payload);
+    const result = await this.api.$put<boolean>(`/${this.path}/resume`, {ids: payload});
 
     return result;
   }

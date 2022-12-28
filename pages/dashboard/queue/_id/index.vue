@@ -1,16 +1,7 @@
 <template>
   <div>
-    <v-data-table
-      hide-default-footer
-      show-select
-      v-model="jobsSelected"
-      :loading="loader"
-      :headers="jobHeaders"
-      :items="jobs"
-      sort-by="createAt"
-      class="accent"
-      @click:row="openJob"
-    >
+    <v-data-table hide-default-footer show-select v-model="jobsSelected" :loading="loader" :headers="jobHeaders"
+      :items="jobs" item-key="id" sort-by="createAt" class="accent" @click:row="openJob">
       <template v-slot:top>
         <template v-if="queueData.jobCounts">
           <v-sheet class="d-flex accent">
@@ -18,16 +9,11 @@
               <span class="font-weight-bold text-h6">
                 {{ queueData.name }}
               </span>
-              <v-chip small class="ml-4" color="green">
+              <v-chip small class="ml-4" :color="queueData.status == 'running' ? 'green' : 'yellow'">
                 {{ queueData.status }}
               </v-chip>
               <v-spacer></v-spacer>
-              <v-btn
-                v-if="queueData.status === 'running'"
-                text
-                color="secondary"
-                @click="pauseQueue"
-              >
+              <v-btn v-if="queueData.status === 'running'" text color="secondary" @click="pauseQueue">
                 <v-icon left>mdi-pause</v-icon>
                 <span>Pause</span>
               </v-btn>
@@ -38,14 +24,8 @@
             </v-flex>
           </v-sheet>
           <v-sheet class="d-flex">
-            <v-card
-              v-for="name in status"
-              tile
-              width="100%"
-              :key="name"
-              :color="state === name ? 'info' : 'accent'"
-              @click="state = name"
-            >
+            <v-card v-for="name in status" tile width="100%" :key="name" :color="state === name ? 'info' : 'accent'"
+              @click="state = name">
               <v-card-text class="text-center">
                 <span>{{ captalize(name) }}</span>
                 <p class="text-h4 text--primary">
@@ -58,21 +38,11 @@
             <v-sheet class="d-flex px-4 py-4 accent">
               <p class="font-weight-bold text-h6">Jobs</p>
               <v-spacer></v-spacer>
-              <v-btn
-                text
-                :disabled="!jobsSelected.length"
-                color="secondary"
-                @click="pauseQueue"
-              >
+              <v-btn text :disabled="!jobsSelected.length" color="secondary" @click="retryJobs()">
                 <v-icon left>mdi-reload</v-icon>
-                <span>Reload</span>
+                <span>Retry</span>
               </v-btn>
-              <v-btn
-                text
-                :disabled="!jobsSelected.length"
-                color="secondary"
-                @click="pauseQueue"
-              >
+              <v-btn text :disabled="!jobsSelected.length" color="secondary" @click="removeJobs()">
                 <v-icon left>mdi-delete</v-icon>
                 <span>Remove</span>
               </v-btn>
@@ -95,7 +65,7 @@ export default Vue.extend({
     return {
       loader: false,
       state: "waiting",
-      jobsSelected: [] as string[],
+      jobsSelected: [] as IJob[],
       jobs: [] as IJob[],
       jobHeaders: [
         {
@@ -162,14 +132,7 @@ export default Vue.extend({
     },
   },
   created() {
-    this.filterJobs();
-    this.$api.dashboard.queueDash(this.$route.params.id).then((res) => {
-      this.items[1].text = res.groupId;
-      this.items[1].href = "/dashboard/group/" + res.groupId;
-      this.items[2].text = res.name;
-      this.items[2].disabled = true;
-      this.queueData = res;
-    });
+    this.getUpdatedData();
   },
   methods: {
     captalize(str: string) {
@@ -190,15 +153,21 @@ export default Vue.extend({
       this.$router.push(`/dashboard/queue/${this.$route.params.id}/jobs/${id}`);
     },
     pauseQueue() {
-      this.$api.queue.pause(this.$route.params.id);
+      this.$api.queue.pause(this.$route.params.id).then(() => {
+        this.getUpdatedData();
+      });
     },
     resumeQueue() {
-      this.$api.queue.resume(this.$route.params.id);
+      this.$api.queue.resume(this.$route.params.id).then(() => {
+        this.getUpdatedData();
+      });
     },
     retryJobs() {
       this.$api.jobs.retryJob(this.$route.params.id, {
-        jobIds: this.jobsSelected,
+        jobIds: this.mapSelected(),
         state: this.state,
+      }).then(() => {
+        this.getUpdatedData();
       });
 
       this.jobsSelected = [];
@@ -206,12 +175,29 @@ export default Vue.extend({
     },
     removeJobs() {
       this.$api.jobs.deleteJob(this.$route.params.id, {
-        jobIds: this.jobsSelected,
+        jobIds: this.mapSelected(),
+      }).then(() => {
+        this.getUpdatedData();
       });
 
       this.jobsSelected = [];
       this.filterJobs();
     },
+    mapSelected(): string[] {
+      return this.jobsSelected.map(job => {
+        return job.id
+      });
+    },
+    getUpdatedData() {
+      this.filterJobs();
+      this.$api.dashboard.queueDash(this.$route.params.id).then((res) => {
+        this.items[1].text = res.groupId;
+        this.items[1].href = "/dashboard/group/" + res.groupId;
+        this.items[2].text = res.name;
+        this.items[2].disabled = true;
+        this.queueData = res;
+      });
+    }
   },
 });
 </script>
