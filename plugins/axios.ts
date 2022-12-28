@@ -18,7 +18,6 @@ const api: Plugin = (context, inject) => {
   })
 
   api.setInterceptorRequest((config: any) => {
-    console.log(context.store.state)
     config.headers.Authorization = `Bearer ${context.store.state.auth.token}`
     return config
   })
