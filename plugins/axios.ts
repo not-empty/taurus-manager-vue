@@ -10,6 +10,18 @@ declare module 'vue/types/vue' {
 
 const api: Plugin = (context, inject) => {
   const api = new Api(context.$axios)
+
+  api.setInterceptorResponseError(function (error: any) {
+    context.store.dispatch('auth/removeSession')
+    context.redirect('/')
+    return Promise.reject(error);
+  })
+
+  api.setInterceptorRequest((config: any) => {
+    config.headers.Authorization = `Bearer ${context.store.state.auth.token}`
+    return config
+  })
+
   inject('api', api)
 }
 

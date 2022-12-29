@@ -1,144 +1,95 @@
 <template>
   <div>
-    <v-toolbar flat>
-      <v-toolbar-title>DashBoard</v-toolbar-title>
+    <v-sheet class="d-flex px-4 py-4 accent align-center mb-2">
+      <span class="font-weight-bold text-h6">Dashboard</span>
       <v-spacer></v-spacer>
-      <v-btn color="primary" @click="useCards = !useCards">
-        <v-icon>{{ useCards ? "mdi-view-list" : "mdi-table" }}</v-icon>
+      <v-btn
+        text
+        :disabled="!jobsSelected.length"
+        color="secondary"
+        @click="confirmPause()"
+      >
+        <v-icon left>mdi-pause</v-icon>
+        <span>Pause</span>
       </v-btn>
-    </v-toolbar>
-
-    <template v-if="!useCards">
-      <div v-for="group in dashboardData" :key="group.group.id">
-        <v-data-table
-          hide-default-footer
-          :headers="queuesHeaders"
-          :items="group.queues"
-          sort-by="createAt"
-          class="rounded my-4"
-          @click:row="openQueue"
-        >
-          <template v-slot:top>
-            <v-toolbar flat class="pointer" @click="openGroup(group.group.id)">
-              <v-toolbar-title>{{ group.group.name }}</v-toolbar-title>
-            </v-toolbar>
-          </template>
-          <template v-slot:item.status="{ item }">
-            <v-chip outlined color="green">
-              {{ item.status }}
-            </v-chip>
-          </template>
-          <template v-slot:item.actions="{ item }">
-            <v-icon v-if="item.status === 'running'" @click.stop="pauseQueue(item.id)">
-              mdi-pause
-            </v-icon>
-            <v-icon v-else @click.stop="resumeQueue(item.id)">
-              mdi-play
-            </v-icon>
-          </template>
-        </v-data-table>
-      </div>
-    </template>
-    <div v-else>
-      <v-sheet v-for="group in dashboardData" class="rounded my-4" :key="group.group.id">
-        <v-toolbar flat class="pointer" @click="openGroup(group.group.id)">
-          <v-toolbar-title>{{ group.group.name }}</v-toolbar-title>
-        </v-toolbar>
-        <v-divider></v-divider>
-        <v-sheet v-for="queue in group.queues" :key="queue.id">
-          <v-toolbar flat class="pointer" @click="openQueue(queue)">
-            <v-toolbar-title>{{ queue.name }}</v-toolbar-title>
-            <v-chip outlined class="pointer ml-4" color="green">
-              {{ queue.status }}
-            </v-chip>
-            <v-spacer></v-spacer>
-            <v-btn v-if="queue.status === 'running'" color="primary" @click="pauseQueue(queue.id)">
-              Pause
-              <v-icon right>mdi-pause</v-icon>
-            </v-btn>
-            <v-btn v-else color="primary" @click="resumeQueue(queue.id)">
-              Resume
-              <v-icon right>mdi-play</v-icon>
-            </v-btn>
-          </v-toolbar>
-          <v-sheet class="d-flex">
-            <v-card tile width="100%">
-              <v-card-text class="text-center">
-                <span>Waiting</span>
-                <p class="text-h4 text--primary">
-                  {{ queue.jobCounts.waiting }}
-                </p>
-              </v-card-text>
-            </v-card>
-            <v-card tile width="100%">
-              <v-card-text class="text-center">
-                <span>Paused</span>
-                <p class="text-h4 text--primary">
-                  {{ queue.jobCounts.paused }}
-                </p>
-              </v-card-text>
-            </v-card>
-            <v-card tile width="100%">
-              <v-card-text class="text-center">
-                <span>Active</span>
-                <p class="text-h4 text--primary">
-                  {{ queue.jobCounts.active }}
-                </p>
-              </v-card-text>
-            </v-card>
-            <v-card tile width="100%">
-              <v-card-text class="text-center">
-                <span>Delayed</span>
-                <p class="text-h4 text--primary">
-                  {{ queue.jobCounts.delayed }}
-                </p>
-              </v-card-text>
-            </v-card>
-            <v-card tile width="100%">
-              <v-card-text class="text-center">
-                <span>Failed</span>
-                <p class="text-h4 text--primary">
-                  {{ queue.jobCounts.failed }}
-                </p>
-              </v-card-text>
-            </v-card>
-          </v-sheet>
-        </v-sheet>
-      </v-sheet>
+      <v-btn
+        text
+        :disabled="!jobsSelected.length"
+        color="secondary"
+        @click="confirmResume()"
+      >
+        <v-icon left>mdi-play</v-icon>
+        <span>Resume</span>
+      </v-btn>
+    </v-sheet>
+    <div v-for="group in dashboardData" :key="group.group.id">
+      <v-data-table
+        hide-default-footer
+        show-select
+        v-model="jobsSelected"
+        :headers="queuesHeaders"
+        :items="group.queues"
+        sort-by="name"
+        class="accent mb-8"
+        @click:row="openQueue"
+      >
+        <template v-slot:top>
+          <p
+            class="px-4 py-4 font-weight-bold text-h6"
+            @click="openGroup(group.group.id)"
+          >
+            {{ group.group.name }}
+          </p>
+        </template>
+        <template v-slot:item.status="{ item }">
+          <v-chip small :color="item.status == 'running' ? 'green' : 'yellow'">
+            {{ item.status }}
+          </v-chip>
+        </template>
+      </v-data-table>
     </div>
+    <confirmation :state="corfirmModal" :function="modalFunction" :mensage="modalMesage" @close="corfirmModal = false"></confirmation>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { DashGroup } from "~/types/group";
+import { IJob } from "~/types/job";
 import { IQueue } from "~/types/queue";
+import confirmation from "../../components/utilities/confirmationModal.vue"
 export default Vue.extend({
-  middleware: 'auth',
+  middleware: "auth",
   name: "IndexPage",
+  components: {
+    confirmation
+  },
   data() {
     return {
-      logado: '',
+      logado: "",
+      jobsSelected: [] as IQueue[],
       dashboardData: [] as DashGroup[],
+      corfirmModal: false,
+      modalFunction: function(){},
+      modalMesage: '',
       queuesHeaders: [
         {
           text: "Name",
           value: "name",
         },
         {
-          text: "",
+          text: "Status",
           value: "status",
-          align: "start",
-          sortable: false,
         },
         {
           text: "Waiting",
           value: "jobCounts.waiting",
-        },{
+        },
+        {
           text: "Paused",
           value: "jobCounts.paused",
-        }
-        ,{
+        },
+        {
           text: "Active",
           value: "jobCounts.active",
         },
@@ -150,18 +101,12 @@ export default Vue.extend({
           text: "Failed",
           value: "jobCounts.failed",
         },
-        {
-          text: "Actions",
-          value: "actions",
-          align: "end",
-          sortable: false,
-        },
       ],
-      useCards: false
+      useCards: false,
     };
   },
   async created() {
-    this.dashboardData = await this.$api.dashboard.groupDash()
+    this.getUpdatedData()
   },
   methods: {
     openQueue({ id }: IQueue) {
@@ -170,21 +115,36 @@ export default Vue.extend({
     openGroup(id: string) {
       this.$router.push("/dashboard/group/" + id);
     },
-    pauseQueue(id: string) {
-      this.$api.queue.pause(id);
+    confirmPause(){
+      this.modalFunction = this.pauseQueue;
+      this.modalMesage = 'Pause selected queues?';
+      this.corfirmModal = true;
     },
-    resumeQueue(id: string) {
-      this.$api.queue.resume(id);
+    pauseQueue() {
+      this.$api.queue.pauseBulk(this.mapSelected()).then(() => {
+        this.getUpdatedData()
+      });
     },
-  }
+    confirmResume() {
+      this.modalFunction = this.resumeQueue;
+      this.modalMesage = 'Resume selected queues?';
+      this.corfirmModal = true;
+    },
+    resumeQueue() {
+      this.$api.queue.resumeBulk(this.mapSelected()).then(() => {
+        this.getUpdatedData()
+      });
+    },
+    mapSelected(): string[] {
+      return this.jobsSelected.map(job => {
+        return job.id
+      });
+    },
+    getUpdatedData() {
+      this.$api.dashboard.groupDash().then((res) => {
+        this.dashboardData = res;
+      });
+    }
+  },
 });
 </script>
-
-<style>
-.card-border {
-  border-bottom: 1px solid #cccccc50;
-}
-.pointer {
-  cursor: pointer;
-}
-</style>

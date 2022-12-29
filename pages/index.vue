@@ -9,7 +9,7 @@
           <v-text-field
             type="password"
             v-model="sessionPayload.password"
-            label="Senha"
+            label="Passsword"
             required
             outlined
           ></v-text-field>
@@ -24,7 +24,7 @@
 <script lang="ts">
 import Vue from "vue";
 export default Vue.extend({
-  layout: 'empty',
+  layout: 'emptyLayout',
   middleware: "guest",
   data() {
     return {

@@ -12,3 +12,7 @@ export interface IJob {
     failedReason: string | null,
     stacktrace: any | null
 }
+
+export interface IJobPayload {
+    data: any
+}

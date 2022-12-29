@@ -1,0 +1,25 @@
+html {
+  overflow-y: auto !important;
+}
+
+.v-btn {
+  text-transform: unset !important;
+}
+
+table > thead > tr:last-child > th {
+  border: none !important;
+}
+
+table > tbody > tr:not(:last-child) > td:not(.v-data-table__mobile-row),
+table > tbody > tr:not(:last-child) > th:not(.v-data-table__mobile-row) {
+  border: none !important;
+}
+
+table > tbody > tr:nth-of-type(odd) {
+  background-color: #25262c;
+}
+
+table > tbody > tr,
+.v-chip {
+  cursor: pointer !important;
+}

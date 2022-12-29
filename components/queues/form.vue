@@ -2,13 +2,13 @@
   <v-card>
     <v-form v-model="valid" @submit.prevent="submitForm()">
       <v-card-title>
-        <span class="text-h5">Fila</span>
+        <span class="text-h5">Queue</span>
       </v-card-title>
       <v-card-text>
         <v-container>
           <v-row>
             <v-col cols="12">
-              <v-text-field label="Nome*" v-model="queueData.name" required></v-text-field>
+              <v-text-field label="Name*" v-model="queueData.name" required></v-text-field>
             </v-col>
           </v-row>
           <v-row>
@@ -22,26 +22,26 @@
           </v-row>
           <v-row>
             <v-col cols="12" sm="12" lg="12">
-              <v-select :items="groups" item-text="name" item-value="id" label="Grupo" v-model="queueData.groupId"
+              <v-select :items="groups" item-text="name" item-value="id" label="Group" v-model="queueData.groupId"
                 required></v-select>
             </v-col>
             <v-col cols="12" sm="12" lg="12">
-              <v-textarea label="Descrição" rows="1" auto-grow v-model="queueData.description"></v-textarea>
+              <v-textarea label="Description" rows="1" auto-grow v-model="queueData.description"></v-textarea>
             </v-col>
             <v-col>
               <v-text-field label="Compliance" v-model="queueData.compliance"></v-text-field>
             </v-col>
           </v-row>
         </v-container>
-        <small>*Campos obrigatórios</small>
+        <small>*Required</small>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="blue darken-1" text @click="closeDialog()">
-          Fechar
+          Close
         </v-btn>
         <v-btn color="blue darken-1" text type="submit">
-          Salvar
+          Save
         </v-btn>
       </v-card-actions>
     </v-form>
