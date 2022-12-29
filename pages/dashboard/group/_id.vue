@@ -1,12 +1,14 @@
 <template>
   <div>
-    <v-data-table hide-default-footer show-select :headers="queuesHeaders" :items="dashboardData.queues"
+    <v-data-table :search="search" hide-default-footer show-select :headers="queuesHeaders" :items="dashboardData.queues"
       v-model="jobsSelected" @click:row="openQueue" sort-by="createAt" class="accent">
       <template v-slot:top>
         <div class="d-flex align-center">
           <p class="px-4 py-4 font-weight-bold text-h6">
             {{ dashboardData.group?.name }}
           </p>
+          <v-spacer></v-spacer>
+          <v-text-field label="Search for groups" v-model="search" append-icon="mdi-magnify"></v-text-field>
           <v-spacer></v-spacer>
           <v-btn text :disabled="!jobsSelected.length" color="secondary" @click="confirmPause()">
             <v-icon left>mdi-pause</v-icon>
@@ -45,6 +47,7 @@ export default Vue.extend({
       logado: "",
       dashboardData: {} as DashGroup,
       jobsSelected: [] as IQueue[],
+      search: '',
       corfirmModal: false,
       modalFunction: function () { },
       modalMesage: '',
@@ -100,7 +103,7 @@ export default Vue.extend({
       this.$router.push("/dashboard/queue/" + id);
     },
     pauseQueue() {
-      this.$api.queue.pauseBulk(this.mapSelected()).then(()=>{
+      this.$api.queue.pauseBulk(this.mapSelected()).then(() => {
         this.getUpdatedData();
       });
     },
@@ -110,7 +113,7 @@ export default Vue.extend({
       this.corfirmModal = true;
     },
     resumeQueue() {
-      this.$api.queue.resumeBulk(this.mapSelected()).then(()=>{
+      this.$api.queue.resumeBulk(this.mapSelected()).then(() => {
         this.getUpdatedData();
       });
     },

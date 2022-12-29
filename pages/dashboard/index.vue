@@ -3,7 +3,7 @@
     <v-sheet class="d-flex px-4 py-4 accent align-center mb-2">
       <span class="font-weight-bold text-h6">Dashboard</span>
       <v-spacer></v-spacer>
-      <v-text-field label="Search for groups" v-model="search"></v-text-field>
+      <v-text-field label="Search for groups" v-model="search" append-icon="mdi-magnify"></v-text-field>
       <v-spacer></v-spacer>
       <v-btn
         text
