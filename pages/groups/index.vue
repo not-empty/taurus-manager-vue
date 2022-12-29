@@ -77,6 +77,7 @@ export default Vue.extend({
     close() {
       this.edit = null;
       this.dialog = false;
+      this.getGroups();
     },
     deleteGroups(group: IGroup) {
       this.$api.group.delete(group.id).then(() => {

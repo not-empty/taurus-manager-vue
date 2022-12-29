@@ -91,6 +91,7 @@ export default Vue.extend({
     close() {
       this.edit = null;
       this.dialog = false;
+      this.getQueues();
     },
     deleteQueue(queue: IQueue) {
       this.$api.queue.delete(queue.id).then(() => {

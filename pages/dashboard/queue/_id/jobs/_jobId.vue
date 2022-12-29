@@ -2,7 +2,7 @@
   <div>
     <v-sheet class="px-4 py-4 accent d-flex justify-space-between" >
       <span class="font-weight-bold text-h6">Jobs</span>
-      <v-btn text color="secondary">
+      <v-btn text color="secondary" @click="confirmClone()">
         <v-icon left>mdi-content-copy</v-icon>
         <span>Clone Job</span>
       </v-btn>
@@ -71,20 +71,28 @@
     <code class="d-flex py-1 rounded-0 code-border overflow">
       <pre class="language-markup">{{ job.stacktrace }}</pre>
     </code>
+    <confirmation :state="ModalState" :function="ModalFunc" :mensage="ModalMessage" @close="ModalState = false"></confirmation>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { IJob } from "~/types/job";
+import confirmation from "../../../../../components/utilities/confirmationModal.vue"
 export default Vue.extend({
   middleware: "auth",
   name: "ViewQueue",
+  components: {
+    confirmation
+  },
   data() {
     return {
       loader: true,
       state: "running",
       job: {} as IJob,
+      ModalState: false,
+      ModalFunc: function(){},
+      ModalMessage: '',
       items: [
         {
           text: "Dashboard",
@@ -117,7 +125,16 @@ export default Vue.extend({
         this.loader = false;
       });
   },
-  methods: {},
+  methods: {
+    confirmClone(){
+      this.ModalFunc = this.cloneJob;
+      this.ModalMessage = 'Clonar job?';
+      this.ModalState = true;
+    },
+    cloneJob() {
+      this.$api.jobs.cloneJob(this.$route.params.id, this.$route.params.jobId);
+    }
+  },
 });
 </script>
 
@@ -127,7 +144,8 @@ export default Vue.extend({
 }
 
 .overflow {
-  overflow: auto;
   max-width: 100%;
+  word-break: break-all;
+  white-space: break-spaces;
 }
 </style>

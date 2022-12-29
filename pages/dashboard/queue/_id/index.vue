@@ -13,11 +13,11 @@
                 {{ queueData.status }}
               </v-chip>
               <v-spacer></v-spacer>
-              <v-btn v-if="queueData.status === 'running'" text color="secondary" @click="pauseQueue">
+              <v-btn v-if="queueData.status === 'running'" text color="secondary" @click="confirmPause()">
                 <v-icon left>mdi-pause</v-icon>
                 <span>Pause</span>
               </v-btn>
-              <v-btn v-else text color="secondary" @click="resumeQueue">
+              <v-btn v-else text color="secondary" @click="confirmResume()">
                 <v-icon left>mdi-play</v-icon>
                 <span>Resume</span>
               </v-btn>
@@ -38,11 +38,11 @@
             <v-sheet class="d-flex px-4 py-4 accent">
               <p class="font-weight-bold text-h6">Jobs</p>
               <v-spacer></v-spacer>
-              <v-btn text :disabled="!jobsSelected.length" color="secondary" @click="retryJobs()">
+              <v-btn text :disabled="!jobsSelected.length" v-if="state == 'failed'" color="secondary" @click="confirmRetry()">
                 <v-icon left>mdi-reload</v-icon>
                 <span>Retry</span>
               </v-btn>
-              <v-btn text :disabled="!jobsSelected.length" color="secondary" @click="removeJobs()">
+              <v-btn text :disabled="!jobsSelected.length" color="secondary" @click="confirmRemove()">
                 <v-icon left>mdi-delete</v-icon>
                 <span>Remove</span>
               </v-btn>
@@ -51,6 +51,7 @@
         </template>
       </template>
     </v-data-table>
+    <confirmation :state="ModalState" :function="ModalFunc" :mensage="ModalMessage" @close="ModalState = false"></confirmation>
   </div>
 </template>
 
@@ -58,13 +59,20 @@
 import Vue from "vue";
 import { IJob } from "~/types/job";
 import { DashQueue, JobCounts } from "~/types/queue";
+import confirmation from "../../../../components/utilities/confirmationModal.vue"
 export default Vue.extend({
   middleware: "auth",
   name: "ViewQueue",
+  components: {
+    confirmation
+  },
   data() {
     return {
       loader: false,
       state: "waiting",
+      ModalState: false,
+      ModalFunc: function(){},
+      ModalMessage: '',
       jobsSelected: [] as IJob[],
       jobs: [] as IJob[],
       jobHeaders: [
@@ -152,15 +160,30 @@ export default Vue.extend({
     openJob({ id }: IJob) {
       this.$router.push(`/dashboard/queue/${this.$route.params.id}/jobs/${id}`);
     },
+    confirmPause(){
+      this.ModalFunc = this.pauseQueue;
+      this.ModalMessage = 'Pausar a fila?';
+      this.ModalState = true;
+    },
     pauseQueue() {
       this.$api.queue.pause(this.$route.params.id).then(() => {
         this.getUpdatedData();
       });
     },
+    confirmResume(){
+      this.ModalFunc = this.resumeQueue;
+      this.ModalMessage = 'Retomar a fila?';
+      this.ModalState = true;
+    },
     resumeQueue() {
       this.$api.queue.resume(this.$route.params.id).then(() => {
         this.getUpdatedData();
       });
+    },
+    confirmRetry(){
+      this.ModalFunc = this.retryJobs;
+      this.ModalMessage = 'Retentar todos os jobs selecionados?';
+      this.ModalState = true;
     },
     retryJobs() {
       this.$api.jobs.retryJob(this.$route.params.id, {
@@ -172,6 +195,11 @@ export default Vue.extend({
 
       this.jobsSelected = [];
       this.filterJobs();
+    },
+    confirmRemove(){
+      this.ModalFunc = this.removeJobs;
+      this.ModalMessage = 'Remover todos os jobs selecionados?';
+      this.ModalState = true;
     },
     removeJobs() {
       this.$api.jobs.deleteJob(this.$route.params.id, {

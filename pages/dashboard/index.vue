@@ -7,7 +7,7 @@
         text
         :disabled="!jobsSelected.length"
         color="secondary"
-        @click="pauseQueue"
+        @click="confirmPause()"
       >
         <v-icon left>mdi-pause</v-icon>
         <span>Pause</span>
@@ -16,7 +16,7 @@
         text
         :disabled="!jobsSelected.length"
         color="secondary"
-        @click="resumeQueue"
+        @click="confirmResume()"
       >
         <v-icon left>mdi-play</v-icon>
         <span>Resume</span>
@@ -48,6 +48,7 @@
         </template>
       </v-data-table>
     </div>
+    <confirmation :state="corfirmModal" :function="modalFunction" :mensage="modalMesage" @close="corfirmModal = false"></confirmation>
   </div>
 </template>
 
@@ -56,14 +57,21 @@ import Vue from "vue";
 import { DashGroup } from "~/types/group";
 import { IJob } from "~/types/job";
 import { IQueue } from "~/types/queue";
+import confirmation from "../../components/utilities/confirmationModal.vue"
 export default Vue.extend({
   middleware: "auth",
   name: "IndexPage",
+  components: {
+    confirmation
+  },
   data() {
     return {
       logado: "",
       jobsSelected: [] as IJob[],
       dashboardData: [] as DashGroup[],
+      corfirmModal: false,
+      modalFunction: function(){},
+      modalMesage: '',
       queuesHeaders: [
         {
           text: "Name",
@@ -107,10 +115,20 @@ export default Vue.extend({
     openGroup(id: string) {
       this.$router.push("/dashboard/group/" + id);
     },
+    confirmPause(){
+      this.modalFunction = this.pauseQueue;
+      this.modalMesage = 'Pausar todas as filas selecionadas?';
+      this.corfirmModal = true;
+    },
     pauseQueue() {
       this.$api.queue.pauseBulk(this.mapSelected()).then(() => {
         this.getUpdatedData()
       });
+    },
+    confirmResume() {
+      this.modalFunction = this.resumeQueue;
+      this.modalMesage = 'Rodar todas as filas selecionadas?';
+      this.corfirmModal = true;
     },
     resumeQueue() {
       this.$api.queue.resumeBulk(this.mapSelected()).then(() => {

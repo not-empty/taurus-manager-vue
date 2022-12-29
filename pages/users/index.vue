@@ -24,7 +24,7 @@
     </v-data-table>
 
     <v-dialog v-model="dialog" persistent max-width="600px" v-if="dialog">
-      <UsersFrom @close="dialog = false" :user="edit"></UsersFrom>
+      <UsersFrom @close="closeModal()" :user="edit"></UsersFrom>
     </v-dialog>
   </div>
 </template>
@@ -93,6 +93,10 @@ export default Vue.extend({
         this.getUsers();
       });
     },
+    closeModal() {
+      this.dialog = false;
+      this.getUsers();
+    }
   },
 });
 </script>
