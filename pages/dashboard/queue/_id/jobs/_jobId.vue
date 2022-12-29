@@ -93,6 +93,7 @@ export default Vue.extend({
       ModalState: false,
       ModalFunc: function(){},
       ModalMessage: '',
+      createDialog: false,
       items: [
         {
           text: "Dashboard",
@@ -128,7 +129,7 @@ export default Vue.extend({
   methods: {
     confirmClone(){
       this.ModalFunc = this.cloneJob;
-      this.ModalMessage = 'Clonar job?';
+      this.ModalMessage = 'Clone job?';
       this.ModalState = true;
     },
     cloneJob() {

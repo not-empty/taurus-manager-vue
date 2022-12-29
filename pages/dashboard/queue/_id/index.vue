@@ -13,6 +13,10 @@
                 {{ queueData.status }}
               </v-chip>
               <v-spacer></v-spacer>
+              <v-btn text color="secondary" @click="createDialog = true">
+                <v-icon left>mdi-plus</v-icon>
+                <span>Create job</span>
+              </v-btn>
               <v-btn v-if="queueData.status === 'running'" text color="secondary" @click="confirmPause()">
                 <v-icon left>mdi-pause</v-icon>
                 <span>Pause</span>
@@ -52,6 +56,9 @@
       </template>
     </v-data-table>
     <confirmation :state="ModalState" :function="ModalFunc" :mensage="ModalMessage" @close="ModalState = false"></confirmation>
+    <v-dialog v-model="createDialog" persistent max-width="800px" v-if="createDialog">
+      <createJob :queue-id="$route.params.id" @close="createDialog = false"></createJob>
+    </v-dialog>
   </div>
 </template>
 
@@ -60,11 +67,13 @@ import Vue from "vue";
 import { IJob } from "~/types/job";
 import { DashQueue, JobCounts } from "~/types/queue";
 import confirmation from "../../../../components/utilities/confirmationModal.vue"
+import createJob from "../../../../components/jobs/form.vue"
 export default Vue.extend({
   middleware: "auth",
   name: "ViewQueue",
   components: {
-    confirmation
+    confirmation,
+    createJob
   },
   data() {
     return {
@@ -75,6 +84,7 @@ export default Vue.extend({
       ModalMessage: '',
       jobsSelected: [] as IJob[],
       jobs: [] as IJob[],
+      createDialog: false,
       jobHeaders: [
         {
           text: "ID",
@@ -162,7 +172,7 @@ export default Vue.extend({
     },
     confirmPause(){
       this.ModalFunc = this.pauseQueue;
-      this.ModalMessage = 'Pausar a fila?';
+      this.ModalMessage = 'Pause Queue?';
       this.ModalState = true;
     },
     pauseQueue() {
@@ -172,7 +182,7 @@ export default Vue.extend({
     },
     confirmResume(){
       this.ModalFunc = this.resumeQueue;
-      this.ModalMessage = 'Retomar a fila?';
+      this.ModalMessage = 'Resume Queue?';
       this.ModalState = true;
     },
     resumeQueue() {
@@ -182,7 +192,7 @@ export default Vue.extend({
     },
     confirmRetry(){
       this.ModalFunc = this.retryJobs;
-      this.ModalMessage = 'Retentar todos os jobs selecionados?';
+      this.ModalMessage = 'Retry selected jobs?';
       this.ModalState = true;
     },
     retryJobs() {
@@ -198,7 +208,7 @@ export default Vue.extend({
     },
     confirmRemove(){
       this.ModalFunc = this.removeJobs;
-      this.ModalMessage = 'Remover todos os jobs selecionados?';
+      this.ModalMessage = 'Remove selected jobs?';
       this.ModalState = true;
     },
     removeJobs() {

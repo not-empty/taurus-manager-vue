@@ -13,7 +13,7 @@
           <v-spacer></v-spacer>
           <v-btn text color="secondary" @click="dialog = true">
             <v-icon left>mdi-account-multiple-plus</v-icon>
-            <span>Novo Usuário</span>
+            <span>New user</span>
           </v-btn>
         </v-flex>
       </template>

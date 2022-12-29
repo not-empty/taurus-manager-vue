@@ -9,11 +9,11 @@
     >
       <template v-slot:top>
         <v-flex class="d-flex align-center px-4 py-4">
-          <span class="font-weight-bold text-h6">Grupos</span>
+          <span class="font-weight-bold text-h6">Groups</span>
           <v-spacer></v-spacer>
           <v-btn text color="secondary" @click="dialog = true">
             <v-icon left>mdi-archive-plus</v-icon>
-            <span>Novo grupo</span>
+            <span>New group</span>
           </v-btn>
         </v-flex>
       </template>

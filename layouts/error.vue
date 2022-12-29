@@ -25,7 +25,7 @@ export default {
   data () {
     return {
       pageNotFound: '404 Not Found',
-      otherError: 'Houve um erro de comunicação com o backend, tente novamente mais tarde'
+      otherError: 'Server Error, try again later'
     }
   },
   head () {

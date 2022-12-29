@@ -9,7 +9,7 @@
           <v-text-field
             type="password"
             v-model="sessionPayload.password"
-            label="Senha"
+            label="Passsword"
             required
             outlined
           ></v-text-field>

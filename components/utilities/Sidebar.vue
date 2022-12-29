@@ -56,12 +56,12 @@ export default defineComponent({
       },
       {
         icon: "mdi-archive",
-        title: "Grupos",
+        title: "Grups",
         to: "/groups",
       },
       {
         icon: "mdi-tray-full",
-        title: "Filas",
+        title: "Queues",
         to: "/queue",
       },
       {

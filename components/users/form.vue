@@ -2,13 +2,13 @@
   <v-card>
     <v-form v-model="valid" @submit.prevent="submitForm()">
       <v-card-title>
-        <span class="text-h5">Usuário</span>
+        <span class="text-h5">User</span>
       </v-card-title>
       <v-card-text>
         <v-container>
           <v-row>
             <v-col cols="12">
-              <v-text-field label="Nome*" v-model="UserData.name" required></v-text-field>
+              <v-text-field label="Name*" v-model="UserData.name" required></v-text-field>
             </v-col>
           </v-row>
           <v-row>
@@ -21,15 +21,15 @@
             </v-col>
           </v-row>
         </v-container>
-        <small>*Campos obrigatórios</small>
+        <small>*Required</small>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="blue darken-1" text @click="closeDialog()">
-          Fechar
+          Close
         </v-btn>
         <v-btn color="blue darken-1" text type="submit">
-          Salvar
+          Save
         </v-btn>
       </v-card-actions>
     </v-form>

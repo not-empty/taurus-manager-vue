@@ -9,11 +9,11 @@
     >
       <template v-slot:top>
         <v-flex class="d-flex align-center px-4 py-4">
-          <span class="font-weight-bold text-h6">Filas</span>
+          <span class="font-weight-bold text-h6">Queues</span>
           <v-spacer></v-spacer>
           <v-btn text color="secondary" @click="dialog = true">
             <v-icon left>mdi-tray-plus</v-icon>
-            <span>Nova Fila</span>
+            <span>New Queue</span>
           </v-btn>
         </v-flex>
       </template>

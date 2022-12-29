@@ -67,7 +67,7 @@ export default Vue.extend({
   data() {
     return {
       logado: "",
-      jobsSelected: [] as IJob[],
+      jobsSelected: [] as IQueue[],
       dashboardData: [] as DashGroup[],
       corfirmModal: false,
       modalFunction: function(){},
@@ -117,7 +117,7 @@ export default Vue.extend({
     },
     confirmPause(){
       this.modalFunction = this.pauseQueue;
-      this.modalMesage = 'Pausar todas as filas selecionadas?';
+      this.modalMesage = 'Pause selected queues?';
       this.corfirmModal = true;
     },
     pauseQueue() {
@@ -127,7 +127,7 @@ export default Vue.extend({
     },
     confirmResume() {
       this.modalFunction = this.resumeQueue;
-      this.modalMesage = 'Rodar todas as filas selecionadas?';
+      this.modalMesage = 'Resume selected queues?';
       this.corfirmModal = true;
     },
     resumeQueue() {
