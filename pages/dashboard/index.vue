@@ -3,6 +3,8 @@
     <v-sheet class="d-flex px-4 py-4 accent align-center mb-2">
       <span class="font-weight-bold text-h6">Dashboard</span>
       <v-spacer></v-spacer>
+      <v-text-field label="Search for groups" v-model="search"></v-text-field>
+      <v-spacer></v-spacer>
       <v-btn
         text
         :disabled="!jobsSelected.length"
@@ -22,7 +24,7 @@
         <span>Resume</span>
       </v-btn>
     </v-sheet>
-    <div v-for="group in dashboardData" :key="group.group.id">
+    <div v-for="group in filteredData" :key="group.group.id">
       <v-data-table
         hide-default-footer
         show-select
@@ -53,6 +55,7 @@
 </template>
 
 <script lang="ts">
+import { thisExpression } from "@babel/types";
 import Vue from "vue";
 import { DashGroup } from "~/types/group";
 import { IJob } from "~/types/job";
@@ -69,9 +72,11 @@ export default Vue.extend({
       logado: "",
       jobsSelected: [] as IQueue[],
       dashboardData: [] as DashGroup[],
+      filteredData: [] as DashGroup[],
       corfirmModal: false,
       modalFunction: function(){},
       modalMesage: '',
+      search: '',
       queuesHeaders: [
         {
           text: "Name",
@@ -143,8 +148,16 @@ export default Vue.extend({
     getUpdatedData() {
       this.$api.dashboard.groupDash().then((res) => {
         this.dashboardData = res;
+        this.filteredData = this.dashboardData;
       });
     }
   },
+  watch: {
+    'search': function() {
+      this.filteredData = this.dashboardData.filter((res) => {
+        return res.group.name.match(this.search)
+      })
+    }
+  }
 });
 </script>
