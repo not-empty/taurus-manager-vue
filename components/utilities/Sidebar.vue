@@ -1,13 +1,12 @@
 <template>
   <div>
     <v-list>
-      <v-list-item class="px-3">
+      <v-list-item class="px-2">
         <v-list-item-avatar>
           <v-img src="/horus.png"></v-img>
         </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title class="title">Horus</v-list-item-title>
-
         </v-list-item-content>
         <v-btn icon @click.stop="$emit('close')">
           <v-icon>mdi-chevron-left</v-icon>
@@ -15,7 +14,12 @@
       </v-list-item>
     </v-list>
     <v-list>
-      <v-list-item v-for="link in links" :key="link.to" :to="link.to" class="list px-3">
+      <v-list-item
+        v-for="link in links"
+        :key="link.to"
+        :to="link.to"
+        class="list"
+      >
         <v-list-item-icon><v-icon>{{ link.icon }}</v-icon></v-list-item-icon>
         <v-list-item-content nuxt>
           <v-list-item-title v-text="link.title"></v-list-item-title>
@@ -42,7 +46,7 @@ export default defineComponent({
       },
       {
         icon: "mdi-archive",
-        title: "Grups",
+        title: "Groups",
         to: "/groups",
       },
       {

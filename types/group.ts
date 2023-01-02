@@ -15,6 +15,15 @@ export interface GroupPayload {
 }
 
 export interface DashGroup {
-  group: IGroup 
+  group: IGroup
   queues: DashQueue[];
+}
+
+export interface IStateGroup {
+  id: string;
+  name: string;
+}
+
+export interface IState {
+  groups: IStateGroup[];
 }

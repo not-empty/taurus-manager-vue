@@ -1,9 +1,26 @@
 <template>
   <div>
-    <v-sheet class="d-flex px-4 py-4 accent align-center mb-2">
-      <span class="font-weight-bold text-h6">Dashboard</span>
-      <v-spacer></v-spacer>
-      <v-text-field label="Search for groups" v-model="search" append-icon="mdi-magnify"></v-text-field>
+    <v-breadcrumbs :items="items" class="pl-3">
+      <template v-slot:item="{ item }">
+        <v-breadcrumbs-item
+          :href="item.href"
+          :disabled="item.disabled"
+        >
+          {{ item.text }}
+        </v-breadcrumbs-item>
+      </template>
+    </v-breadcrumbs>
+    <v-flex class="d-flex py-4 align-center mb-2 rounded">
+      <v-text-field
+        filled
+        hide-details
+        single-line
+        rounded
+        dense
+        label="Search for groups"
+        v-model="search"
+        append-icon="mdi-magnify"
+      ></v-text-field>
       <v-spacer></v-spacer>
       <v-btn
         text
@@ -23,7 +40,11 @@
         <v-icon left>mdi-play</v-icon>
         <span>Resume</span>
       </v-btn>
-    </v-sheet>
+      <v-btn text color="secondary" @click="getUpdatedData()">
+        <v-icon left>mdi-reload</v-icon>
+        <span>Refresh</span>
+      </v-btn>
+    </v-flex>
     <div v-for="group in filteredData" :key="group.group.id">
       <v-data-table
         hide-default-footer
@@ -40,7 +61,9 @@
             class="px-4 py-4 font-weight-bold text-h6"
             @click="openGroup(group.group.id)"
           >
-            {{ group.group.name }}
+            <span class="pointer">
+              {{ group.group.name }}
+            </span>
           </p>
         </template>
         <template v-slot:item.status="{ item }">
@@ -55,10 +78,8 @@
 </template>
 
 <script lang="ts">
-import { thisExpression } from "@babel/types";
 import Vue from "vue";
 import { DashGroup } from "~/types/group";
-import { IJob } from "~/types/job";
 import { IQueue } from "~/types/queue";
 import confirmation from "../../components/utilities/confirmationModal.vue"
 export default Vue.extend({
@@ -105,6 +126,12 @@ export default Vue.extend({
         {
           text: "Failed",
           value: "jobCounts.failed",
+        },
+      ],
+      items: [
+        {
+          text: "Dashboard",
+          disabled: false,
         },
       ],
       useCards: false,
@@ -161,3 +188,9 @@ export default Vue.extend({
   }
 });
 </script>
+
+<style scoped>
+.pointer {
+  cursor: pointer;
+}
+</style>

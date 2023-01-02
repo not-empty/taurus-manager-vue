@@ -1,7 +1,19 @@
 <template>
   <div>
-    <v-data-table hide-default-footer  show-select v-model="jobsSelected" :loading="loader" :headers="jobHeaders"
-      :items="jobs" item-key="id" sort-by="createAt" class="accent" @click:row="openJob" :items-per-page="pagination.itemsPerPage">
+    <v-breadcrumbs :items="items" class="pl-3"></v-breadcrumbs>
+    <v-data-table
+      hide-default-footer
+      show-select
+      v-model="jobsSelected"
+      :loading="loader"
+      :headers="jobHeaders"
+      :items="jobs"
+      item-key="id"
+      sort-by="createAt"
+      class="accent"
+      @click:row="openJob"
+      :items-per-page="pagination.itemsPerPage"
+    >
       <template v-slot:top>
         <template v-if="queueData.jobCounts">
           <v-sheet class="d-flex accent">
@@ -43,12 +55,16 @@
               <p class="font-weight-bold text-h6">Jobs</p>
               <v-spacer></v-spacer>
               <v-btn text :disabled="!jobsSelected.length" v-if="state == 'failed'" color="secondary" @click="confirmRetry()">
-                <v-icon left>mdi-reload</v-icon>
+                <v-icon left>mdi-reload-alert</v-icon>
                 <span>Retry</span>
               </v-btn>
               <v-btn text :disabled="!jobsSelected.length" color="secondary" @click="confirmRemove()">
                 <v-icon left>mdi-delete</v-icon>
                 <span>Remove</span>
+              </v-btn>
+              <v-btn text color="secondary" @click="getUpdatedData()">
+                <v-icon left>mdi-reload</v-icon>
+                <span>Refresh</span>
               </v-btn>
             </v-sheet>
           </v-sheet>
@@ -72,6 +88,7 @@ import { IJob } from "~/types/job";
 import { DashQueue, JobCounts } from "~/types/queue";
 import confirmation from "../../../../components/utilities/confirmationModal.vue"
 import createJob from "../../../../components/jobs/form.vue"
+import { mapGetters, mapActions } from "vuex"
 export default Vue.extend({
   middleware: "auth",
   name: "ViewQueue",
@@ -144,7 +161,6 @@ export default Vue.extend({
         {
           text: "",
           disabled: true,
-          href: "",
         },
       ],
       status: [
@@ -177,6 +193,12 @@ export default Vue.extend({
     this.getUpdatedData();
   },
   methods: {
+    ...mapActions("groups", ["setGroups"]),
+    ...mapGetters("groups", {
+      groups: "groups",
+      groupById: "groupById",
+    }),
+
     captalize(str: string) {
       return str.charAt(0).toUpperCase() + str.slice(1);
     },
@@ -260,8 +282,13 @@ export default Vue.extend({
     },
     getUpdatedData() {
       this.filterJobs();
-      this.$api.dashboard.queueDash(this.$route.params.id).then((res) => {
-        this.items[1].text = res.groupId;
+      this.$api.dashboard.queueDash(this.$route.params.id).then(async (res) => {
+        if (!this.groupById()(res.groupId)) {
+          const group = await this.$api.group.getById(res.groupId);
+          this.setGroups(group);
+        }
+
+        this.items[1].text = this.groupById()(res.groupId).name;
         this.items[1].href = "/dashboard/group/" + res.groupId;
         this.items[2].text = res.name;
         this.items[2].disabled = true;

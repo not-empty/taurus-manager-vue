@@ -36,3 +36,13 @@ export interface QueuePayload {
   description: string
   compliance: string | null
 }
+
+export interface IStateQueue {
+  id: string,
+  name: string,
+  groupId: string,
+}
+
+export interface IState {
+  queues: IStateQueue[],
+}

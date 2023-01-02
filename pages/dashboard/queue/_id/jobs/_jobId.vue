@@ -1,5 +1,6 @@
 <template>
   <div>
+    <v-breadcrumbs :items="items" class="pl-3"></v-breadcrumbs>
     <v-sheet class="px-4 py-4 accent d-flex justify-space-between" >
       <span class="font-weight-bold text-h6">Jobs</span>
       <v-btn text color="secondary" @click="confirmClone()">
@@ -79,6 +80,7 @@
 import Vue from "vue";
 import { IJob } from "~/types/job";
 import confirmation from "../../../../../components/utilities/confirmationModal.vue"
+import { mapGetters, mapActions } from "vuex"
 export default Vue.extend({
   middleware: "auth",
   name: "ViewQueue",
@@ -108,7 +110,6 @@ export default Vue.extend({
         {
           text: "",
           disabled: true,
-          href: "",
         },
       ],
     };
@@ -116,10 +117,17 @@ export default Vue.extend({
   created() {
     this.$api.jobs
       .getJob(this.$route.params.id, this.$route.params.jobId)
-      .then((res) => {
-        this.items[1].text = this.$route.params.id;
+      .then(async (res) => {
+        const queueId = this.$route.params.id;
+
+        if (!this.queueById()(queueId)) {
+          const queue = await this.$api.queue.getById(queueId);
+          this.setQueue(queue);
+        }
+
+        this.items[1].text = this.queueById()(queueId).name;
         this.items[1].href = "/dashboard/queue/" + this.$route.params.id;
-        this.items[2].text = res.id;
+        this.items[2].text = res.name;
         this.job = res;
       })
       .finally(() => {
@@ -127,6 +135,12 @@ export default Vue.extend({
       });
   },
   methods: {
+    ...mapActions("queues", ["setQueue"]),
+    ...mapGetters("queues", {
+      queues: "queues",
+      queueById: "queueById",
+    }),
+
     confirmClone(){
       this.ModalFunc = this.cloneJob;
       this.ModalMessage = 'Clone job?';

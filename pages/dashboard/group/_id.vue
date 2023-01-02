@@ -1,14 +1,35 @@
 <template>
   <div>
-    <v-data-table :search="search" hide-default-footer show-select :headers="queuesHeaders" :items="dashboardData.queues"
-      v-model="jobsSelected" @click:row="openQueue" sort-by="createAt" class="accent">
+    <v-breadcrumbs :items="items" class="pl-3"></v-breadcrumbs>
+    <v-data-table
+      :search="search"
+      hide-default-footer
+      show-select
+      :loading="loader"
+      :headers="queuesHeaders"
+      :items="dashboardData.queues"
+      v-model="jobsSelected"
+      @click:row="openQueue"
+      sort-by="createAt"
+      class="accent"
+    >
       <template v-slot:top>
-        <div class="d-flex align-center">
-          <p class="px-4 py-4 font-weight-bold text-h6">
+        <div class="d-flex align-center px-4 py-4">
+          <span class="font-weight-bold text-h6">
             {{ dashboardData.group?.name }}
-          </p>
+          </span>
           <v-spacer></v-spacer>
-          <v-text-field label="Search for queues" v-model="search" append-icon="mdi-magnify"></v-text-field>
+          <v-text-field
+            filled
+            hide-details
+            single-line
+            rounded
+            dense
+            label="Search for queues"
+            v-model="search"
+            append-icon="mdi-magnify"
+            class="shrink"
+          ></v-text-field>
           <v-spacer></v-spacer>
           <v-btn text :disabled="!jobsSelected.length" color="secondary" @click="confirmPause()">
             <v-icon left>mdi-pause</v-icon>
@@ -17,6 +38,10 @@
           <v-btn text :disabled="!jobsSelected.length" color="secondary" @click="confirmResume()">
             <v-icon left>mdi-play</v-icon>
             <span>Resume</span>
+          </v-btn>
+          <v-btn text color="secondary" @click="getUpdatedData()">
+            <v-icon left>mdi-reload</v-icon>
+            <span>Refresh</span>
           </v-btn>
         </div>
       </template>
@@ -44,6 +69,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      loader: false,
       logado: "",
       dashboardData: {} as DashGroup,
       jobsSelected: [] as IQueue[],
@@ -89,8 +115,7 @@ export default Vue.extend({
         },
         {
           text: "",
-          disabled: false,
-          href: "",
+          disabled: true,
         },
       ],
     };
@@ -131,11 +156,15 @@ export default Vue.extend({
       });
     },
     getUpdatedData() {
+      this.loader = true;
+
       this.$api.dashboard.groupDashById(this.$route.params.id).then((res) => {
         this.dashboardData = res;
         this.items[1].text = res.group.name;
         this.items[1].href = "/dashboard/group/" + res.group.id;
-      });
+      }).finally(() => {
+        this.loader = false;
+      })
     }
   },
 });
