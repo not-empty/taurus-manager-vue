@@ -1,17 +1,3 @@
-<style scoped>
-.list {
-  list-style: none;
-}
-
-.list:hover {
-  color: #db1e72 !important;
-}
-
-.list:hover i {
-  color: #db1e72 !important;
-}
-</style>
-
 <template>
   <div>
     <v-list>
@@ -73,3 +59,17 @@ export default defineComponent({
   }),
 });
 </script>
+
+<style scoped>
+.list {
+  list-style: none;
+}
+
+.list:hover {
+  color: #db1e72 !important;
+}
+
+.list:hover i {
+  color: #db1e72 !important;
+}
+</style>

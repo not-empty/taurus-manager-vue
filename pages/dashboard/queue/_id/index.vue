@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-data-table hide-default-footer show-select v-model="jobsSelected" :loading="loader" :headers="jobHeaders"
-      :items="jobs" item-key="id" sort-by="createAt" class="accent" @click:row="openJob">
+    <v-data-table hide-default-footer  show-select v-model="jobsSelected" :loading="loader" :headers="jobHeaders"
+      :items="jobs" item-key="id" sort-by="createAt" class="accent" @click:row="openJob" :items-per-page="pagination.itemsPerPage">
       <template v-slot:top>
         <template v-if="queueData.jobCounts">
           <v-sheet class="d-flex accent">
@@ -54,6 +54,10 @@
           </v-sheet>
         </template>
       </template>
+      <template v-slot:footer>
+        <v-data-footer :items-per-page-options="itemQuantities" :pagination="pagination" :options.sync="pagination" show-current-page :page-text="`Total pages: ${pagination.pageCount}`">
+        </v-data-footer>
+      </template>
     </v-data-table>
     <confirmation :state="ModalState" :function="ModalFunc" :mensage="ModalMessage" @close="ModalState = false"></confirmation>
     <v-dialog v-model="createDialog" persistent max-width="800px" v-if="createDialog">
@@ -85,6 +89,20 @@ export default Vue.extend({
       jobsSelected: [] as IJob[],
       jobs: [] as IJob[],
       createDialog: false,
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        pageCount: 2,
+        pageStart: 0,
+        pageStop: 1,
+        itemsLength: 1
+      },
+      itemQuantities: [
+        25,
+        50,
+        100,
+        1000
+      ],
       jobHeaders: [
         {
           text: "ID",
@@ -143,6 +161,12 @@ export default Vue.extend({
     state() {
       this.filterJobs();
     },
+    pagination: {
+      handler() {
+        this.filterJobs();
+      },
+      deep: true,
+    }
   },
   computed: {
     hasJobsSelected() {
@@ -159,9 +183,17 @@ export default Vue.extend({
     filterJobs() {
       this.loader = true;
       this.$api.jobs
-        .getJobPaginate(this.$route.params.id, 1, 25, this.state)
+        .getJobPaginate(this.$route.params.id, this.pagination.page, this.pagination.itemsPerPage, this.state)
         .then((res) => {
           this.jobs = res.jobs;
+          this.pagination.itemsLength = res.total;
+          if(res.total !== 0) {
+            this.pagination.pageCount = Math.ceil(res.total / this.pagination.itemsPerPage);
+            this.pagination.pageStop = this.pagination.pageCount;
+            return;
+          }
+          this.pagination.pageCount = 1
+          this.pagination.pageStop = 1
         })
         .finally(() => {
           this.loader = false;
@@ -236,7 +268,7 @@ export default Vue.extend({
         this.queueData = res;
       });
     }
-  },
+  }
 });
 </script>
 

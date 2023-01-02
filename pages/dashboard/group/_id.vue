@@ -8,7 +8,7 @@
             {{ dashboardData.group?.name }}
           </p>
           <v-spacer></v-spacer>
-          <v-text-field label="Search for groups" v-model="search" append-icon="mdi-magnify"></v-text-field>
+          <v-text-field label="Search for queues" v-model="search" append-icon="mdi-magnify"></v-text-field>
           <v-spacer></v-spacer>
           <v-btn text :disabled="!jobsSelected.length" color="secondary" @click="confirmPause()">
             <v-icon left>mdi-pause</v-icon>
