@@ -8,15 +8,48 @@
         <v-container>
           <v-row>
             <v-col cols="12">
-              <v-text-field label="Name*" v-model="UserData.name" required></v-text-field>
+              <v-text-field
+                label="Name*"
+                v-model="UserData.name"
+                required
+                :rules="stringRule"
+              ></v-text-field>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="12" sm="12" md="12" lg="12">
-              <v-text-field label="Email*" v-model="UserData.email" required></v-text-field>
+              <v-text-field
+                label="Email*"
+                v-model="UserData.email"
+                :rules="emailRules"
+                required
+              ></v-text-field>
             </v-col>
             <v-col cols="12" sm="12" md="12" lg="12">
               <v-text-field label="Role*" v-model="UserData.role" required>
+              </v-text-field>
+            </v-col>
+            <v-col cols="12" sm="12" md="12" lg="12">
+              <v-select
+                v-model="UserData.groupIds"
+                :items="GroupsData"
+                :rules="groupsRules"
+                label="Groups*"
+                multiple
+                item-text="name"
+                item-value="id"
+              ></v-select>
+            </v-col>
+            <v-col cols="12" sm="12" md="12" lg="12">
+              <v-text-field
+                label="Senha*"
+                v-model="UserData.password"
+                required
+                :rules="stringRule('Password')"
+                :type="showPassword ? 'text' : 'password'"
+                :append-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                @click:append="showPassword = !showPassword"
+              >
               </v-text-field>
             </v-col>
           </v-row>
@@ -38,9 +71,11 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { IGroup } from "~/types/group";
 import { IUser } from "~/types/user";
+
 export default defineComponent({
-  name: "QueueForm",
+  name: "UserForm",
   props: {
     user: {} as PropType<IUser | null>,
   },
@@ -48,13 +83,30 @@ export default defineComponent({
     return {
       page: 1,
       UserData: {} as IUser,
+      GroupsData: [] as IGroup[],
       valid: true,
+      emailRules: [
+        (v: string) => !!v || 'E-mail is required',
+        (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+      ],
+      groupsRules: [
+        (v: string[]) => v.length || 'Groups is required',
+      ],
+      stringRule: (name: string) => [(v: string) => !!v || `${name} is required`],
+      showPassword: false,
     };
   },
-  mounted() {
+  async created() {
+    const { groups } = await this.$api.group.getPaginated(1, 1000);
+    this.GroupsData = groups;
+  },
+  async mounted() {
     if (this.user && this.user.id) {
-      this.UserData = JSON.parse(JSON.stringify(this.user))
+      this.UserData = await this.$api.user.getById(this.user.id);
+      return;
     }
+
+    this.UserData.password = "1doc@2023";
   },
   methods: {
     closeDialog() {
@@ -62,11 +114,17 @@ export default defineComponent({
         id: "",
         name: "",
         email: "",
-        role: ""
+        role: "",
+        groups: [],
+        groupIds: [],
       }
       this.$emit("close")
     },
     submitForm() {
+      delete this.UserData.groups
+
+      console.log(this.UserData);
+
       if (this.user && this.user.id) {
         this.$api.user.edit(this.user.id, this.UserData).then(() => {
           this.closeDialog()
@@ -78,7 +136,7 @@ export default defineComponent({
       this.$api.user.post(this.UserData).then(() => {
         this.closeDialog()
       })
-    }
+    },
   }
 });
 </script>

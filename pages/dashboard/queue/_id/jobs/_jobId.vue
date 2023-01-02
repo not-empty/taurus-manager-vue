@@ -39,7 +39,7 @@
         <v-card-text class="text-center">
           <span>CreatedAt</span>
           <p class="text-h6 text--primary">
-            {{ job.createdAt }}
+            {{ new Date(job.createdAt).toLocaleString("pt-BR") }}
           </p>
         </v-card-text>
       </v-card>
@@ -47,7 +47,7 @@
         <v-card-text class="text-center">
           <span>ProcessedAt</span>
           <p class="text-h6 text--primary">
-            {{ job.processedAt }}
+            {{ new Date(job.processedAt).toLocaleString("pt-BR") }}
           </p>
         </v-card-text>
       </v-card>
@@ -55,7 +55,7 @@
         <v-card-text class="text-center">
           <span>FinishedAt</span>
           <p class="text-h6 text--primary">
-            {{ job.finishedAt }}
+            {{ new Date(job.finishedAt).toLocaleString("pt-BR") }}
           </p>
         </v-card-text>
       </v-card>

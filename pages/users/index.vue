@@ -11,7 +11,7 @@
         <v-flex class="d-flex align-center px-4 py-4">
           <span class="font-weight-bold text-h6">Users</span>
           <v-spacer></v-spacer>
-          <v-btn text color="secondary" @click="dialog = true">
+          <v-btn text color="secondary" @click="newUser">
             <v-icon left>mdi-account-multiple-plus</v-icon>
             <span>New user</span>
           </v-btn>
@@ -81,6 +81,9 @@ export default Vue.extend({
         name: "",
         email: "",
         role: "",
+        password: "",
+        groups: [],
+        groupIds: [],
       };
       this.dialog = true;
     },

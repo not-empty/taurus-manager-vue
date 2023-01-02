@@ -8,25 +8,53 @@
         <v-container>
           <v-row>
             <v-col cols="12">
-              <v-text-field label="Name*" v-model="queueData.name" required></v-text-field>
+              <v-text-field
+                label="Name*"
+                v-model="queueData.name"
+                required
+                :rules="stringRule('Name')"
+              ></v-text-field>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="12" sm="12" md="10" lg="10">
-              <v-text-field label="Host*" v-model="queueData.host" required></v-text-field>
+              <v-text-field
+                label="Host*"
+                v-model="queueData.host"
+                required
+                :rules="stringRule('Host')"
+              ></v-text-field>
             </v-col>
             <v-col cols="12" sm="12" md="2" lg="2">
-              <v-text-field label="Port*" v-model="queueData.port" required>
+              <v-text-field
+                label="Port*"
+                v-model="queueData.port"
+                required
+                type="number"
+                :rules="stringRule('Port')"
+              >
               </v-text-field>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="12" sm="12" lg="12">
-              <v-select :items="groups" item-text="name" item-value="id" label="Group" v-model="queueData.groupId"
-                required></v-select>
+              <v-select
+                :items="groups"
+                item-text="name"
+                item-value="id"
+                label="Group*"
+                v-model="queueData.groupId"
+                required
+                :rules="stringRule('Group')"
+              ></v-select>
             </v-col>
             <v-col cols="12" sm="12" lg="12">
-              <v-textarea label="Description" rows="1" auto-grow v-model="queueData.description"></v-textarea>
+              <v-textarea
+                label="Description"
+                rows="1"
+                auto-grow
+                v-model="queueData.description"
+              ></v-textarea>
             </v-col>
             <v-col>
               <v-text-field label="Compliance" v-model="queueData.compliance"></v-text-field>
@@ -63,6 +91,7 @@ export default defineComponent({
       groups: [] as IGroup[],
       queueData: {} as QueuePayload,
       valid: true,
+      stringRule: (name: string) => [(v: string) => !!v || `${name} is required`],
     };
   },
   mounted() {
