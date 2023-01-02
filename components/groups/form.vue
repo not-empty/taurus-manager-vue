@@ -8,12 +8,22 @@
           <v-container>
             <v-row>
               <v-col cols="12" sm="12" lg="12">
-                <v-text-field label="Name*" v-model="groupData.name" required></v-text-field>
+                <v-text-field
+                  label="Name*"
+                  v-model="groupData.name"
+                  required
+                  :rules="stringRule('Name')"
+                ></v-text-field>
               </v-col>
             </v-row>
             <v-row>
               <v-col cols="12" sm="12" lg="12">
-                <v-textarea label="Description" rows="1" auto-grow v-model="groupData.description"></v-textarea>
+                <v-textarea
+                  label="Description"
+                  rows="1"
+                  auto-grow
+                  v-model="groupData.description"
+                ></v-textarea>
               </v-col>
             </v-row>
           </v-container>
@@ -31,7 +41,7 @@
       </v-form>
     </v-card>
   </template>
-  
+
   <script lang="ts">
   import { defineComponent, PropType } from "vue";
   import { GroupPayload, IGroup } from "~/types/group";
@@ -46,6 +56,7 @@
         groups: [] as IGroup[],
         groupData: {} as GroupPayload,
         valid: true,
+        stringRule: (name: string) => [(v: string) => !!v || `${name} is required`],
       };
     },
     mounted() {
@@ -73,10 +84,10 @@
           this.$api.group.edit(this.group.id, this.groupData).then(() => {
             this.closeDialog()
           })
-  
+
           return
         }
-  
+
         this.$api.group.create(this.groupData).then(() => {
           this.closeDialog()
         })
