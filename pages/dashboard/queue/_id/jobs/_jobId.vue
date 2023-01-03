@@ -136,10 +136,7 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions("queues", ["setQueue"]),
-    ...mapGetters("queues", {
-      queues: "queues",
-      queueById: "queueById",
-    }),
+    ...mapGetters("queues", ["queues", "queueById"]),
 
     confirmClone(){
       this.ModalFunc = this.cloneJob;
