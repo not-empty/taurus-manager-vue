@@ -63,14 +63,14 @@
     <v-sheet class="px-4 py-4 accent">
       <span class="font-weight-bold text-h6">Data</span>
     </v-sheet>
-    <code class="d-flex py-1 rounded-0 code-border overflow">
-      <pre class="language-markup">{{ job.data }}</pre>
+    <code class="d-flex py-1 rounded-0 code-border ">
+      <pre class="language-markup overflow">{{ job.data }}</pre>
     </code>
     <v-sheet class="px-4 py-4 accent">
       <span class="font-weight-bold text-h6">Trace</span>
     </v-sheet>
-    <code class="d-flex py-1 rounded-0 code-border overflow">
-      <pre class="language-markup">{{ job.stacktrace }}</pre>
+    <code class="d-flex py-1 rounded-0 code-border ">
+      <pre class="language-markup overflow">{{ job.stacktrace }}</pre>
     </code>
     <confirmation :state="ModalState" :function="ModalFunc" :mensage="ModalMessage" @close="ModalState = false"></confirmation>
   </div>
