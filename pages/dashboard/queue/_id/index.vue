@@ -41,7 +41,7 @@
           </v-sheet>
           <v-sheet class="d-flex">
             <v-card v-for="name in status" tile width="100%" :key="name" :color="state === name ? 'info' : 'accent'"
-              @click="state = name">
+              @click="changeState(name)">
               <v-card-text class="text-center">
                 <span>{{ captalize(name) }}</span>
                 <p class="text-h4 text--primary">
@@ -71,7 +71,7 @@
         </template>
       </template>
       <template v-slot:footer>
-        <v-data-footer :items-per-page-options="itemQuantities" :pagination="pagination" :options.sync="pagination" show-current-page :page-text="`Total pages: ${pagination.pageCount}`">
+        <v-data-footer :items-per-page-options="itemQuantities" @update:options="filterJobs" :pagination="pagination" :options.sync="pagination" show-current-page :page-text="`Total pages: ${pagination.pageCount}`">
         </v-data-footer>
       </template>
     </v-data-table>
@@ -86,9 +86,10 @@
 import Vue from "vue";
 import { IJob } from "~/types/job";
 import { DashQueue, JobCounts } from "~/types/queue";
-import confirmation from "../../../../components/utilities/confirmationModal.vue"
-import createJob from "../../../../components/jobs/form.vue"
-import { mapGetters, mapActions } from "vuex"
+import confirmation from "../../../../components/utilities/confirmationModal.vue";
+import createJob from "../../../../components/jobs/form.vue";
+import { mapGetters, mapActions } from "vuex";
+import { pagination } from '~/types/pagination';
 export default Vue.extend({
   middleware: "auth",
   name: "ViewQueue",
@@ -173,17 +174,6 @@ export default Vue.extend({
       ] as (keyof JobCounts)[],
     };
   },
-  watch: {
-    state() {
-      this.filterJobs();
-    },
-    pagination: {
-      handler() {
-        this.filterJobs();
-      },
-      deep: true,
-    }
-  },
   computed: {
     hasJobsSelected() {
       return this.jobsSelected.length > 0;
@@ -198,12 +188,20 @@ export default Vue.extend({
       groups: "groups",
       groupById: "groupById",
     }),
+    changeState(name: string) {
+      this.state = name;
+      this.filterJobs();
+    },
 
     captalize(str: string) {
       return str.charAt(0).toUpperCase() + str.slice(1);
     },
-    filterJobs() {
+    filterJobs(pagination?: pagination) {
       this.loader = true;
+      if (pagination !== undefined) {
+        this.pagination = pagination;
+      }
+
       this.$api.jobs
         .getJobPaginate(this.$route.params.id, this.pagination.page, this.pagination.itemsPerPage, this.state)
         .then((res) => {
