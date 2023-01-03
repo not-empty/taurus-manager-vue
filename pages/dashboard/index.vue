@@ -1,15 +1,6 @@
 <template>
   <div>
-    <v-breadcrumbs :items="items" class="pl-3">
-      <template v-slot:item="{ item }">
-        <v-breadcrumbs-item
-          :href="item.href"
-          :disabled="item.disabled"
-        >
-          {{ item.text }}
-        </v-breadcrumbs-item>
-      </template>
-    </v-breadcrumbs>
+    <v-breadcrumbs :items="items" class="pl-3"></v-breadcrumbs>
     <v-flex class="d-flex py-4 align-center mb-2 rounded">
       <v-text-field
         filled

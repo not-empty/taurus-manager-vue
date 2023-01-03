@@ -12,16 +12,7 @@
 
 <template>
   <v-app dark>
-    <v-navigation-drawer
-      app
-      color="accent"
-      v-model="drawer"
-      :mini-variant.sync="drawer"
-      permanent
-      floating
-    >
-      <Sidebar @close="drawer = true"/>
-    </v-navigation-drawer>
+    <Sidebar />
     <v-main>
       <v-container>
         <Nuxt />
