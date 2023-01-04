@@ -37,7 +37,7 @@
     <template v-slot:append>
       <v-list>
         <v-list-item class="px-2">
-          <v-list-item-avatar>
+          <v-list-item-avatar class="d-flex justify-center">
             <v-avatar color="secondary">{{ user.name.charAt(0) }}</v-avatar>
           </v-list-item-avatar>
           <v-list-item-content>
