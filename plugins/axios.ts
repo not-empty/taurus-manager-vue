@@ -1,6 +1,7 @@
 import { Api } from "~/services/api"
 
 import { Plugin } from '@nuxt/types'
+import type { AxiosError } from 'axios'
 
 declare module 'vue/types/vue' {
   interface Vue {
@@ -10,8 +11,11 @@ declare module 'vue/types/vue' {
 
 const api: Plugin = (context, inject) => {
   const api = new Api(context.$axios)
-  api.setInterceptorResponseError(function (error: any) {
-    if(context.store.state.auth.user.role == 'Administrator') {
+  api.setInterceptorResponseError(function (error: AxiosError) {
+    if(
+      context.store.state.auth.user.role == 'Administrator' &&
+      error.response?.status == 500
+    ) {
       context.redirect('/queue');
       alert('possivel erro no url do redis ou redis offline');
       return Promise.resolve(error);
