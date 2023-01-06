@@ -1,15 +1,3 @@
-<style>
-.scroll {
-  height: 100vh;
-  overflow: auto;
-}
-
-.space {
-  display: block;
-  height: 25px;
-}
-</style>
-
 <template>
   <v-app dark>
     <Sidebar />
@@ -22,47 +10,59 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { authStore } from "~/types/authStore";
-import Sidebar from "~/components/utilities/Sidebar.vue";
+import Vue from 'vue';
+import { authStore } from '~/types/authStore';
+import Sidebar from '~/components/utilities/Sidebar.vue';
 
 export default Vue.extend({
-  name: "DefaultLayout",
+  name: 'DefaultLayout',
   components: {
-    Sidebar,
+    Sidebar
   },
-  data() {
+  data () {
     return {
-      title: "Constellation",
-      userName: "",
+      title: 'Constellation',
+      userName: '',
 
       drawer: true,
-      loader: false,
+      loader: false
     };
   },
-  created() {
+  created () {
     const session = this.$store.state as { auth: authStore };
     if (session.auth.user) {
       this.userName = session.auth.user.name;
     }
   },
   methods: {
-    logout() {
+    logout () {
       this.loader = true;
-      this.$store.dispatch("auth/removeSession").then(() => {
-        this.$router.push("/");
+      this.$store.dispatch('auth/removeSession').then(() => {
+        this.$router.push('/');
       });
     },
-    hasRole(role: string | undefined) {
+    hasRole (role: string | undefined) {
       const session = this.$store.state as { auth: authStore };
-      if (session.auth.user?.role == role) {
+      if (session.auth.user?.role === role) {
         return true;
       }
       if (!role) {
         return true;
       }
       return false;
-    },
-  },
+    }
+  }
 });
 </script>
+
+<style>
+.scroll {
+  height: 100vh;
+  overflow: auto;
+}
+
+.space {
+  display: block;
+  height: 25px;
+}
+</style>

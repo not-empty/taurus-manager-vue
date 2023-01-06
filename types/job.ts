@@ -1,6 +1,6 @@
 export interface IJob {
     id: string,
-    data: any | null
+    data: string | number | Record<string, unknown> | unknown[] | null
     attemptsMade: number
     name: string
     timestamp: number,
@@ -10,9 +10,9 @@ export interface IJob {
     state: string,
     canRetry: boolean,
     failedReason: string | null,
-    stacktrace: any | null
+    stacktrace: Record<string, unknown> | string | number | unknown[] | null
 }
 
 export interface IJobPayload {
-    data: any
+    data: Record<string, unknown> | string | number | unknown[] | null
 }

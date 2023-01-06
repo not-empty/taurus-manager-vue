@@ -2,96 +2,108 @@
   <div>
     <v-flex class="d-flex align-center px-4 py-4">
       <span class="font-weight-bold text-h6">Users</span>
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-btn text color="secondary" @click="newUser">
-        <v-icon left>mdi-account-multiple-plus</v-icon>
+        <v-icon left>
+          mdi-account-multiple-plus
+        </v-icon>
         <span>New user</span>
       </v-btn>
     </v-flex>
-    <v-data-table hide-default-footer :headers="userHeaders" :items="users" sort-by="name" class="accent">
-      <template v-slot:item.actions="{ item }">
-        <v-icon class="mr-4" @click="editUser(item)">mdi-pencil</v-icon>
-        <v-icon @click="deleteUser(item)">mdi-delete</v-icon>
+    <v-data-table
+      hide-default-footer
+      :headers="userHeaders"
+      :items="users"
+      sort-by="name"
+      class="accent"
+    >
+      <template #[`item.actions`]="{ item }">
+        <v-icon class="mr-4" @click="editUser(item)">
+          mdi-pencil
+        </v-icon>
+        <v-icon @click="deleteUser(item)">
+          mdi-delete
+        </v-icon>
       </template>
     </v-data-table>
 
-    <v-dialog v-model="dialog" persistent max-width="600px" v-if="dialog">
-      <UsersFrom @close="closeModal()" :user="edit"></UsersFrom>
+    <v-dialog v-if="dialog" v-model="dialog" persistent max-width="600px">
+      <UsersFrom :user="edit" @close="closeModal()" />
     </v-dialog>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { IUser } from "~/types/user";
-import UsersFrom from "~/components/users/form.vue";
+import Vue from 'vue';
+import { IUser } from '~/types/user';
+import UsersFrom from '~/components/users/form.vue';
 export default Vue.extend({
-  middleware: "auth",
-  name: "Users",
+  name: 'Users',
   components: {
-    UsersFrom,
+    UsersFrom
   },
-  data() {
+  middleware: 'auth',
+  data () {
     return {
       users: [] as IUser[],
       userHeaders: [
         {
-          text: "Name",
-          value: "name",
+          text: 'Name',
+          value: 'name'
         },
         {
-          text: "Email",
-          value: "email",
+          text: 'Email',
+          value: 'email'
         },
         {
-          text: "Role",
-          value: "role",
+          text: 'Role',
+          value: 'role'
         },
         {
-          text: "Actions",
-          value: "actions",
-          align: "end",
-          sortable: false,
-        },
+          text: 'Actions',
+          value: 'actions',
+          align: 'end',
+          sortable: false
+        }
       ],
       dialog: false,
-      edit: {} as IUser | null,
+      edit: {} as IUser | null
     };
   },
-  created() {
+  created () {
     this.getUsers();
   },
   methods: {
-    getUsers() {
+    getUsers () {
       this.$api.user
         .getPaginated(1, 25)
-        .then((response) => (this.users = response.users));
+        .then(response => (this.users = response.users));
     },
-    newUser() {
+    newUser () {
       this.edit = {
-        id: "",
-        name: "",
-        email: "",
-        role: "",
-        password: "",
+        id: '',
+        name: '',
+        email: '',
+        role: '',
+        password: '',
         groups: [],
-        groupIds: [],
+        groupIds: []
       };
       this.dialog = true;
     },
-    editUser(user: IUser) {
+    editUser (user: IUser) {
       this.edit = user;
       this.dialog = true;
     },
-    deleteUser(user: IUser) {
+    deleteUser (user: IUser) {
       this.$api.user.deleteById(user.id).then(() => {
         this.getUsers();
       });
     },
-    closeModal() {
+    closeModal () {
       this.dialog = false;
       this.getUsers();
     }
-  },
+  }
 });
 </script>

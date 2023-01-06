@@ -1,18 +1,18 @@
-import { GetterTree, ActionTree, MutationTree } from 'vuex'
-import { IStateQueue, IState } from "~/types/queue"
+import { GetterTree, ActionTree, MutationTree } from 'vuex';
+import { IStateQueue, IState } from '~/types/queue';
 
 export const state = (): IState => ({
-  queues: [],
-})
+  queues: []
+});
 
 export type RootState = ReturnType<typeof state>
 
 export const getters: GetterTree<RootState, RootState> = {
   queues: (state): IStateQueue[] => state.queues,
   queueById: (state): (id: string) => IStateQueue | undefined => (id) => {
-    return state.queues.find((queue) => queue.id === id);
+    return state.queues.find(queue => queue.id === id);
   }
-}
+};
 
 export const mutations: MutationTree<RootState> = {
   CHANGE_QUEUES: (state, queue: IStateQueue) => {
@@ -24,15 +24,15 @@ export const mutations: MutationTree<RootState> = {
     }
 
     state.queues.push(queue);
-  },
-}
+  }
+};
 
 export const actions: ActionTree<RootState, RootState> = {
-  setQueue({ commit }, queue: IStateQueue) {
+  setQueue ({ commit }, queue: IStateQueue) {
     commit('CHANGE_QUEUES', {
       id: queue.id,
       name: queue.name,
-      groupId: queue.groupId,
-    })
-  },
-}
+      groupId: queue.groupId
+    });
+  }
+};
