@@ -51,8 +51,8 @@
             </v-card>
           </v-sheet>
           <v-sheet>
-            <v-sheet class="d-flex px-4 py-4 accent">
-              <p class="font-weight-bold text-h6">Jobs</p>
+            <v-sheet class="d-flex px-4 py-4 accent align-center">
+              <p class="font-weight-bold text-h6 mb-0">Jobs</p>
               <v-spacer></v-spacer>
               <v-btn text :disabled="!jobsSelected.length" v-if="state == 'failed'" color="secondary" @click="confirmRetry()">
                 <v-icon left>mdi-reload-alert</v-icon>
@@ -68,6 +68,8 @@
               </v-btn>
             </v-sheet>
           </v-sheet>
+          <v-data-footer :items-per-page-options="itemQuantities" @update:options="filterJobs" :pagination="pagination" :options.sync="pagination" show-current-page :page-text="`Total pages: ${pagination.pageCount}`">
+        </v-data-footer>
         </template>
       </template>
       <template v-slot:footer>

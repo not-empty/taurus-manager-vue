@@ -12,7 +12,7 @@
                 label="Name*"
                 v-model="UserData.name"
                 required
-                :rules="stringRule"
+                :rules="stringRules"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -26,8 +26,8 @@
               ></v-text-field>
             </v-col>
             <v-col cols="12" sm="12" md="12" lg="12">
-              <v-text-field label="Role*" v-model="UserData.role" required>
-              </v-text-field>
+              <v-select label="Role*" :items="roleItems" v-model="UserData.role" required>
+              </v-select>
             </v-col>
             <v-col cols="12" sm="12" md="12" lg="12">
               <v-select
@@ -45,7 +45,7 @@
                 label="Senha*"
                 v-model="UserData.password"
                 required
-                :rules="stringRule('Password')"
+                :rules="passswordRules"
                 :type="showPassword ? 'text' : 'password'"
                 :append-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
                 @click:append="showPassword = !showPassword"
@@ -85,14 +85,24 @@ export default defineComponent({
       UserData: {} as IUser,
       GroupsData: [] as IGroup[],
       valid: true,
+      roleItems: [
+        'Administrator',
+        'Controller',
+        'Guest'
+      ],
       emailRules: [
-        (v: string) => !!v || 'E-mail is required',
+        (v: string) => Boolean(v) || 'E-mail is required',
         (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
       ],
       groupsRules: [
-        (v: string[]) => v.length || 'Groups is required',
+        (v: string[]) => Boolean(v.length) || 'Groups is required',
       ],
-      stringRule: (name: string) => [(v: string) => !!v || `${name} is required`],
+      stringRules: [
+        (v: string) => Boolean(v) || `Name is required`
+      ],
+      passswordRules: [
+        (v: string) => Boolean(v) || `Password is required`
+      ],
       showPassword: false,
     };
   },

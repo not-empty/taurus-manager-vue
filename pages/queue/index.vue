@@ -1,22 +1,14 @@
 <template>
   <div>
-    <v-data-table
-      hide-default-footer
-      :headers="queueHeaders"
-      :items="queues"
-      sort-by="name"
-      class="accent"
-    >
-      <template v-slot:top>
-        <v-flex class="d-flex align-center px-4 py-4">
-          <span class="font-weight-bold text-h6">Queues</span>
-          <v-spacer></v-spacer>
-          <v-btn text color="secondary" @click="dialog = true">
-            <v-icon left>mdi-tray-plus</v-icon>
-            <span>New Queue</span>
-          </v-btn>
-        </v-flex>
-      </template>
+    <v-flex class="d-flex align-center px-4 py-4">
+      <span class="font-weight-bold text-h6">Queues</span>
+      <v-spacer></v-spacer>
+      <v-btn text color="secondary" @click="dialog = true">
+        <v-icon left>mdi-tray-plus</v-icon>
+        <span>New Queue</span>
+      </v-btn>
+    </v-flex>
+    <v-data-table hide-default-footer :headers="queueHeaders" :items="queues" sort-by="name" class="accent">
       <template v-slot:item.actions="{ item }">
         <v-icon class="mr-4" @click="editQueue(item)">mdi-pencil</v-icon>
         <v-icon @click="deleteQueue(item)">mdi-delete</v-icon>

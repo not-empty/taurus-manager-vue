@@ -1,22 +1,14 @@
 <template>
   <div>
-    <v-data-table
-      hide-default-footer
-      :headers="userHeaders"
-      :items="users"
-      sort-by="name"
-      class="accent"
-    >
-      <template v-slot:top>
-        <v-flex class="d-flex align-center px-4 py-4">
-          <span class="font-weight-bold text-h6">Users</span>
-          <v-spacer></v-spacer>
-          <v-btn text color="secondary" @click="newUser">
-            <v-icon left>mdi-account-multiple-plus</v-icon>
-            <span>New user</span>
-          </v-btn>
-        </v-flex>
-      </template>
+    <v-flex class="d-flex align-center px-4 py-4">
+      <span class="font-weight-bold text-h6">Users</span>
+      <v-spacer></v-spacer>
+      <v-btn text color="secondary" @click="newUser">
+        <v-icon left>mdi-account-multiple-plus</v-icon>
+        <span>New user</span>
+      </v-btn>
+    </v-flex>
+    <v-data-table hide-default-footer :headers="userHeaders" :items="users" sort-by="name" class="accent">
       <template v-slot:item.actions="{ item }">
         <v-icon class="mr-4" @click="editUser(item)">mdi-pencil</v-icon>
         <v-icon @click="deleteUser(item)">mdi-delete</v-icon>

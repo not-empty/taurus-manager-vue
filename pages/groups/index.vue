@@ -1,22 +1,14 @@
 <template>
   <div>
-    <v-data-table
-      hide-default-footer
-      :headers="groupHeaders"
-      :items="groups"
-      sort-by="name"
-      class="accent"
-    >
-      <template v-slot:top>
-        <v-flex class="d-flex align-center px-4 py-4">
-          <span class="font-weight-bold text-h6">Groups</span>
-          <v-spacer></v-spacer>
-          <v-btn text color="secondary" @click="dialog = true">
-            <v-icon left>mdi-archive-plus</v-icon>
-            <span>New group</span>
-          </v-btn>
-        </v-flex>
-      </template>
+    <v-flex class="d-flex align-center px-4 py-4">
+      <span class="font-weight-bold text-h6">Groups</span>
+      <v-spacer></v-spacer>
+      <v-btn text color="secondary" @click="dialog = true">
+        <v-icon left>mdi-archive-plus</v-icon>
+        <span>New group</span>
+      </v-btn>
+    </v-flex>
+    <v-data-table hide-default-footer :headers="groupHeaders" :items="groups" sort-by="name" class="accent">
       <template v-slot:item.actions="{ item }">
         <v-icon class="mr-4" @click="editGroups(item)">mdi-pencil</v-icon>
         <v-icon @click="deleteGroups(item)">mdi-delete</v-icon>

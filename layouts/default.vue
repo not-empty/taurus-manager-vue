@@ -37,27 +37,6 @@ export default Vue.extend({
       userName: "",
 
       drawer: true,
-      menuItems: [
-        {
-          title: "Dashboard",
-          url: "/dashboard",
-        },
-        {
-          title: "Filas",
-          url: "/queue",
-          permission: "administrator",
-        },
-        {
-          title: "Grupos",
-          url: "/groups",
-          permission: "administrator",
-        },
-        {
-          title: "Usuarios",
-          url: "/users",
-          permission: "administrator",
-        },
-      ],
       loader: false,
     };
   },
