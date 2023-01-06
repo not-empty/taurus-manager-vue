@@ -23,22 +23,3 @@ table > tbody > tr,
 .v-chip {
   cursor: pointer !important;
 }
-
-* {
-  scrollbar-width: auto;
-  scrollbar-color: #db1e72 #1e1f24;
-}
-
-*::-webkit-scrollbar {
-  width: 16px;
-}
-
-*::-webkit-scrollbar-track {
-  background: #1e1f24;
-}
-
-*::-webkit-scrollbar-thumb {
-  background-color: #db1e72;
-  border-radius: 10px;
-  border: 3px solid #1e1f24;
-}
