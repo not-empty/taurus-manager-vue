@@ -1,6 +1,8 @@
 <template>
   <div>
-    <v-breadcrumbs :items="items" class="pl-3"></v-breadcrumbs>
+    <div class="px-4 py-4">
+      <span class="font-weight-bold text-h6">Dashboard</span>
+    </div>
     <v-flex class="d-flex py-4 align-center mb-2 rounded">
       <v-text-field
         filled
@@ -117,12 +119,6 @@ export default Vue.extend({
         {
           text: "Failed",
           value: "jobCounts.failed",
-        },
-      ],
-      items: [
-        {
-          text: "Dashboard",
-          disabled: false,
         },
       ],
       useCards: false,

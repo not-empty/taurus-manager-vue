@@ -58,10 +58,10 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="closeDialog()">
+        <v-btn color="secondary" text @click="closeDialog()">
           Close
         </v-btn>
-        <v-btn color="blue darken-1" text type="submit">
+        <v-btn color="secondary" text type="submit">
           Save
         </v-btn>
       </v-card-actions>
