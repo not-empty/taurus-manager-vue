@@ -8,14 +8,14 @@
         <v-container>
           <v-row>
             <v-col cols="12" sm="12" lg="12">
-              <v-textarea label="Data" rows="1" auto-grow v-model="jobData.data"></v-textarea>
+              <v-textarea v-model="jobData.data" label="Data" rows="1" auto-grow />
             </v-col>
           </v-row>
         </v-container>
         <small>*Required</small>
       </v-card-text>
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn color="secondary" text @click="closeDialog()">
           Close
         </v-btn>
@@ -28,40 +28,39 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { IJobPayload } from '../../types/job';
+import { defineComponent } from 'vue';
 export default defineComponent({
-  name: "JobForm",
+  name: 'JobForm',
   props: {
     queueId: {
       type: String,
       required: true
     }
   },
-  data() {
+  data () {
     return {
       page: 1,
       jobData: {
         data: ''
       },
-      valid: true,
+      valid: true
     };
   },
   methods: {
-    closeDialog() {
-      this.$emit("close")
+    closeDialog () {
+      this.$emit('close');
     },
-    submitForm() {
-      try{
+    submitForm () {
+      try {
         this.jobData.data = JSON.parse(this.jobData.data);
       } catch (e) {
         alert('Data isn`t a valid json');
         return;
       }
-      
-      this.$api.jobs.createJob(this.queueId, {data: this.jobData}).then(() => {
-        this.$emit("close")
-      })
+
+      this.$api.jobs.createJob(this.queueId, { data: this.jobData }).then(() => {
+        this.$emit('close');
+      });
     }
   }
 });

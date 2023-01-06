@@ -1,10 +1,10 @@
-import { NuxtAxiosInstance } from "@nuxtjs/axios";
+import type { NuxtAxiosInstance } from '@nuxtjs/axios';
 
 export class Module {
   public api: NuxtAxiosInstance;
-  public path: string
+  public path: string;
 
-  constructor(axios: NuxtAxiosInstance, path: string) {
+  constructor (axios: NuxtAxiosInstance, path: string) {
     this.api = axios;
     this.path = path;
   }

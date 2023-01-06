@@ -1,4 +1,4 @@
-import { ISession } from "~/types/session";
+import { ISession } from '~/types/session';
 
 export interface ApiResponse<T> {
   data: T;

@@ -14,7 +14,7 @@
 
 <script>
 export default {
-  name: 'error',
+  name: 'Error',
   layout: 'emptyLayout',
   props: {
     error: {
@@ -26,21 +26,21 @@ export default {
     return {
       pageNotFound: '404 Not Found',
       otherError: 'Server Error, try again later'
-    }
+    };
   },
   head () {
     const title =
-      this.error.statusCode === 404 ? this.pageNotFound : this.otherError
+      this.error.statusCode === 404 ? this.pageNotFound : this.otherError;
     return {
       title
-    }
+    };
   },
   methods: {
-    reload() {
+    reload () {
       window.location.reload();
     }
   }
-}
+};
 </script>
 
 <style scoped>

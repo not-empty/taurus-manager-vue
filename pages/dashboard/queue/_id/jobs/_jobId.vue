@@ -1,10 +1,12 @@
 <template>
   <div>
-    <v-breadcrumbs :items="items" class="pl-3"></v-breadcrumbs>
-    <v-sheet class="px-4 py-4 accent d-flex justify-space-between" >
+    <v-breadcrumbs :items="items" class="pl-3" />
+    <v-sheet class="px-4 py-4 accent d-flex justify-space-between">
       <span class="font-weight-bold text-h6">Jobs</span>
       <v-btn text color="secondary" @click="confirmClone()">
-        <v-icon left>mdi-content-copy</v-icon>
+        <v-icon left>
+          mdi-content-copy
+        </v-icon>
         <span>Clone Job</span>
       </v-btn>
     </v-sheet>
@@ -47,7 +49,11 @@
         <v-card-text class="text-center">
           <span>ProcessedAt</span>
           <p class="text-h6 text--primary">
-            {{ job.processedAt ? new Date(job.processedAt).toLocaleString("pt-BR") : '---' }}
+            {{
+              job.processedAt
+                ? new Date(job.processedAt).toLocaleString("pt-BR")
+                : '---'
+            }}
           </p>
         </v-card-text>
       </v-card>
@@ -55,7 +61,11 @@
         <v-card-text class="text-center">
           <span>FinishedAt</span>
           <p class="text-h6 text--primary">
-            {{ job.finishedAt ? new Date(job.finishedAt).toLocaleString("pt-BR") : '---' }}
+            {{
+              job.finishedAt
+                ? new Date(job.finishedAt).toLocaleString("pt-BR")
+                : '---'
+            }}
           </p>
         </v-card-text>
       </v-card>
@@ -72,49 +82,54 @@
     <code class="d-flex py-1 rounded-0 code-border ">
       <pre class="language-markup overflow">{{ job.stacktrace }}</pre>
     </code>
-    <confirmation :state="ModalState" :function="ModalFunc" :mensage="ModalMessage" @close="ModalState = false"></confirmation>
+    <confirmation
+      :state="ModalState"
+      :function="ModalFunc"
+      :mensage="ModalMessage"
+      @close="ModalState = false"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { IJob } from "~/types/job";
-import confirmation from "../../../../../components/utilities/confirmationModal.vue"
-import { mapGetters, mapActions } from "vuex"
+import Vue from 'vue';
+import { mapGetters, mapActions } from 'vuex';
+import confirmation from '../../../../../components/utilities/confirmationModal.vue';
+import { IJob } from '~/types/job';
 export default Vue.extend({
-  middleware: "auth",
-  name: "ViewQueue",
+  name: 'ViewQueue',
   components: {
     confirmation
   },
-  data() {
+  middleware: 'auth',
+  data () {
     return {
       loader: true,
-      state: "running",
+      state: 'running',
       job: {} as IJob,
       ModalState: false,
-      ModalFunc: function(){},
+      ModalFunc: function () {},
       ModalMessage: '',
       createDialog: false,
       items: [
         {
-          text: "Dashboard",
+          text: 'Dashboard',
           disabled: false,
-          href: "/dashboard",
+          href: '/dashboard'
         },
         {
-          text: "",
+          text: '',
           disabled: false,
-          href: "",
+          href: ''
         },
         {
-          text: "",
-          disabled: true,
-        },
-      ],
+          text: '',
+          disabled: true
+        }
+      ]
     };
   },
-  created() {
+  created () {
     this.$api.jobs
       .getJob(this.$route.params.id, this.$route.params.jobId)
       .then(async (res) => {
@@ -126,7 +141,7 @@ export default Vue.extend({
         }
 
         this.items[1].text = this.queueById()(queueId).name;
-        this.items[1].href = "/dashboard/queue/" + this.$route.params.id;
+        this.items[1].href = '/dashboard/queue/' + this.$route.params.id;
         this.items[2].text = res.name;
         this.job = res;
       })
@@ -135,18 +150,18 @@ export default Vue.extend({
       });
   },
   methods: {
-    ...mapActions("queues", ["setQueue"]),
-    ...mapGetters("queues", ["queues", "queueById"]),
+    ...mapActions('queues', ['setQueue']),
+    ...mapGetters('queues', ['queues', 'queueById']),
 
-    confirmClone(){
+    confirmClone () {
       this.ModalFunc = this.cloneJob;
       this.ModalMessage = 'Clone job?';
       this.ModalState = true;
     },
-    cloneJob() {
+    cloneJob () {
       this.$api.jobs.cloneJob(this.$route.params.id, this.$route.params.jobId);
     }
-  },
+  }
 });
 </script>
 

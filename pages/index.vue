@@ -3,18 +3,24 @@
     <v-row justify="center" align="center">
       <v-col lg="6">
         <form>
-          <v-text-field v-model="sessionPayload.email" label="E-mail" required outlined>
-          </v-text-field>
+          <v-text-field
+            v-model="sessionPayload.email"
+            label="E-mail"
+            required
+            outlined
+          />
 
           <v-text-field
-            type="password"
             v-model="sessionPayload.password"
+            type="password"
             label="Passsword"
             required
             outlined
-          ></v-text-field>
+          />
 
-          <v-btn class="mr-4" @click="submit" block> submit </v-btn>
+          <v-btn class="mr-4" block @click="submit">
+            submit
+          </v-btn>
         </form>
       </v-col>
     </v-row>
@@ -22,29 +28,29 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 export default Vue.extend({
   layout: 'emptyLayout',
-  middleware: "guest",
-  data() {
+  middleware: 'guest',
+  data () {
     return {
       sessionPayload: {
-        email: "",
-        password: "",
-      },
+        email: '',
+        password: ''
+      }
     };
   },
   methods: {
-    submit() {
+    submit () {
       this.$api.session
         .post(this.sessionPayload)
         .then((res) => {
-          this.$store.dispatch("auth/setSession", res);
+          this.$store.dispatch('auth/setSession', res);
         })
         .finally(() => {
-          this.$router.push("/dashboard");
+          this.$router.push('/dashboard');
         });
-    },
-  },
+    }
+  }
 });
 </script>

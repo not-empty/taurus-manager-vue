@@ -1,24 +1,30 @@
 <template>
-  <v-dialog v-model="state" max-width="400px">
+  <v-dialog v-model="isActive" max-width="400px">
     <v-card class="py-3">
       <v-card-title>
         <h4>{{ mensage }}</h4>
       </v-card-title>
       <v-card-actions class="d-flex justify-end">
-        <v-btn text color="secondary" @click="$emit('close')">Cancel</v-btn>
-        <v-btn text color="secondary" @click="confirm()">Confirm</v-btn>
+        <v-btn text color="secondary" @click="$emit('close')">
+          Cancel
+        </v-btn>
+        <v-btn text color="secondary" @click="confirm()">
+          Confirm
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
-
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   props: {
-    state: Boolean,
+    state: {
+      type: Boolean,
+      default: false
+    },
     mensage: {
       type: String,
       required: true
@@ -28,16 +34,21 @@ export default defineComponent({
       required: true
     }
   },
-  data() {
+  data () {
     return {
-
+      isActive: false
+    };
+  },
+  watch: {
+    state (n: boolean) {
+      this.isActive = n;
     }
   },
   methods: {
-    confirm() {
+    confirm () {
       this.$emit('close');
-      this.function()
-    },
+      this.function();
+    }
   }
-})
+});
 </script>

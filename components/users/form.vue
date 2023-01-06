@@ -9,25 +9,29 @@
           <v-row>
             <v-col cols="12">
               <v-text-field
-                label="Name*"
                 v-model="UserData.name"
+                label="Name*"
                 required
                 :rules="stringRules"
-              ></v-text-field>
+              />
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="12" sm="12" md="12" lg="12">
               <v-text-field
-                label="Email*"
                 v-model="UserData.email"
+                label="Email*"
                 :rules="emailRules"
                 required
-              ></v-text-field>
+              />
             </v-col>
             <v-col cols="12" sm="12" md="12" lg="12">
-              <v-select label="Role*" :items="roleItems" v-model="UserData.role" required>
-              </v-select>
+              <v-select
+                v-model="UserData.role"
+                label="Role*"
+                :items="roleItems"
+                required
+              />
             </v-col>
             <v-col cols="12" sm="12" md="12" lg="12">
               <v-select
@@ -38,26 +42,25 @@
                 multiple
                 item-text="name"
                 item-value="id"
-              ></v-select>
+              />
             </v-col>
             <v-col cols="12" sm="12" md="12" lg="12">
               <v-text-field
-                label="Senha*"
                 v-model="UserData.password"
+                label="Senha*"
                 required
                 :rules="passswordRules"
                 :type="showPassword ? 'text' : 'password'"
                 :append-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
                 @click:append="showPassword = !showPassword"
-              >
-              </v-text-field>
+              />
             </v-col>
           </v-row>
         </v-container>
         <small>*Required</small>
       </v-card-text>
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn color="secondary" text @click="closeDialog()">
           Close
         </v-btn>
@@ -70,83 +73,84 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { IGroup } from "~/types/group";
-import { IUser } from "~/types/user";
+import { defineComponent, PropType } from 'vue';
+import { IGroup } from '~/types/group';
+import { IUser } from '~/types/user';
 
 export default defineComponent({
-  name: "UserForm",
+  name: 'UserForm',
   props: {
-    user: {} as PropType<IUser | null>,
+    user: {
+      type: Object as PropType<IUser | null>,
+      default: () => ({})
+    }
   },
-  data() {
+  data () {
     return {
       page: 1,
       UserData: {} as IUser,
       GroupsData: [] as IGroup[],
       valid: true,
       roleItems: [
-        'Administrator',
+        'administrator',
         'Controller',
         'Guest'
       ],
       emailRules: [
         (v: string) => Boolean(v) || 'E-mail is required',
-        (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+        (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid'
       ],
       groupsRules: [
-        (v: string[]) => Boolean(v.length) || 'Groups is required',
+        (v: string[]) => Boolean(v.length) || 'Groups is required'
       ],
       stringRules: [
-        (v: string) => Boolean(v) || `Name is required`
+        (v: string) => Boolean(v) || 'Name is required'
       ],
       passswordRules: [
-        (v: string) => Boolean(v) || `Password is required`
+        (v: string) => Boolean(v) || 'Password is required'
       ],
-      showPassword: false,
+      showPassword: false
     };
   },
-  async created() {
+  async created () {
     const { groups } = await this.$api.group.getPaginated(1, 1000);
     this.GroupsData = groups;
   },
-  async mounted() {
+  async mounted () {
     if (this.user && this.user.id) {
       this.UserData = await this.$api.user.getById(this.user.id);
       return;
     }
 
-    this.UserData.password = "1doc@2023";
+    this.UserData.password = '1doc@2023';
   },
   methods: {
-    closeDialog() {
+    closeDialog () {
       this.UserData = {
-        id: "",
-        name: "",
-        email: "",
-        role: "",
+        id: '',
+        name: '',
+        email: '',
+        role: '',
         groups: [],
-        groupIds: [],
-      }
-      this.$emit("close")
+        groupIds: []
+      };
+      this.$emit('close');
     },
-    submitForm() {
-      delete this.UserData.groups
-
-      console.log(this.UserData);
+    submitForm () {
+      delete this.UserData.groups;
 
       if (this.user && this.user.id) {
         this.$api.user.edit(this.user.id, this.UserData).then(() => {
-          this.closeDialog()
-        })
+          this.closeDialog();
+        });
 
-        return
+        return;
       }
 
       this.$api.user.post(this.UserData).then(() => {
-        this.closeDialog()
-      })
-    },
+        this.closeDialog();
+      });
+    }
   }
 });
 </script>
