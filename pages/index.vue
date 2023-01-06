@@ -1,13 +1,18 @@
 <template>
   <v-container>
-    <v-row justify="center" align="center">
-      <v-col lg="6">
-        <form>
+    <v-card>
+      <v-card-title class="d-flex align-center flex-column">
+        <v-img src="/horus.png" max-width="5vw" />
+        <h1>Horus</h1>
+      </v-card-title>
+      <div class="px-5 py-5">
+        <v-form @submit.prevent="submit">
           <v-text-field
             v-model="sessionPayload.email"
             label="E-mail"
             required
             outlined
+            :rules="emailRules"
           />
 
           <v-text-field
@@ -18,12 +23,19 @@
             outlined
           />
 
-          <v-btn class="mr-4" block @click="submit">
-            submit
+          <div
+            v-if="validation"
+            class="d-flex justify-center pb-5 error--text"
+          >
+            Invalid Email or Password
+          </div>
+
+          <v-btn class="mr-4" block type="submit">
+            Login
           </v-btn>
-        </form>
-      </v-col>
-    </v-row>
+        </v-form>
+      </div>
+    </v-card>
   </v-container>
 </template>
 
@@ -37,7 +49,12 @@ export default Vue.extend({
       sessionPayload: {
         email: '',
         password: ''
-      }
+      },
+      emailRules: [
+        (v: string) => Boolean(v) || 'E-mail is required',
+        (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid'
+      ],
+      validation: false
     };
   },
   methods: {
@@ -46,6 +63,9 @@ export default Vue.extend({
         .post(this.sessionPayload)
         .then((res) => {
           this.$store.dispatch('auth/setSession', res);
+        })
+        .catch(() => {
+          this.validation = true;
         })
         .finally(() => {
           this.$router.push('/dashboard');
