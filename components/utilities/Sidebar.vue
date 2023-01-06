@@ -6,10 +6,11 @@
     :mini-variant="drawer"
     permanent
     floating
+    expand-on-hover
   >
     <v-list>
       <v-list-item class="px-2">
-        <v-list-item-avatar @click="drawer = false">
+        <v-list-item-avatar>
           <v-img src="/horus.png" />
         </v-list-item-avatar>
         <v-list-item-content>
@@ -17,9 +18,6 @@
             Horus
           </v-list-item-title>
         </v-list-item-content>
-        <v-btn icon @click.stop="drawer = true">
-          <v-icon>mdi-chevron-left</v-icon>
-        </v-btn>
       </v-list-item>
     </v-list>
     <v-list>

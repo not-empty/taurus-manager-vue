@@ -12,6 +12,8 @@
       sort-by="createAt"
       class="accent"
       :items-per-page="pagination.itemsPerPage"
+      fixed-header
+      height="55vh"
       @click:row="openJob"
     >
       <template #top>
@@ -108,14 +110,6 @@
               </v-btn>
             </v-sheet>
           </v-sheet>
-          <v-data-footer
-            :items-per-page-options="itemQuantities"
-            :pagination="pagination"
-            :options.sync="pagination"
-            show-current-page
-            :page-text="`Total pages: ${pagination.pageCount}`"
-            @update:options="filterJobs"
-          />
         </template>
       </template>
       <template #footer>
