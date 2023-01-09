@@ -169,7 +169,7 @@ export default Vue.extend({
     },
     confirmDelete (queue: IQueue) {
       this.modalFunction = this.deleteQueue;
-      this.modalMessage = `Delete user ${queue.name}?`;
+      this.modalMessage = `Delete queue ${queue.name}?`;
       this.corfirmModal = true;
     }
   }

@@ -155,7 +155,7 @@ export default Vue.extend({
     },
     confirmDelete (group: IGroup) {
       this.modalFunction = this.deleteGroups;
-      this.modalMessage = `Delete user ${group.name}?`;
+      this.modalMessage = `Delete group ${group.name}?`;
       this.corfirmModal = true;
     }
   }
