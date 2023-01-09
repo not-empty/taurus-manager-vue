@@ -1,12 +1,38 @@
 <template>
-  <v-container>
-    <v-card>
-      <v-card-title class="d-flex align-center flex-column">
-        <v-img src="/horus.png" max-width="5vw" />
-        <h1>Horus</h1>
-      </v-card-title>
-      <div class="px-5 py-5">
+  <v-container class="d-flex justify-center align-center">
+    <v-card
+      class="flex-row d-flex"
+      max-width="62vw"
+      min-width="52vw"
+    >
+      <div
+        class="
+          blue-grey
+          darken-4
+          flex-grow-1
+          flex-shrink-1
+          d-flex
+          justify-center
+          align-center
+        "
+      >
+        <v-img
+          class=""
+          contain
+          src="/horus.svg"
+          max-width="10vw"
+        />
+      </div>
+      <div class="px-5 py-5 flex-grow-1 flex-shrink-">
         <v-form @submit.prevent="submit">
+          <h1 class="mb-2">
+            Horus
+          </h1>
+          <h3 class="font-weight-light">
+            Faça seu login
+          </h3>
+          <br>
+          <br>
           <v-text-field
             v-model="sessionPayload.email"
             label="E-mail"
@@ -29,10 +55,22 @@
           >
             Invalid Email or Password
           </div>
-
-          <v-btn class="mr-4" block type="submit">
-            Login
-          </v-btn>
+          <br>
+          <div class="min-content ml-auto">
+            <v-btn
+              class="mr-4"
+              block
+              type="submit"
+              text
+              color="secondary"
+              width="min-content"
+            >
+              <v-icon left>
+                mdi-login
+              </v-icon>
+              Login
+            </v-btn>
+          </div>
         </v-form>
       </div>
     </v-card>
