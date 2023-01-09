@@ -13,6 +13,7 @@
     <v-data-table
       hide-default-footer
       :headers="userHeaders"
+      :items-per-page="pagination.itemsPerPage"
       :items="users"
       sort-by="name"
       class="accent"
@@ -24,6 +25,16 @@
         <v-icon @click="deleteUser(item)">
           mdi-delete
         </v-icon>
+      </template>
+      <template #footer>
+        <v-data-footer
+          :items-per-page-options="itemQuantities"
+          :pagination="pagination"
+          :options.sync="pagination"
+          show-current-page
+          :page-text="`Total pages: ${pagination.pageCount}`"
+          @update:options="getUsers"
+        />
       </template>
     </v-data-table>
 
@@ -37,6 +48,7 @@
 import Vue from 'vue';
 import { IUser } from '~/types/user';
 import UsersFrom from '~/components/users/form.vue';
+import { pagination } from '~/types/pagination';
 export default Vue.extend({
   name: 'Users',
   components: {
@@ -46,6 +58,20 @@ export default Vue.extend({
   data () {
     return {
       users: [] as IUser[],
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        pageCount: 1,
+        pageStart: 0,
+        pageStop: 1,
+        itemsLength: 1
+      },
+      itemQuantities: [
+        25,
+        50,
+        100,
+        1000
+      ],
       userHeaders: [
         {
           text: 'Name',
@@ -74,10 +100,18 @@ export default Vue.extend({
     this.getUsers();
   },
   methods: {
-    getUsers () {
+    getUsers (pagination?: pagination) {
+      if (typeof pagination !== 'undefined') {
+        this.pagination = pagination;
+      }
       this.$api.user
-        .getPaginated(1, 25)
-        .then(response => (this.users = response.users));
+        .getPaginated(this.pagination.page, this.pagination.itemsPerPage)
+        .then((response) => {
+          this.users = response.users;
+          this.pagination.itemsLength = response.total;
+          const pages = response.total / this.pagination.itemsPerPage;
+          this.pagination.pageCount = Math.ceil(pages);
+        });
     },
     newUser () {
       this.edit = {
