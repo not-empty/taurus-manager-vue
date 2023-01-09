@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-form v-model="valid" @submit.prevent="submitForm()">
+    <v-form ref="userForm" v-model="valid" @submit.prevent="submitForm()">
       <v-card-title>
         <span class="text-h5">User</span>
       </v-card-title>
@@ -90,7 +90,7 @@ export default defineComponent({
       page: 1,
       UserData: {} as IUser,
       GroupsData: [] as IGroup[],
-      valid: true,
+      valid: false,
       roleItems: [
         'administrator',
         'Controller',
@@ -138,7 +138,9 @@ export default defineComponent({
     },
     submitForm () {
       delete this.UserData.groups;
-
+      if (!this.valid) {
+        return;
+      }
       if (this.user && this.user.id) {
         this.$api.user.edit(this.user.id, this.UserData).then(() => {
           this.closeDialog();

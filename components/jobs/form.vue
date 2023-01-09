@@ -43,7 +43,7 @@ export default defineComponent({
       jobData: {
         data: ''
       },
-      valid: true
+      valid: false
     };
   },
   methods: {
@@ -51,6 +51,9 @@ export default defineComponent({
       this.$emit('close');
     },
     submitForm () {
+      if (!this.valid) {
+        return;
+      }
       try {
         this.jobData.data = JSON.parse(this.jobData.data);
       } catch (e) {

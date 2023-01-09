@@ -22,7 +22,7 @@
         <v-icon class="mr-4" @click="editQueue(item)">
           mdi-pencil
         </v-icon>
-        <v-icon @click="deleteQueue(item)">
+        <v-icon @click="selectDeleteQueue(item)">
           mdi-delete
         </v-icon>
       </template>
@@ -41,6 +41,12 @@
     <v-dialog v-if="dialog" v-model="dialog" persistent max-width="600px">
       <QueueForm :queue="edit" @close="close()" />
     </v-dialog>
+    <confirmation
+      :state="corfirmModal"
+      :function="modalFunction"
+      :message="modalMessage"
+      @close="corfirmModal = false"
+    />
   </div>
 </template>
 
@@ -49,9 +55,13 @@ import Vue from 'vue';
 import { IQueue } from '~/types/queue';
 import QueueForm from '~/components/queues/form.vue';
 import { pagination } from '~/types/pagination';
+import confirmation from '~/components/utilities/confirmationModal.vue';
 export default Vue.extend({
   name: 'IndexPage',
-  components: { QueueForm },
+  components: {
+    QueueForm,
+    confirmation
+  },
   middleware: 'auth',
   data () {
     return {
@@ -105,7 +115,11 @@ export default Vue.extend({
         50,
         100,
         1000
-      ]
+      ],
+      corfirmModal: false,
+      modalFunction: () => {},
+      modalMessage: '',
+      selectedQueue: {} as IQueue | null
     };
   },
   watch: {
@@ -129,10 +143,12 @@ export default Vue.extend({
       this.dialog = false;
       this.getQueues();
     },
-    deleteQueue (queue: IQueue) {
-      this.$api.queue.delete(queue.id).then(() => {
-        this.getQueues();
-      });
+    deleteQueue () {
+      if (this.selectedQueue) {
+        this.$api.queue.delete(this.selectedQueue.id).then(() => {
+          this.getQueues();
+        });
+      }
     },
     getQueues (pagination?: pagination) {
       if (typeof pagination !== 'undefined') {
@@ -146,6 +162,15 @@ export default Vue.extend({
           const pages = response.total / this.pagination.itemsPerPage;
           this.pagination.pageCount = Math.ceil(pages);
         });
+    },
+    selectDeleteQueue (queue: IQueue) {
+      this.selectedQueue = queue;
+      this.confirmDelete(queue);
+    },
+    confirmDelete (queue: IQueue) {
+      this.modalFunction = this.deleteQueue;
+      this.modalMessage = `Delete queue ${queue.name}?`;
+      this.corfirmModal = true;
     }
   }
 });

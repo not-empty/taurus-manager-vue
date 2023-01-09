@@ -22,7 +22,7 @@
         <v-icon class="mr-4" @click="editUser(item)">
           mdi-pencil
         </v-icon>
-        <v-icon @click="deleteUser(item)">
+        <v-icon @click="selectDeleteUser(item)">
           mdi-delete
         </v-icon>
       </template>
@@ -41,18 +41,26 @@
     <v-dialog v-if="dialog" v-model="dialog" persistent max-width="600px">
       <UsersFrom :user="edit" @close="closeModal()" />
     </v-dialog>
+    <confirmation
+      :state="corfirmModal"
+      :function="modalFunction"
+      :message="modalMessage"
+      @close="corfirmModal = false"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import confirmation from '~/components/utilities/confirmationModal.vue';
 import { IUser } from '~/types/user';
 import UsersFrom from '~/components/users/form.vue';
 import { pagination } from '~/types/pagination';
 export default Vue.extend({
   name: 'Users',
   components: {
-    UsersFrom
+    UsersFrom,
+    confirmation
   },
   middleware: 'auth',
   data () {
@@ -72,6 +80,9 @@ export default Vue.extend({
         100,
         1000
       ],
+      corfirmModal: false,
+      modalFunction: () => {},
+      modalMessage: '',
       userHeaders: [
         {
           text: 'Name',
@@ -93,7 +104,8 @@ export default Vue.extend({
         }
       ],
       dialog: false,
-      edit: {} as IUser | null
+      edit: {} as IUser | null,
+      selectedUser: {} as IUser | null
     };
   },
   created () {
@@ -129,10 +141,21 @@ export default Vue.extend({
       this.edit = user;
       this.dialog = true;
     },
-    deleteUser (user: IUser) {
-      this.$api.user.deleteById(user.id).then(() => {
-        this.getUsers();
-      });
+    selectDeleteUser (user: IUser) {
+      this.selectedUser = user;
+      this.confirmDelete(user);
+    },
+    deleteUser () {
+      if (this.selectedUser) {
+        this.$api.user.deleteById(this.selectedUser.id).then(() => {
+          this.getUsers();
+        });
+      }
+    },
+    confirmDelete (user: IUser) {
+      this.modalFunction = this.deleteUser;
+      this.modalMessage = `Delete user ${user.name}?`;
+      this.corfirmModal = true;
     },
     closeModal () {
       this.dialog = false;

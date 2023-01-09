@@ -92,7 +92,7 @@ export default defineComponent({
       page: 1,
       groups: [] as IGroup[],
       queueData: {} as QueuePayload,
-      valid: true,
+      valid: false,
       stringRule: (name: string) => [(v: string) => !!v || `${name} is required`]
     };
   },
@@ -121,6 +121,9 @@ export default defineComponent({
       });
     },
     submitForm () {
+      if (!this.valid) {
+        return;
+      }
       if (this.queue && this.queue.id) {
         this.$api.queue.edit(this.queue.id, this.queueData).then(() => {
           this.closeDialog();

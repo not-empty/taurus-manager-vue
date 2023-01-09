@@ -58,7 +58,7 @@ export default defineComponent({
       page: 1,
       groups: [] as IGroup[],
       groupData: {} as GroupPayload,
-      valid: true,
+      valid: false,
       stringRule: (name: string) => [
         (v: string) => !!v || `${name} is required`
       ]
@@ -85,6 +85,9 @@ export default defineComponent({
       });
     },
     submitForm () {
+      if (!this.valid) {
+        return;
+      }
       if (this.group && this.group.id) {
         this.$api.group.edit(this.group.id, this.groupData).then(() => {
           this.closeDialog();

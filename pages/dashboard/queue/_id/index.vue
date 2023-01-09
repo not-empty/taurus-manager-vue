@@ -126,7 +126,7 @@
     <confirmation
       :state="ModalState"
       :function="ModalFunc"
-      :mensage="ModalMessage"
+      :message="ModalMessage"
       @close="ModalState = false"
     />
     <v-dialog v-if="createDialog" v-model="createDialog" persistent max-width="800px">

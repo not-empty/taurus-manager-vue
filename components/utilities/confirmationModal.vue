@@ -2,7 +2,7 @@
   <v-dialog v-model="isActive" max-width="400px">
     <v-card class="py-3">
       <v-card-title>
-        <h4>{{ mensage }}</h4>
+        <h4>{{ message }}</h4>
       </v-card-title>
       <v-card-actions class="d-flex justify-end">
         <v-btn text color="secondary" @click="$emit('close')">
@@ -25,7 +25,7 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    mensage: {
+    message: {
       type: String,
       required: true
     },
