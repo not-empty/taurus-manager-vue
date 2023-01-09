@@ -75,7 +75,7 @@
     <confirmation
       :state="corfirmModal"
       :function="modalFunction"
-      :mensage="modalMesage"
+      :message="modalMessage"
       @close="corfirmModal = false"
     />
   </div>
@@ -100,7 +100,7 @@ export default Vue.extend({
       filteredData: [] as DashGroup[],
       corfirmModal: false,
       modalFunction: () => {},
-      modalMesage: '',
+      modalMessage: '',
       search: '',
       queuesHeaders: [
         {
@@ -154,7 +154,7 @@ export default Vue.extend({
     },
     confirmPause () {
       this.modalFunction = this.pauseQueue;
-      this.modalMesage = 'Pause selected queues?';
+      this.modalMessage = 'Pause selected queues?';
       this.corfirmModal = true;
     },
     pauseQueue () {
@@ -164,7 +164,7 @@ export default Vue.extend({
     },
     confirmResume () {
       this.modalFunction = this.resumeQueue;
-      this.modalMesage = 'Resume selected queues?';
+      this.modalMessage = 'Resume selected queues?';
       this.corfirmModal = true;
     },
     resumeQueue () {

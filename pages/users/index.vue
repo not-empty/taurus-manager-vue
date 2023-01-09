@@ -44,7 +44,7 @@
     <confirmation
       :state="corfirmModal"
       :function="modalFunction"
-      :mensage="modalMesage"
+      :message="modalMessage"
       @close="corfirmModal = false"
     />
   </div>
@@ -82,7 +82,7 @@ export default Vue.extend({
       ],
       corfirmModal: false,
       modalFunction: () => {},
-      modalMesage: '',
+      modalMessage: '',
       userHeaders: [
         {
           text: 'Name',
@@ -154,7 +154,7 @@ export default Vue.extend({
     },
     confirmDelete (user: IUser) {
       this.modalFunction = this.deleteUser;
-      this.modalMesage = `Delete user ${user.name}?`;
+      this.modalMessage = `Delete user ${user.name}?`;
       this.corfirmModal = true;
     },
     closeModal () {

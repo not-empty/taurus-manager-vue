@@ -85,7 +85,7 @@
     <confirmation
       :state="ModalState"
       :function="ModalFunc"
-      :mensage="ModalMessage"
+      :message="ModalMessage"
       @close="ModalState = false"
     />
   </div>

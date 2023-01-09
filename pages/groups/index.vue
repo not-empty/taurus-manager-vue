@@ -43,7 +43,7 @@
     <confirmation
       :state="corfirmModal"
       :function="modalFunction"
-      :mensage="modalMesage"
+      :message="modalMessage"
       @close="corfirmModal = false"
     />
   </div>
@@ -101,7 +101,7 @@ export default Vue.extend({
         1000
       ],
       modalFunction: () => {},
-      modalMesage: '',
+      modalMessage: '',
       selectedQueue: {} as IGroup | null,
       corfirmModal: false
     };
@@ -155,7 +155,7 @@ export default Vue.extend({
     },
     confirmDelete (group: IGroup) {
       this.modalFunction = this.deleteGroups;
-      this.modalMesage = `Delete user ${group.name}?`;
+      this.modalMessage = `Delete user ${group.name}?`;
       this.corfirmModal = true;
     }
   }

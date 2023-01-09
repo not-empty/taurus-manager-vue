@@ -44,7 +44,7 @@
     <confirmation
       :state="corfirmModal"
       :function="modalFunction"
-      :mensage="modalMesage"
+      :message="modalMessage"
       @close="corfirmModal = false"
     />
   </div>
@@ -118,7 +118,7 @@ export default Vue.extend({
       ],
       corfirmModal: false,
       modalFunction: () => {},
-      modalMesage: '',
+      modalMessage: '',
       selectedQueue: {} as IQueue | null
     };
   },
@@ -169,7 +169,7 @@ export default Vue.extend({
     },
     confirmDelete (queue: IQueue) {
       this.modalFunction = this.deleteQueue;
-      this.modalMesage = `Delete user ${queue.name}?`;
+      this.modalMessage = `Delete user ${queue.name}?`;
       this.corfirmModal = true;
     }
   }
