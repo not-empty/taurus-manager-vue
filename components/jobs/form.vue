@@ -43,7 +43,7 @@ export default defineComponent({
       jobData: {
         data: ''
       },
-      valid: true
+      valid: false
     };
   },
   methods: {

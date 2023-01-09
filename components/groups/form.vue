@@ -58,7 +58,7 @@ export default defineComponent({
       page: 1,
       groups: [] as IGroup[],
       groupData: {} as GroupPayload,
-      valid: true,
+      valid: false,
       stringRule: (name: string) => [
         (v: string) => !!v || `${name} is required`
       ]
