@@ -24,6 +24,10 @@ table > tbody > tr,
   cursor: pointer !important;
 }
 
+.min-content {
+  width: min-content;
+}
+
 * {
   scrollbar-width: auto;
   scrollbar-color: #db1e72 #1e1f24;
