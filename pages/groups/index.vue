@@ -25,6 +25,16 @@
           mdi-delete
         </v-icon>
       </template>
+      <template #footer>
+        <v-data-footer
+          :items-per-page-options="itemQuantities"
+          :pagination="pagination"
+          :options.sync="pagination"
+          show-current-page
+          :page-text="`Total pages: ${pagination.pageCount}`"
+          @update:options="getGroups"
+        />
+      </template>
     </v-data-table>
 
     <v-dialog v-if="dialog" v-model="dialog" persistent max-width="600px">
@@ -37,6 +47,7 @@
 import Vue from 'vue';
 import { IGroup } from '~/types/group';
 import GroupForm from '~/components/groups/form.vue';
+import { pagination } from '~/types/pagination';
 export default Vue.extend({
   name: 'Groups',
   components: { GroupForm },
@@ -64,8 +75,20 @@ export default Vue.extend({
       edit: {} as IGroup | null,
       page: 1,
       lenght: 1,
-      pageLenght: 20,
-      items: [20, 100, 500, 1000]
+      pagination: {
+        page: 1,
+        itemsPerPage: 25,
+        pageCount: 1,
+        pageStart: 0,
+        pageStop: 1,
+        itemsLength: 1
+      },
+      itemQuantities: [
+        25,
+        50,
+        100,
+        1000
+      ]
     };
   },
   watch: {
@@ -96,13 +119,17 @@ export default Vue.extend({
         this.getGroups();
       });
     },
-    getGroups () {
+    getGroups (pagination?: pagination) {
+      if (typeof pagination !== 'undefined') {
+        this.pagination = pagination;
+      }
       this.$api.group
-        .getPaginated(this.page, this.pageLenght)
+        .getPaginated(this.pagination.page, this.pagination.itemsPerPage)
         .then((response) => {
           this.groups = response.groups;
-          const pages = response.total / this.pageLenght;
-          this.lenght = Math.ceil(pages);
+          this.pagination.itemsLength = response.total;
+          const pages = response.total / this.pagination.itemsPerPage;
+          this.pagination.pageCount = Math.ceil(pages);
         });
     }
   }
