@@ -21,7 +21,7 @@
         <v-icon class="mr-4" @click="editGroups(item)">
           mdi-pencil
         </v-icon>
-        <v-icon @click="deleteGroups(item)">
+        <v-icon @click="selectDeleteGroup(item)">
           mdi-delete
         </v-icon>
       </template>
@@ -40,6 +40,12 @@
     <v-dialog v-if="dialog" v-model="dialog" persistent max-width="600px">
       <GroupForm :group="edit" @close="close()" />
     </v-dialog>
+    <confirmation
+      :state="corfirmModal"
+      :function="modalFunction"
+      :mensage="modalMesage"
+      @close="corfirmModal = false"
+    />
   </div>
 </template>
 
@@ -48,9 +54,13 @@ import Vue from 'vue';
 import { IGroup } from '~/types/group';
 import GroupForm from '~/components/groups/form.vue';
 import { pagination } from '~/types/pagination';
+import confirmation from '~/components/utilities/confirmationModal.vue';
 export default Vue.extend({
   name: 'Groups',
-  components: { GroupForm },
+  components: {
+    GroupForm,
+    confirmation
+  },
   middleware: 'auth',
   data () {
     return {
@@ -73,6 +83,7 @@ export default Vue.extend({
       ],
       dialog: false,
       edit: {} as IGroup | null,
+      selectedGroup: {} as IGroup | null,
       page: 1,
       lenght: 1,
       pagination: {
@@ -88,7 +99,11 @@ export default Vue.extend({
         50,
         100,
         1000
-      ]
+      ],
+      modalFunction: () => {},
+      modalMesage: '',
+      selectedQueue: {} as IGroup | null,
+      corfirmModal: false
     };
   },
   watch: {
@@ -114,10 +129,12 @@ export default Vue.extend({
       this.dialog = false;
       this.getGroups();
     },
-    deleteGroups (group: IGroup) {
-      this.$api.group.delete(group.id).then(() => {
-        this.getGroups();
-      });
+    deleteGroups () {
+      if (this.selectedGroup) {
+        this.$api.group.delete(this.selectedGroup.id).then(() => {
+          this.getGroups();
+        });
+      }
     },
     getGroups (pagination?: pagination) {
       if (typeof pagination !== 'undefined') {
@@ -131,6 +148,15 @@ export default Vue.extend({
           const pages = response.total / this.pagination.itemsPerPage;
           this.pagination.pageCount = Math.ceil(pages);
         });
+    },
+    selectDeleteGroup (group: IGroup) {
+      this.selectedGroup = group;
+      this.confirmDelete(group);
+    },
+    confirmDelete (group: IGroup) {
+      this.modalFunction = this.deleteGroups;
+      this.modalMesage = `Delete user ${group.name}?`;
+      this.corfirmModal = true;
     }
   }
 });

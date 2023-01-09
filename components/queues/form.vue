@@ -121,6 +121,9 @@ export default defineComponent({
       });
     },
     submitForm () {
+      if (!this.valid) {
+        return;
+      }
       if (this.queue && this.queue.id) {
         this.$api.queue.edit(this.queue.id, this.queueData).then(() => {
           this.closeDialog();
