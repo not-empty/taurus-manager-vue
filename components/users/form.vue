@@ -164,6 +164,9 @@ export default defineComponent({
       if (!password) {
         return 'Password is required';
       }
+      if (password.length < 8) {
+        return 'Password need at least eight caracters';
+      }
       return true;
     }
   }
