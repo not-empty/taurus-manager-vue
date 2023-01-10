@@ -107,7 +107,7 @@ export default defineComponent({
         (v: string) => Boolean(v) || 'Name is required'
       ],
       passswordRules: [
-        (v: string) => Boolean(v) || 'Password is required'
+        // (v: string) => Boolean(v) || 'Password is required'
       ],
       showPassword: false
     };
