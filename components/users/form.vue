@@ -49,7 +49,7 @@
                 v-model="UserData.password"
                 label="Senha*"
                 required
-                :rules="passswordRules"
+                :rules="passwordRules"
                 :type="showPassword ? 'text' : 'password'"
                 :append-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
                 @click:append="showPassword = !showPassword"
@@ -106,11 +106,15 @@ export default defineComponent({
       stringRules: [
         (v: string) => Boolean(v) || 'Name is required'
       ],
-      passswordRules: [
-        (v: string) => Boolean(v) || 'Password is required'
-      ],
       showPassword: false
     };
+  },
+  computed: {
+    passwordRules: function () {
+      return [
+        (v: string) => this.validateIfNeedPassword(v)
+      ];
+    }
   },
   async created () {
     const { groups } = await this.$api.group.getPaginated(1, 1000);
@@ -152,6 +156,18 @@ export default defineComponent({
       this.$api.user.post(this.UserData).then(() => {
         this.closeDialog();
       });
+    },
+    validateIfNeedPassword (password: string): boolean | string {
+      if (this.user && this.user.id) {
+        return true;
+      }
+      if (!password) {
+        return 'Password is required';
+      }
+      if (password.length < 8) {
+        return 'Password need at least eight caracters';
+      }
+      return true;
     }
   }
 });

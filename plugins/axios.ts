@@ -20,8 +20,12 @@ const api: Plugin = (context, inject) => {
       alert('possivel erro no url do redis ou redis offline');
       return Promise.resolve(error);
     }
-    context.store.dispatch('auth/removeSession');
-    context.redirect('/');
+
+    if (error.response?.status === 401) {
+      context.store.dispatch('auth/removeSession');
+      context.redirect('/');
+    }
+
     return Promise.reject(error);
   });
 
