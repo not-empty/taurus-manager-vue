@@ -306,8 +306,7 @@ export default Vue.extend({
     },
     retryJobs () {
       this.$api.jobs.retryJob(this.$route.params.id, {
-        jobIds: this.mapSelected(),
-        state: this.state
+        jobIds: this.mapSelected()
       }).then(() => {
         this.getUpdatedData();
       });

@@ -6,7 +6,6 @@ import { IJob, IJobPayload } from '~/types/job';
 
 interface payloadCreateJobRetryJob {
   jobIds: string[];
-  state: string;
 }
 
 export class JobsModule extends Module {
