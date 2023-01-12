@@ -227,6 +227,11 @@ export default Vue.extend({
       ] as (keyof JobCounts)[]
     };
   },
+  watch: {
+    'pagination.itemsPerPage': function (items) {
+      this.setPagination(items);
+    }
+  },
   created () {
     this.getUpdatedData();
   },
@@ -235,6 +240,10 @@ export default Vue.extend({
     ...mapGetters('groups', {
       groups: 'groups',
       groupById: 'groupById'
+    }),
+    ...mapActions('options', ['setPagination']),
+    ...mapGetters('options', {
+      itemsPerPage: 'pagination'
     }),
     changeState (name: string) {
       this.state = name;
@@ -335,6 +344,7 @@ export default Vue.extend({
       });
     },
     getUpdatedData () {
+      this.pagination.itemsPerPage = this.itemsPerPage();
       this.filterJobs();
       this.$api.dashboard.queueDash(this.$route.params.id).then(async (res) => {
         if (!this.groupById()(res.groupId)) {

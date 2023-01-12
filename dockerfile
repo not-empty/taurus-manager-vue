@@ -10,6 +10,7 @@ RUN npm run generate
 FROM kiwfydev/nginx-alpine:latest
 
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 COPY --from=build ./app/dist /var/www/html
 EXPOSE 80
 STOPSIGNAL SIGTERM
