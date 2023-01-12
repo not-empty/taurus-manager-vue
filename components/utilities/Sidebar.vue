@@ -9,12 +9,12 @@
     expand-on-hover
   >
     <v-list>
-      <v-list-item class="px-2">
+      <v-list-item class="px-2" to="/dashboard" color="accent">
         <v-list-item-avatar>
           <v-img src="/horus.png" />
         </v-list-item-avatar>
         <v-list-item-content>
-          <v-list-item-title class="title">
+          <v-list-item-title class="title white--text">
             Horus
           </v-list-item-title>
         </v-list-item-content>
@@ -119,5 +119,9 @@ export default defineComponent({
 
 .list:hover i {
   color: #db1e72 !important;
+}
+
+.remove-hover {
+  background-color: transparent !important;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-breadcrumbs :items="items" class="pl-3" />
+    <BreadCrumbs :items="items" />
     <v-data-table
       v-model="jobsSelected"
       hide-default-footer
@@ -130,7 +130,7 @@
       @close="ModalState = false"
     />
     <v-dialog v-if="createDialog" v-model="createDialog" persistent max-width="800px">
-      <createJob :queue-id="$route.params.id" @close="createDialog = false" />
+      <createJob :queue-id="$route.params.id" @close="createdJob" />
     </v-dialog>
   </div>
 </template>
@@ -143,11 +143,14 @@ import createJob from '../../../../components/jobs/form.vue';
 import { IJob } from '~/types/job';
 import { DashQueue, JobCounts } from '~/types/queue';
 import { pagination } from '~/types/pagination';
+import BreadCrumbs from '~/components/utilities/Breadcrumbs.vue';
+
 export default Vue.extend({
   name: 'ViewQueue',
   components: {
     confirmation,
-    createJob
+    createJob,
+    BreadCrumbs
   },
   middleware: 'auth',
   data () {
@@ -227,6 +230,11 @@ export default Vue.extend({
       ] as (keyof JobCounts)[]
     };
   },
+  watch: {
+    'pagination.itemsPerPage': function (items) {
+      this.setPagination(items);
+    }
+  },
   created () {
     this.getUpdatedData();
   },
@@ -236,11 +244,19 @@ export default Vue.extend({
       groups: 'groups',
       groupById: 'groupById'
     }),
+    ...mapActions('options', ['setPagination']),
+    ...mapGetters('options', {
+      itemsPerPage: 'pagination'
+    }),
+
     changeState (name: string) {
       this.state = name;
       this.filterJobs();
     },
-
+    createdJob () {
+      this.createDialog = false;
+      this.getUpdatedData();
+    },
     captalize (str: string) {
       return str.charAt(0).toUpperCase() + str.slice(1);
     },
@@ -335,6 +351,7 @@ export default Vue.extend({
       });
     },
     getUpdatedData () {
+      this.pagination.itemsPerPage = this.itemsPerPage();
       this.filterJobs();
       this.$api.dashboard.queueDash(this.$route.params.id).then(async (res) => {
         if (!this.groupById()(res.groupId)) {

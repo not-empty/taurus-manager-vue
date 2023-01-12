@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-breadcrumbs :items="items" class="pl-3" />
+    <BreadCrumbs :items="items" />
     <v-sheet class="px-4 py-4 accent d-flex justify-space-between">
       <span class="font-weight-bold text-h6">Jobs</span>
       <v-btn text color="secondary" @click="confirmClone()">
@@ -96,10 +96,13 @@ import Vue from 'vue';
 import { mapGetters, mapActions } from 'vuex';
 import confirmation from '../../../../../components/utilities/confirmationModal.vue';
 import { IJob } from '~/types/job';
+import BreadCrumbs from '~/components/utilities/Breadcrumbs.vue';
+
 export default Vue.extend({
   name: 'ViewQueue',
   components: {
-    confirmation
+    confirmation,
+    BreadCrumbs
   },
   middleware: 'auth',
   data () {

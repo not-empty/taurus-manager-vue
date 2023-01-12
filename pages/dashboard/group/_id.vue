@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-breadcrumbs :items="items" class="pl-3" />
+    <BreadCrumbs :items="items" />
     <div class="d-flex mb-5">
       <v-text-field
         v-model="search"
@@ -81,10 +81,13 @@ import Vue from 'vue';
 import confirmation from '../../../components/utilities/confirmationModal.vue';
 import { DashGroup } from '~/types/group';
 import { IQueue } from '~/types/queue';
+import BreadCrumbs from '~/components/utilities/Breadcrumbs.vue';
+
 export default Vue.extend({
   name: 'IndexPage',
   components: {
-    confirmation
+    confirmation,
+    BreadCrumbs
   },
   middleware: 'auth',
   data () {
