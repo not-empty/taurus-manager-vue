@@ -53,6 +53,7 @@
         :items="group.queues"
         sort-by="name"
         class="accent mb-8"
+        :items-per-page="1000"
         @click:row="openQueue"
       >
         <template #top>

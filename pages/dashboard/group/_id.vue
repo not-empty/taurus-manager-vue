@@ -50,6 +50,7 @@
       :loading="loader"
       :headers="queuesHeaders"
       :items="dashboardData.queues"
+      :items-per-page="1000"
       sort-by="createAt"
       class="accent"
       @click:row="openQueue"
