@@ -106,7 +106,8 @@ export default Vue.extend({
       queuesHeaders: [
         {
           text: 'Name',
-          value: 'name'
+          value: 'name',
+          width: 500
         },
         {
           text: 'Status',
@@ -180,7 +181,15 @@ export default Vue.extend({
     },
     getUpdatedData () {
       this.$api.dashboard.groupDash().then((res) => {
-        this.dashboardData = res;
+        this.dashboardData = res.map((group) => {
+          group.queues = group.queues.map((queue) => {
+            if (queue.name.length > 50) {
+              queue.name = queue.name.substring(0, 50) + '...';
+            }
+            return queue;
+          });
+          return group;
+        });
         this.filteredData = this.dashboardData;
       });
     }
