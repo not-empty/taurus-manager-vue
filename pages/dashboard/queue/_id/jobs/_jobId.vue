@@ -76,12 +76,24 @@
     <code class="d-flex py-1 rounded-0 code-border ">
       <pre class="language-markup overflow">{{ job.data }}</pre>
     </code>
-    <v-sheet class="px-4 py-4 accent">
-      <span class="font-weight-bold text-h6">Trace</span>
-    </v-sheet>
-    <code class="d-flex py-1 rounded-0 code-border ">
-      <pre class="language-markup overflow">{{ job.stacktrace }}</pre>
-    </code>
+
+    <template v-if="job.failedReason">
+      <v-sheet class="px-4 py-4 accent">
+        <span class="font-weight-bold text-h6">FailedReason</span>
+      </v-sheet>
+      <code class="d-flex py-1 rounded-0 error-border">
+        <pre class="language-markup overflow">{{ job.failedReason }}</pre>
+      </code>
+    </template>
+    <template v-if="job.stacktrace && job.stacktrace.length > 0">
+      <v-sheet class="px-4 py-4 accent">
+        <span class="font-weight-bold text-h6">StackTrace</span>
+      </v-sheet>
+      <code class="d-flex py-1 rounded-0 error-border">
+        <pre class="language-markup overflow">{{ job.stacktrace }}</pre>
+      </code>
+    </template>
+
     <confirmation
       :state="ModalState"
       :function="ModalFunc"
@@ -172,7 +184,9 @@ export default Vue.extend({
 .code-border {
   border-left: 2px solid #db1e72;
 }
-
+.error-border {
+  border-left: 2px solid #db1e4d;
+}
 .overflow {
   max-width: 100%;
   word-break: break-all;

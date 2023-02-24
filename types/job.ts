@@ -1,3 +1,8 @@
+export type JobStacktrace = {
+    order: number;
+    content: string;
+};
+
 export interface IJob {
     id: string,
     data: string | number | Record<string, unknown> | unknown[] | null
@@ -10,7 +15,7 @@ export interface IJob {
     state: string,
     canRetry: boolean,
     failedReason: string | null,
-    stacktrace: Record<string, unknown> | string | number | unknown[] | null
+    stacktrace: JobStacktrace[] | null;
 }
 
 export interface IJobPayload {
