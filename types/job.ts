@@ -15,7 +15,7 @@ export interface IJob {
     state: string,
     canRetry: boolean,
     failedReason: string | null,
-    stacktrace: JobStacktrace[] | null;
+    stacktrace: JobStacktrace[] | null,
 }
 
 export interface IJobPayload {
