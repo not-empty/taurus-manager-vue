@@ -14,6 +14,7 @@
       hide-default-footer
       :headers="groupHeaders"
       :items="groups"
+      :items-per-page="pagination.itemsPerPage"
       sort-by="name"
       class="accent"
     >
