@@ -10,7 +10,7 @@ interface payloadCreateJobRetryJob {
 
 export class JobsModule extends Module {
   public async createJob (id: string, payload: IJobPayload): Promise<boolean> {
-    const result = await this.api.$post<boolean>(`${this.path}/${id}/job`, payload);
+    const result = await this.api.$post<boolean>(`${this.path}/${id}/job`, payload.data);
 
     return result;
   }

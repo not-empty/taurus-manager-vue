@@ -139,15 +139,18 @@ export default Vue.extend({
   },
   watch: {
     search: function () {
-      this.filteredData = this.dashboardData.filter((res) => {
-        return res.group.name.match(this.search);
-      });
+      this.searchMethod();
     }
   },
   created () {
     this.getUpdatedData();
   },
   methods: {
+    searchMethod () {
+      this.filteredData = this.dashboardData.filter((res) => {
+        return res.group.name.match(this.search);
+      });
+    },
     openQueue ({ id }: IQueue) {
       this.$router.push('/dashboard/queue/' + id);
     },
@@ -191,6 +194,7 @@ export default Vue.extend({
           return group;
         });
         this.filteredData = this.dashboardData;
+        this.searchMethod();
       });
     }
   }
