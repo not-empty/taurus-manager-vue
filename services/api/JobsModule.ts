@@ -2,15 +2,21 @@ import { Module } from './modules';
 import {
   ApiResponseJobsPaginated
 } from './types';
-import { IJob, IJobPayload } from '~/types/job';
+import { IJob } from '~/types/job';
 
 interface payloadCreateJobRetryJob {
   jobIds: string[];
 }
 
 export class JobsModule extends Module {
-  public async createJob (id: string, payload: IJobPayload): Promise<boolean> {
-    const result = await this.api.$post<boolean>(`${this.path}/${id}/job`, payload.data);
+  public async createJob (
+    id: string,
+    payload: Record<string, unknown> | unknown[] | null
+  ): Promise<boolean> {
+    const result = await this.api.$post<boolean>(
+      `${this.path}/${id}/job`,
+      { data: payload }
+    );
 
     return result;
   }
