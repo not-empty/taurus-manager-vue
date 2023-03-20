@@ -18,6 +18,3 @@ export interface IJob {
     stacktrace: JobStacktrace[] | null,
 }
 
-export interface IJobPayload {
-    data: Record<string, unknown> | string | number | unknown[] | null
-}

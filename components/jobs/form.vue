@@ -8,7 +8,7 @@
         <v-container>
           <v-row>
             <v-col cols="12" sm="12" lg="12">
-              <v-textarea v-model="jobData.data" label="Data" rows="1" auto-grow />
+              <v-textarea v-model="jobData" label="Data" rows="1" auto-grow />
             </v-col>
           </v-row>
         </v-container>
@@ -40,9 +40,7 @@ export default defineComponent({
   data () {
     return {
       page: 1,
-      jobData: {
-        data: ''
-      },
+      jobData: '',
       valid: false
     };
   },
@@ -54,14 +52,15 @@ export default defineComponent({
       if (!this.valid) {
         return;
       }
+      let jobDataJson = {};
       try {
-        this.jobData.data = JSON.parse(this.jobData.data);
+        jobDataJson = JSON.parse(this.jobData);
       } catch (e) {
         alert('Data isn`t a valid json');
         return;
       }
 
-      this.$api.jobs.createJob(this.queueId, { data: this.jobData }).then(() => {
+      this.$api.jobs.createJob(this.queueId, jobDataJson).then(() => {
         this.$emit('close');
       });
     }
