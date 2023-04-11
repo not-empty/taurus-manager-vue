@@ -156,7 +156,7 @@ export default Vue.extend({
   data () {
     return {
       loader: false,
-      state: 'waiting',
+      state: localStorage.getItem(this.$route.params.id) ?? 'waiting',
       ModalState: false,
       ModalFunc: function () {},
       ModalMessage: '',
@@ -251,6 +251,8 @@ export default Vue.extend({
 
     changeState (name: string) {
       this.state = name;
+      this.jobsSelected = [];
+      localStorage.setItem(this.$route.params.id, name);
       this.filterJobs();
     },
     createdJob () {
