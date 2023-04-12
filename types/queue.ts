@@ -41,6 +41,7 @@ export interface IStateQueue {
   id: string,
   name: string,
   groupId: string,
+  state: string | null
 }
 
 export interface IState {
