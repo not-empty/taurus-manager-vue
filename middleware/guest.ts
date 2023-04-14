@@ -12,7 +12,7 @@ interface AuthState {
 export default function (context: Context) {
   const state = context.store.state as AuthState;
   const decodedToken = decode(state.auth.token);
-  if (!checkExpire(decodedToken)) {
+  if (checkExpire(decodedToken)) {
     context.redirect('/dashboard');
   }
 }
@@ -20,7 +20,8 @@ export default function (context: Context) {
 function checkExpire (token: string | JwtPayload | null): boolean {
   if (token) {
     const { exp } = token as JwtPayload;
-    return (exp && exp > Date.now()) as boolean;
+    return (exp && exp < Date.now()) as boolean;
   }
-  return true;
+
+  return false;
 }
