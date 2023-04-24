@@ -1,3 +1,6 @@
+import { IStateQueue } from './queue';
+
 export interface optionsStore {
-  pagination: number
+  pagination: number,
+  stateQueue: IStateQueue
 }

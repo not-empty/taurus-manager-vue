@@ -156,7 +156,7 @@ export default Vue.extend({
   data () {
     return {
       loader: false,
-      state: 'waiting',
+      state: this.$store.state.options.stateQueue.state,
       ModalState: false,
       ModalFunc: function () {},
       ModalMessage: '',
@@ -244,13 +244,15 @@ export default Vue.extend({
       groups: 'groups',
       groupById: 'groupById'
     }),
-    ...mapActions('options', ['setPagination']),
+    ...mapActions('options', ['setPagination', 'setState']),
     ...mapGetters('options', {
       itemsPerPage: 'pagination'
     }),
 
     changeState (name: string) {
       this.state = name;
+      this.jobsSelected = [];
+      this.setState({ id: this.$route.params.id, state: name });
       this.filterJobs();
     },
     createdJob () {
