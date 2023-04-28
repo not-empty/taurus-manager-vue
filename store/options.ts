@@ -9,7 +9,7 @@ export const state = (): optionsStore => {
   };
   const options = localStorage.getItem('pagination');
   if (options) {
-    configDefault.pagination = JSON.parse(options);
+    configDefault.pagination = JSON.parse(options).pagination;
   }
   const optionsState = localStorage.getItem('state');
   if (optionsState) {
