@@ -16,9 +16,12 @@ const api: Plugin = (context, inject) => {
       context.store.state.auth.user.role === 'administrator' &&
       error.response?.status === 500
     ) {
-      context.redirect('/queue');
-      alert('possivel erro no url do redis ou redis offline');
-      return Promise.resolve(error);
+      const erro = error.response.data?.error;
+      if (erro && erro.code === 'ECONNREFUSED') {
+        context.redirect('/queue');
+        alert('possivel erro no url do redis ou redis offline');
+        return Promise.resolve(error);
+      }
     }
 
     if (error.response?.status === 401) {

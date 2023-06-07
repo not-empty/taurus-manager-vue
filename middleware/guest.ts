@@ -25,7 +25,7 @@ function checkExpire (token: JwtPayload | null): boolean {
     const { exp } = token;
     const milisecond = exp * 1000;
 
-    if (milisecond < Date.now()) {
+    if (milisecond > Date.now()) {
       return true;
     }
   }
