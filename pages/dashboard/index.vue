@@ -147,8 +147,12 @@ export default Vue.extend({
   },
   methods: {
     searchMethod () {
+      const search = this.search.toLowerCase();
+
       this.filteredData = this.dashboardData.filter((res) => {
-        return res.group.name.match(this.search);
+        return res.group.name.toLowerCase().match(search) || res.queues.some((queue) => {
+          return queue.name.toLowerCase().match(search);
+        });
       });
     },
     openQueue ({ id }: IQueue) {
