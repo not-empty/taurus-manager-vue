@@ -30,8 +30,7 @@
       </q-breadcrumbs>
 
       <div class="text-h7">
-        Only show queues waiting or paused items using the health value
-        configuration as a reference
+        only shows queues that are out of normal health according to the configured health_value.
         <q-spinner
           v-if="showSpinner"
           color="primary"
