@@ -1,0 +1,178 @@
+.q-card--dark {
+  border: 0;
+  box-shadow: none;
+}
+
+body.body--dark .q-layout__shadow:after {
+  box-shadow: none;
+}
+
+.crud-dialog .q-card {
+  width: 600px;
+  max-width: 90%;
+}
+
+.job-dialog .q-card {
+  width: 1000px;
+  max-width: 90%;
+  height: 800px;
+  max-height: 90%;
+}
+
+.manage-groups-form {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+body {
+  font-size: 17px !important;
+}
+
+.q-table tbody td {
+  font-size: 17px !important;
+}
+
+.q-field {
+  font-size: 17px !important;
+}
+
+.nofification {
+  font-size: 18px !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.custom-checkbox .q-checkbox__label {
+  font-size: 20px !important;
+  margin-left: 8px;
+}
+
+.breadcrumb-white {
+  color: white;
+}
+
+::-webkit-scrollbar {
+  width: 18px;
+  background-color: #2c2c2c;
+}
+
+::-webkit-scrollbar-corner {
+  background-color: #2c2c2c;
+}
+
+::-webkit-scrollbar-track {
+  background: #2c2c2c;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #565656;
+  border-radius: 6px;
+  border: 3px solid #2c2c2c;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.tabs-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.tab {
+  flex-grow: 1;
+  text-align: center;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tab-active {
+  background-color: #25262c;
+  color: white;
+}
+
+.tab:not(.tab-active) {
+  background-color: #333;
+  color: #ddd;
+  transition: background-color 0.3s ease;
+}
+
+.tab-hover:not(.tab-active) {
+  background-color: #444;
+  transition: background-color 0.3s ease;
+}
+
+.amount-container span {
+  font-size: 30px;
+}
+
+.queue-title {
+  font-size: 30px;
+  margin-top: 10px;
+}
+
+.limited-table {
+  max-height: 580px;
+  overflow-y: auto;
+}
+
+.q-dialog__backdrop {
+  backdrop-filter: blur(3px);
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.selected-card {
+  border: 3px solid #00bf4f;
+}
+
+.bg-external {
+  background-image: url('./src/assets/img/background-bull.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding: 10px;
+}
+
+.taurus-login-title {
+  font-size: 26px;
+}
+
+.taurus-login-version {
+  font-size: 14px;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-50px);
+  }
+  50% {
+    transform: translateX(50px);
+  }
+  75% {
+    transform: translateX(-50px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.shake-animation {
+  animation: shake 0.5s ease-in-out;
+}
+
+.selected-card {
+  border: 3px solid #00bf4f;
+}

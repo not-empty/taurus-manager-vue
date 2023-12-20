@@ -1,0 +1,52 @@
+version: "3.7"
+services:
+  taurus-manager-mysql:
+    image: mysql:8.0.16
+    container_name: taurus-manager-mysql
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_DATABASE=taurus-manager
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./backend/mysql-db:/docker-entrypoint-initdb.d
+      - ./backend/storage/.db:/var/lib/mysql
+    security_opt:
+      - seccomp:unconfined
+    networks:
+      - taurus-network
+
+  taurus-manager-back:
+    build:
+      context: ./backend/
+      dockerfile: ./ops/docker/dev/Dockerfile
+    container_name: taurus-manager-back
+    depends_on:
+      - taurus-manager-mysql
+    ports:
+      - "3333:3333"
+    volumes:
+      - ./backend:/app
+    networks:
+      - taurus-network     
+
+  taurus-manager-front:
+    build:
+      context: ./frontend/
+      dockerfile: ./ops/docker/dev/Dockerfile
+    container_name: taurus-manager-front
+    depends_on:
+      - taurus-manager-mysql
+      - taurus-manager-back
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - taurus-network
+
+networks:
+    taurus-network:
+      name: taurus-network

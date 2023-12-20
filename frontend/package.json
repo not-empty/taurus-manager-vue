@@ -1,0 +1,38 @@
+{
+  "name": "taurus-manager-front",
+  "version": "1.0.0",
+  "description": "Taurus Manager",
+  "productName": "Taurus Manager",
+  "author": "Not Empty",
+  "scripts": {
+    "lint": "eslint --ext .js,.ts,.vue ./",
+    "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
+    "test": "echo \"No test specified\" && exit 0",
+    "dev": "quasar dev --host",
+    "build": "quasar build"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.16.9",
+    "axios": "^1.6.2",
+    "quasar": "^2.14.2",
+    "vue": "^3.3.13",
+    "vue-router": "^4.2.5"
+  },
+  "engines": {
+    "node": "^20",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  },
+  "devDependencies": {
+    "@quasar/app-vite": "^1.7.1",
+    "@types/node": "^20.10.5",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-vue": "^9.19.2",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
+  }
+}
