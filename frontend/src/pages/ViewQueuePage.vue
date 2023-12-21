@@ -520,7 +520,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { ref, toRaw, nextTick } from 'vue';
 import { store, initializeStore } from 'src/store';
 import { checkPermission } from 'src/utils/permissions';
@@ -770,15 +769,9 @@ export default {
         const data = {
           data: jobData
         };
-        const token = sessionStorage.getItem('user-token');
-        await axios.post(
-          `http://localhost:3333/queue/${this.queueId}/job`,
+        await this.$api.post(
+          `queue/${this.queueId}/job`,
           data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
         );
         works = true;
       } catch (error) {
@@ -850,13 +843,9 @@ export default {
         let data = {
           jobIds: uniqueIds
         };
-        const token = sessionStorage.getItem('user-token');
-        await axios.post(
-          `http://localhost:3333/queue/${this.dash.id}/job/retry`,
+        await this.$api.post(
+          `queue/${this.dash.id}/job/retry`,
           data,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
         );
         works = true;
       } catch (error) {
@@ -894,13 +883,9 @@ export default {
         const data = {
           ids: [this.queueId]
         };
-        const token = sessionStorage.getItem('user-token');
-        await axios.put(
-          `http://localhost:3333/queue/${this.currentAction}`,
+        await this.$api.put(
+          `queue/${this.currentAction}`,
           data,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
         );
         works = true;
       } catch (error) {
@@ -984,16 +969,7 @@ export default {
     async cloneOneJob(jobId) {
       try {
         var works = false;
-        const token = sessionStorage.getItem('user-token');
-        await axios.post(
-          `http://localhost:3333/queue/${this.queueId}/job/${jobId}/clone`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
+        await this.$api.post(`queue/${this.queueId}/job/${jobId}/clone`);
         await this.refreshAllData();
         works = true;
         this.payloadJobModalOpen = false;
@@ -1028,16 +1004,7 @@ export default {
     async retryAllJobs() {
       try {
         var works = false;
-        const token = sessionStorage.getItem('user-token');
-        await axios.post(
-          `http://localhost:3333/queue/${this.queueId}/job/retry-all`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
+        await this.$api.post(`queue/${this.queueId}/job/retry-all`);
         await this.refreshAllData();
         this.showDialogActionConfirm = false;
         works = true;
@@ -1072,18 +1039,12 @@ export default {
     async retryOneJob(jobId) {
       try {
         var works = false;
-        const token = sessionStorage.getItem('user-token');
         const data = {
           jobIds: [jobId]
         };
-        await axios.post(
-          `http://localhost:3333/queue/${this.queueId}/job/retry`,
+        await this.$api.post(
+          `queue/${this.queueId}/job/retry`,
           data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
         );
         await this.refreshAllData();
         this.payloadJobModalOpen = false;
@@ -1120,18 +1081,10 @@ export default {
       this.loading = true;
       try {
         const { page, rowsPerPage } = this.pagination;
-        const token = sessionStorage.getItem('user-token');
         if (this.typeParam == undefined) {
           this.typeParam = 'waiting';
         }
-        const response = await axios.get(
-          `http://localhost:3333/queue/${this.queueId}/job?state=${this.typeParam}&page=${page}&size=${rowsPerPage}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
+        const response = await this.$api.get(`queue/${this.queueId}/job?state=${this.typeParam}&page=${page}&size=${rowsPerPage}`);
 
         this.rows = response.data.jobs;
         this.pagination.rowsNumber = response.data.total;
@@ -1143,15 +1096,7 @@ export default {
     },
     async fetchDash() {
       try {
-        const token = sessionStorage.getItem('user-token');
-        const response = await axios.get(
-          `http://localhost:3333/queue/${this.queueId}/dashboard`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
+        const response = await this.$api.get(`queue/${this.queueId}/dashboard`);
         this.dash = response.data;
         this.jobCounts = response.data.jobCounts;
       } catch (error) {
@@ -1160,13 +1105,7 @@ export default {
     },
     async fetchGroup() {
       try {
-        const token = sessionStorage.getItem('user-token');
-        const response = await axios.get(
-          `http://localhost:3333/group/${this.dash.groupId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+        const response = await this.$api.get(`group/${this.dash.groupId}`);
         this.group = response.data;
       } catch (error) {
         throw errro;
@@ -1174,15 +1113,7 @@ export default {
     },
     async fetchJob(jobId) {
       try {
-        const token = sessionStorage.getItem('user-token');
-        const response = await axios.get(
-          `http://localhost:3333/queue/${this.queueId}/job/${jobId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
+        const response = await this.$api.get(`queue/${this.queueId}/job/${jobId}`);
         this.jobData = response.data;
         this.jobData.data = JSON.stringify(this.jobData.data, null, 4);
         this.jobData.failedReason = JSON.stringify(
@@ -1218,10 +1149,8 @@ export default {
         let data = {
           jobIds: uniqueIds
         };
-        const token = sessionStorage.getItem('user-token');
-        await axios.delete(`http://localhost:3333/queue/${this.dash.id}/job`, {
-          headers: { Authorization: `Bearer ${token}` },
-          data
+        await this.$api.delete(`queue/${this.dash.id}/job`, {
+          data,
         });
         works = true;
       } catch (error) {

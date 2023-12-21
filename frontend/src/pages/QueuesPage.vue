@@ -137,8 +137,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
   data() {
     return {
@@ -255,13 +253,7 @@ export default {
     },
     async fetchRows() {
       try {
-        const token = sessionStorage.getItem('user-token');
-        const response = await axios.get('http://localhost:3333/queue', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
+        const response = await this.$api.get('queue');
         this.rows = response.data.queues;
       } catch (error) {
         this.$q.notify({
@@ -280,10 +272,7 @@ export default {
     },
     async fetchGroups() {
       try {
-        const token = sessionStorage.getItem('user-token');
-        const response = await axios.get('http://localhost:3333/group', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await this.$api.get('group');
         this.groups = response.data.groups;
       } catch (error) {
         this.$q.notify({
@@ -302,22 +291,16 @@ export default {
     },
     async saveRow() {
       try {
-        const token = sessionStorage.getItem('user-token');
         this.row.groupId = this.row.group.id;
         delete this.row['group'];
         var works = false;
         if (this.isEditMode) {
-          await axios.put(
-            `http://localhost:3333/queue/${this.row.id}`,
+          await this.$api.put(
+            `queue/${this.row.id}`,
             this.row,
-            {
-              headers: { Authorization: `Bearer ${token}` }
-            }
           );
         } else {
-          await axios.post('http://localhost:3333/queue', this.row, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+          await this.$api.post('queue', this.row);
         }
         works = true;
       } catch (error) {
@@ -351,14 +334,8 @@ export default {
     },
     async confirmDelete() {
       try {
-        const token = sessionStorage.getItem('user-token');
         var works = false;
-        await axios.delete(
-          `http://localhost:3333/queue/${this.itemToDelete.id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+        await this.$api.delete(`queue/${this.itemToDelete.id}`);
         works = true;
       } catch (error) {
         this.$q.notify({

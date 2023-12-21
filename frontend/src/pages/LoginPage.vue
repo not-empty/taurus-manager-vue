@@ -74,8 +74,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
   data() {
     return {
@@ -104,7 +102,7 @@ export default {
       }
 
       try {
-        const response = await axios.post('http://localhost:3333/session', {
+        const response = await this.$api.post('session', {
           login: this.login,
           password: this.password
         });

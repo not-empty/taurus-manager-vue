@@ -221,7 +221,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { store, initializeStore } from 'src/store';
 import { checkPermission } from 'src/utils/permissions';
 import {
@@ -254,13 +253,9 @@ export default {
         let data = {
           ids: uniqueIds
         };
-        const token = sessionStorage.getItem('user-token');
-        await axios.put(
-          `http://localhost:3333/queue/${this.currentAction}`,
+        await this.$api.put(
+          `queue/${this.currentAction}`,
           data,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
         );
       } catch (error) {
         this.$q.notify({
@@ -322,15 +317,7 @@ export default {
     },
     async fetchRows() {
       try {
-        const token = sessionStorage.getItem('user-token');
-        const response = await axios.get(
-          `http://localhost:3333/group/dashboard/${this.groupId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
+        const response = await this.$api.get(`group/dashboard/${this.groupId}`);
         this.group = response.data.group;
         this.queues = response.data.queues;
       } catch (error) {

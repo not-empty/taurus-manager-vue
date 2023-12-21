@@ -111,8 +111,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
   data() {
     return {
@@ -196,13 +194,7 @@ export default {
     },
     async fetchRows() {
       try {
-        const token = sessionStorage.getItem('user-token');
-        const response = await axios.get('http://localhost:3333/group', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
+        const response = await this.$api.get('group');
         this.rows = response.data.groups;
       } catch (error) {
         this.$q.notify({
@@ -221,20 +213,14 @@ export default {
     },
     async saveRow() {
       try {
-        const token = sessionStorage.getItem('user-token');
         var works = false;
         if (this.isEditMode) {
-          await axios.put(
-            `http://localhost:3333/group/${this.row.id}`,
+          await this.$api.put(
+            `group/${this.row.id}`,
             this.row,
-            {
-              headers: { Authorization: `Bearer ${token}` }
-            }
           );
         } else {
-          await axios.post('http://localhost:3333/group', this.row, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+          await this.$api.post('group', this.row);
         }
         works = true;
       } catch (error) {
@@ -269,13 +255,7 @@ export default {
     async confirmDelete() {
       try {
         var works = false;
-        const token = sessionStorage.getItem('user-token');
-        await axios.delete(
-          `http://localhost:3333/group/${this.itemToDelete.id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+        await this.$api.delete(`group/${this.itemToDelete.id}`);
         works = true;
       } catch (error) {
         works = false;

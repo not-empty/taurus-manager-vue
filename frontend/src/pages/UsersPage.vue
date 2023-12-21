@@ -190,8 +190,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
   data() {
     return {
@@ -341,13 +339,7 @@ export default {
     },
     async fetchRows() {
       try {
-        const token = sessionStorage.getItem('user-token');
-        const response = await axios.get('http://localhost:3333/user', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
+        const response = await this.$api.get('user');
         this.rows = response.data.users;
       } catch (error) {
         this.$q.notify({
@@ -366,12 +358,7 @@ export default {
     },
     async fetchGroups() {
       try {
-        const token = sessionStorage.getItem('user-token');
-        const response = await axios.get('http://localhost:3333/group', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await this.$api.get('group');
 
         this.groupsOptions = response.data.groups.map((group) => ({
           label: group.name,
@@ -394,18 +381,14 @@ export default {
     },
     async saveRow() {
       try {
-        const token = sessionStorage.getItem('user-token');
         var works = false;
         if (this.isEditMode) {
-          await axios.put(
-            `http://localhost:3333/user/${this.row.id}`,
+          await this.$api.put(
+            `user/${this.row.id}`,
             this.row,
-            {
-              headers: { Authorization: `Bearer ${token}` }
-            }
           );
         } else {
-          await axios.post('http://localhost:3333/user', this.row, {
+          await this.$api.post('user', this.row, {
             headers: { Authorization: `Bearer ${token}` }
           });
         }
@@ -453,14 +436,10 @@ export default {
           allowAll: allowAllValue,
           groups: JSON.stringify(uniqueIds)
         };
-        const token = sessionStorage.getItem('user-token');
         const userId = this.row.id;
-        await axios.put(
-          `http://localhost:3333/user/${userId}`,
+        await this.$api.put(
+          `user/${userId}`,
           updatedGroupData,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
         );
         works = true;
       } catch (error) {
@@ -494,14 +473,8 @@ export default {
     },
     async confirmDelete() {
       try {
-        const token = sessionStorage.getItem('user-token');
         var works = false;
-        await axios.delete(
-          `http://localhost:3333/user/${this.itemToDelete.id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+        await this.$api.delete(`user/${this.itemToDelete.id}`);
         works = true;
       } catch (error) {
         works = false;
