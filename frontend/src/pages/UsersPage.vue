@@ -388,9 +388,7 @@ export default {
             this.row,
           );
         } else {
-          await this.$api.post('user', this.row, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+          await this.$api.post('user', this.row);
         }
         works = true;
       } catch (error) {
