@@ -12,7 +12,7 @@ Groups and queues list
 Queue details
 ![Taurus Manager Queue Details](./screenshot2.png)
 
-Monitor Screen (Monitoring only unhealth queues with autorefresh)
+Monitor Screen (Monitoring only unhealth queues with auto-refresh)
 ![Taurus Manager Queue Monitor](./screenshot3.png)
 
 ## How the Queue Ecosystem Operates
