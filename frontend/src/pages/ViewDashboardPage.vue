@@ -13,7 +13,7 @@
           <q-btn
             flat
             :label="currentAction"
-            :color="getActionColor"
+            :color="calculateActionColor(this.currentAction)"
             @click="confirmAction"
           />
         </q-card-actions>
@@ -55,7 +55,7 @@
           icon="pause"
           color="primary"
           class="q-ml-xl"
-          v-if="hasPermission('controller')"
+          v-if="checkPermission(this.role, 'controller')"
           :disabled="selected.length === 0"
           @click="pauseSelected"
         />
@@ -64,7 +64,7 @@
           label="Resume"
           icon="play_arrow"
           color="primary"
-          v-if="hasPermission('controller')"
+          v-if="checkPermission(this.role, 'controller')"
           :disabled="selected.length === 0"
           @click="resumeSelected"
         />
@@ -153,13 +153,13 @@
           <template v-slot:header-selection="scope">
             <q-checkbox
               v-model="scope.selected"
-              v-if="hasPermission('controller')"
+              v-if="checkPermission(this.role, 'controller')"
             />
           </template>
 
           <template v-slot:body-selection="scope">
             <q-checkbox
-              v-if="hasPermission('controller')"
+              v-if="checkPermission(this.role, 'controller')"
               :model-value="scope.selected"
               @update:model-value="
                 (val, evt) => {
@@ -177,7 +177,7 @@
               <div @click="onRowClick(props.row.id)" class="cursor-pointer">
                 <q-chip
                   :color="
-                    getHealthColor(
+                    calculateHealthColor(
                       props.row.health_value,
                       props.row.jobCounts.waiting,
                       props.row.jobCounts.paused
@@ -201,7 +201,7 @@
           <template v-slot:body-cell-status="props">
             <q-td :props="props">
               <div @click="onRowClick(props.row.id)" class="cursor-pointer">
-                <q-chip :color="getStatusColor(props.row.status)">
+                <q-chip :color="calculateStatusColor(props.row.status)">
                   {{ props.row.status.substring(0, 1).toUpperCase() }}
                 </q-chip>
               </div>
@@ -271,15 +271,14 @@
 <script>
 import axios from 'axios';
 import { ref } from 'vue';
-import { store, initializeStore } from 'src/store';
-import { checkPermission } from 'src/utils/permissions';
-import {
-  calculateHealthColor,
-  calculateStatusColor,
-  calculateActionColor
-} from 'src/utils/colors';
+import colorsMixin from 'src/mixins/colorsMixin';
+import sessionMixin from 'src/mixins/sessionMixin';
 
 export default {
+  mixins: [
+    colorsMixin,
+    sessionMixin,
+  ],
   data() {
     return {
       loading: false,
@@ -357,14 +356,10 @@ export default {
     };
   },
   async mounted() {
-    initializeStore();
-    this.role = store.user.role;
+    this.role = await this.validateUser();
     await this.fetchRows();
   },
   methods: {
-    hasPermission(requiredRole) {
-      return checkPermission(store.user.role, requiredRole);
-    },
     openGroup(id) {
       this.$router.push(`/view/group/${id}`);
     },
@@ -388,13 +383,9 @@ export default {
         let data = {
           ids: uniqueIds
         };
-        const token = sessionStorage.getItem('user-token');
         await axios.put(
-          `http://localhost:3333/queue/${this.currentAction}`,
-          data,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
+          `queue/${this.currentAction}`,
+          data
         );
         works = true;
       } catch (error) {
@@ -426,12 +417,6 @@ export default {
         this.showDialogActionConfirm = false;
       }
     },
-    getHealthColor(health_value, waiting, paused) {
-      return calculateHealthColor(health_value, waiting, paused);
-    },
-    getStatusColor(status) {
-      return calculateStatusColor(status);
-    },
     onRowClick(id) {
       this.$router.push(`/view/queue/${id}`);
     },
@@ -441,14 +426,8 @@ export default {
     async fetchRows() {
       this.loading = true;
       try {
-        const token = sessionStorage.getItem('user-token');
         const response = await axios.get(
-          'http://localhost:3333/group/dashboard',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
+          'group/dashboard'
         );
         this.groups = response.data;
       } catch (error) {
@@ -487,9 +466,6 @@ export default {
         })
         .filter((group) => group.queues.length > 0);
     },
-    getActionColor() {
-      return calculateActionColor(this.currentAction);
-    }
   }
 };
 </script>

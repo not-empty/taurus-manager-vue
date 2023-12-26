@@ -1,4 +1,5 @@
 import { RouteRecordRaw } from 'vue-router';
+import Cookies from 'js-cookie';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -10,7 +11,7 @@ const routes: RouteRecordRaw[] = [
         path: '',
         component: () => import('pages/LoginPage.vue'),
         beforeEnter: (to, from, next) => {
-          const isAuthenticated = sessionStorage.getItem('user-token');
+          const isAuthenticated = Cookies.get('isLogged');
           if (isAuthenticated) {
             next('/view/dashboard');
           } else {
@@ -27,12 +28,13 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/manager',
     component: () => import('layouts/TaurusLayout.vue'),
-    beforeEnter(to, from, next) {
-      const role = sessionStorage.getItem('user-role');
-      if (!role || role !== 'administrator') {
-        next('/403');
+    beforeEnter: (to, from, next) => {
+      const isAuthenticated = Cookies.get('isLogged');
+      if (!isAuthenticated) {
+        next('/login');
+      } else {
+        next();
       }
-      next();
     },
     children: [
       { path: '', redirect: '/manager/groups' },
@@ -45,12 +47,13 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/view',
     component: () => import('layouts/TaurusLayout.vue'),
-    beforeEnter(to, from, next) {
-      const role = sessionStorage.getItem('user-role');
-      if (!role) {
-        next('/403');
+    beforeEnter: (to, from, next) => {
+      const isAuthenticated = Cookies.get('isLogged');
+      if (!isAuthenticated) {
+        next('/login');
+      } else {
+        next();
       }
-      next();
     },
     children: [
       { path: '', redirect: '/view/dashboard' },
@@ -76,7 +79,7 @@ const routes: RouteRecordRaw[] = [
           template: '<div></div>'
         },
         beforeEnter(to, from, next) {
-          sessionStorage.removeItem('user-token');
+          Cookies.remove('isLogged');
           next('/login');
         }
       }

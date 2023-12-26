@@ -191,8 +191,12 @@
 
 <script>
 import axios from 'axios';
+import sessionMixin from 'src/mixins/sessionMixin';
 
 export default {
+  mixins: [
+    sessionMixin,
+  ],
   data() {
     return {
       allowAll: 'true',
@@ -203,6 +207,7 @@ export default {
       dialogGroups: false,
       showDialogDeleteConfirm: false,
       itemToDelete: null,
+      role: '',
       row: {
         name: '',
         login: '',
@@ -278,6 +283,7 @@ export default {
     };
   },
   async mounted() {
+    this.role = await this.validateUserRole('administrator');
     await this.fetchRows();
     await this.fetchGroups();
   },
@@ -341,12 +347,9 @@ export default {
     },
     async fetchRows() {
       try {
-        const token = sessionStorage.getItem('user-token');
-        const response = await axios.get('http://localhost:3333/user', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await axios.get(
+          'user'
+        );
 
         this.rows = response.data.users;
       } catch (error) {
@@ -366,12 +369,9 @@ export default {
     },
     async fetchGroups() {
       try {
-        const token = sessionStorage.getItem('user-token');
-        const response = await axios.get('http://localhost:3333/group', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await axios.get(
+          'group'
+        );
 
         this.groupsOptions = response.data.groups.map((group) => ({
           label: group.name,
@@ -394,20 +394,17 @@ export default {
     },
     async saveRow() {
       try {
-        const token = sessionStorage.getItem('user-token');
         var works = false;
         if (this.isEditMode) {
           await axios.put(
-            `http://localhost:3333/user/${this.row.id}`,
-            this.row,
-            {
-              headers: { Authorization: `Bearer ${token}` }
-            }
+            `user/${this.row.id}`,
+            this.row
           );
         } else {
-          await axios.post('http://localhost:3333/user', this.row, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+          await axios.post(
+            'user',
+            this.row
+          );
         }
         works = true;
       } catch (error) {
@@ -453,14 +450,10 @@ export default {
           allowAll: allowAllValue,
           groups: JSON.stringify(uniqueIds)
         };
-        const token = sessionStorage.getItem('user-token');
         const userId = this.row.id;
         await axios.put(
-          `http://localhost:3333/user/${userId}`,
-          updatedGroupData,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
+          `user/${userId}`,
+          updatedGroupData
         );
         works = true;
       } catch (error) {
@@ -494,13 +487,9 @@ export default {
     },
     async confirmDelete() {
       try {
-        const token = sessionStorage.getItem('user-token');
         var works = false;
         await axios.delete(
-          `http://localhost:3333/user/${this.itemToDelete.id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
+          `user/${this.itemToDelete.id}`
         );
         works = true;
       } catch (error) {

@@ -112,14 +112,19 @@
 
 <script>
 import axios from 'axios';
+import sessionMixin from 'src/mixins/sessionMixin';
 
 export default {
+  mixins: [
+    sessionMixin,
+  ],
   data() {
     return {
       entityName: 'Group',
       showDialogSave: false,
       showDialogDeleteConfirm: false,
       itemToDelete: null,
+      role: '',
       row: {
         name: '',
         description: ''
@@ -175,6 +180,7 @@ export default {
     };
   },
   async mounted() {
+    this.role = await this.validateUserRole('administrator');
     await this.fetchRows();
   },
   methods: {
@@ -196,13 +202,9 @@ export default {
     },
     async fetchRows() {
       try {
-        const token = sessionStorage.getItem('user-token');
-        const response = await axios.get('http://localhost:3333/group', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
+        const response = await axios.get(
+          'group'
+        );
         this.rows = response.data.groups;
       } catch (error) {
         this.$q.notify({
@@ -221,20 +223,16 @@ export default {
     },
     async saveRow() {
       try {
-        const token = sessionStorage.getItem('user-token');
         var works = false;
         if (this.isEditMode) {
           await axios.put(
-            `http://localhost:3333/group/${this.row.id}`,
-            this.row,
-            {
-              headers: { Authorization: `Bearer ${token}` }
-            }
+            `group/${this.row.id}`,
+            this.row
           );
         } else {
-          await axios.post('http://localhost:3333/group', this.row, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+          await axios.post(
+            `group`, this.row
+          );
         }
         works = true;
       } catch (error) {
@@ -269,12 +267,8 @@ export default {
     async confirmDelete() {
       try {
         var works = false;
-        const token = sessionStorage.getItem('user-token');
         await axios.delete(
-          `http://localhost:3333/group/${this.itemToDelete.id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
+          `group/${this.itemToDelete.id}`
         );
         works = true;
       } catch (error) {

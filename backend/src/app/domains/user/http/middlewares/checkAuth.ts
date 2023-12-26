@@ -16,13 +16,11 @@ interface ITokenSubject {
 }
 
 const checkAuth = (request: Request, _: Response, next: NextFunction): void => {
-  const auth = request.headers.authorization;
+  const token = request.cookies['token'];
 
-  if (!auth) {
+  if (!token) {
     throw new CustomError("Missing valid JWT token.", 401);
   }
-
-  const [, token] = auth.split(" ");
 
   try {
     const decoded = verify(token, authConfig.jwt.secret);

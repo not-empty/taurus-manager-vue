@@ -13,7 +13,7 @@
           <q-btn
             flat
             :label="currentAction"
-            :color="getActionColor"
+            :color="calculateActionColor(this.currentAction)"
             @click="confirmAction"
           />
         </q-card-actions>
@@ -59,7 +59,7 @@
           label="Select All"
           v-model="selectAll"
           @update:model-value="toggleSelectAll"
-          v-if="hasPermission('controller')"
+          v-if="checkPermission(this.role, 'controller')"
           class="q-mr-xl"
         />
         <q-btn
@@ -67,7 +67,7 @@
           label="Pause"
           icon="pause"
           color="primary"
-          v-if="hasPermission('controller')"
+          v-if="checkPermission(this.role, 'controller')"
           :disabled="selectedQueues.length === 0"
           @click="pauseSelected"
         />
@@ -77,7 +77,7 @@
           icon="play_arrow"
           color="primary"
           class="q-mr-lg"
-          v-if="hasPermission('controller')"
+          v-if="checkPermission(this.role, 'controller')"
           :disabled="selectedQueues.length === 0"
           @click="resumeSelected"
         />
@@ -113,13 +113,13 @@
             <div class="row">
               <div class="col-12 flex">
                 <q-checkbox
-                  v-if="hasPermission('controller')"
+                  v-if="checkPermission(this.role, 'controller')"
                   :model-value="isSelected(queue.id)"
                   @update:model-value="toggleSelection(queue.id)"
                   :label="queue.name"
                   class="custom-checkbox"
                 />
-                <div class="text-h6" v-if="!hasPermission('controller')">
+                <div class="text-h6" v-if="!checkPermission(this.role, 'controller')">
                   {{ queue.name }}
                 </div>
               </div>
@@ -139,7 +139,7 @@
                 <q-badge
                   rounded
                   :color="
-                    getHealthColor(
+                    calculateHealthColor(
                       queue.health_value,
                       queue.jobCounts.waiting,
                       queue.jobCounts.paused
@@ -150,7 +150,7 @@
                 <q-badge
                   class="q-ml-md"
                   rounded
-                  :color="getStatusColor(queue.status)"
+                  :color="calculateStatusColor(queue.status)"
                   :label="queue.status"
                 />
                 <div class="q-ml-md">
@@ -220,14 +220,14 @@
           <q-linear-progress
             size="10px"
             :value="
-              getProgress(
+              calculateProgress(
                 queue.health_value,
                 queue.jobCounts.waiting,
                 queue.jobCounts.paused
               )
             "
             :color="
-              getHealthColor(
+              calculateHealthColor(
                 queue.health_value,
                 queue.jobCounts.waiting,
                 queue.jobCounts.paused
@@ -243,19 +243,18 @@
 
 <script>
 import axios from 'axios';
-import { store, initializeStore } from 'src/store';
-import { checkPermission } from 'src/utils/permissions';
-import {
-  calculateHealthColor,
-  calculateStatusColor,
-  calculateActionColor,
-  calculateProgress
-} from 'src/utils/colors';
+import colorsMixin from 'src/mixins/colorsMixin';
+import sessionMixin from 'src/mixins/sessionMixin';
 
 export default {
+    mixins: [
+    colorsMixin,
+    sessionMixin,
+  ],
   data() {
     return {
       selectAll: false,
+      role: '',
       filter: '',
       queues: [],
       selectedQueues: [],
@@ -267,9 +266,6 @@ export default {
     };
   },
   methods: {
-    hasPermission(requiredRole) {
-      return checkPermission(store.user.role, requiredRole);
-    },
     startAutoRefresh() {
       this.autoRefreshIntervalId = setInterval(() => {
         this.fetchRows();
@@ -294,14 +290,11 @@ export default {
         let data = {
           ids: uniqueIds
         };
-        const token = sessionStorage.getItem('user-token');
         await axios.put(
-          `http://localhost:3333/queue/${this.currentAction}`,
-          data,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
+          `queue/${this.currentAction}`,
+          data
         );
+        this.clearSelection();
       } catch (error) {
         this.$q.notify({
           type: 'negative',
@@ -319,6 +312,10 @@ export default {
       await this.fetchRows();
       this.showDialogActionConfirm = false;
     },
+    clearSelection() {
+      this.selectedQueues = [];
+      this.selectAll = false;
+    },
     pauseSelected() {
       if (this.selectedQueues.length > 0) {
         this.currentAction = 'pause';
@@ -330,9 +327,6 @@ export default {
         this.currentAction = 'resume';
         this.showDialogActionConfirm = true;
       }
-    },
-    getStatusColor(status) {
-      return calculateStatusColor(status);
     },
     isSelected(queueId) {
       return this.selectedQueues.includes(queueId);
@@ -354,23 +348,11 @@ export default {
       }
       this.selectAll = this.queues.length === this.selectedQueues.length;
     },
-    getProgress(health_value, waiting, paused) {
-      return calculateProgress(health_value, waiting, paused);
-    },
-    getHealthColor(health_value, waiting, paused) {
-      return calculateHealthColor(health_value, waiting, paused);
-    },
     async fetchRows() {
       this.showSpinner = true;
       try {
-        const token = sessionStorage.getItem('user-token');
         const response = await axios.get(
-          'http://localhost:3333/group/monitor',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
+          'group/monitor'
         );
         this.queues = response.data.queues;
       } catch (error) {
@@ -397,8 +379,7 @@ export default {
     this.stopAutoRefresh();
   },
   async mounted() {
-    initializeStore();
-    this.role = store.user.role;
+    this.role = await this.validateUser();
     await this.fetchRows();
   },
   watch: {
@@ -437,9 +418,6 @@ export default {
         queue.name.toLowerCase().includes(filterLower)
       );
     },
-    getActionColor() {
-      return calculateActionColor(this.currentAction);
-    }
   }
 };
 </script>

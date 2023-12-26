@@ -82,7 +82,7 @@
             <q-item-section avatar>
               <q-icon name="logout" />
             </q-item-section>
-            <q-item-section> Logout {{ this.login }} </q-item-section>
+            <q-item-section> Logout</q-item-section>
           </q-item>
         </q-list>
       </q-scroll-area>
@@ -96,21 +96,23 @@
 
 <script>
 import { ref } from 'vue';
+import sessionMixin from 'src/mixins/sessionMixin';
 
 export default {
   name: 'TaurusLayout',
   methods: {},
+  mixins: [sessionMixin],
   setup() {
     return {
       drawer: ref(false),
       miniState: ref(true),
-      login: '',
       role: ''
     };
   },
-  mounted() {
-    this.login = sessionStorage.getItem('user-login');
-    this.role = sessionStorage.getItem('user-role');
+  async mounted() {
+    this.role = await this.validateUser();
+  },
+  methods: {
   }
 };
 </script>

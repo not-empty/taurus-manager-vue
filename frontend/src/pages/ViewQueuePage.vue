@@ -13,7 +13,7 @@
           <q-btn
             flat
             :label="currentAction"
-            :color="getActionColor"
+            :color="calculateActionColor(this.currentAction)"
             @click="confirmAction"
           />
         </q-card-actions>
@@ -100,7 +100,7 @@
               class="q-ml-xl"
               @click="retryOneJob(jobData.id)"
               v-if="
-                this.jobData.state === 'failed' && hasPermission('controller')
+                this.jobData.state === 'failed' && checkPermission(this.role, 'controller')
               "
             />
 
@@ -113,7 +113,7 @@
               @click="cloneOneJob(jobData.id)"
               v-if="
                 this.jobData.state === 'completed' &&
-                hasPermission('controller')
+                checkPermission(this.role, 'controller')
               "
             />
           </q-card-actions>
@@ -207,7 +207,7 @@
         {{ this.dash.name }}
         <q-chip
           :color="
-            getHealthColor(
+            calculateHealthColor(
               this.dash.health_value,
               this.jobCounts.waiting,
               this.jobCounts.paused
@@ -216,7 +216,7 @@
         >
           {{ this.dash.health_value }}
         </q-chip>
-        <q-chip :color="getStatusColor(this.dash.status)">
+        <q-chip :color="calculateStatusColor(this.dash.status)">
           {{ this.dash.status }}
         </q-chip>
       </div>
@@ -233,12 +233,12 @@
           label="Create Job"
           icon="add_circle"
           color="white"
-          v-if="hasPermission('controller')"
+          v-if="checkPermission(this.role, 'controller')"
           @click="openCreateJobModal"
         />
         <q-btn
           flat
-          v-if="this.dash.status === 'running' && hasPermission('controller')"
+          v-if="this.dash.status === 'running' && checkPermission(this.role, 'controller')"
           label="Pause"
           icon="pause"
           color="primary"
@@ -247,7 +247,7 @@
         />
         <q-btn
           flat
-          v-if="this.dash.status === 'paused' && hasPermission('controller')"
+          v-if="this.dash.status === 'paused' && checkPermission(this.role, 'controller')"
           label="Resume"
           icon="play_arrow"
           color="primary"
@@ -255,7 +255,7 @@
         />
         <q-btn
           flat
-          v-if="this.typeParam === 'failed' && hasPermission('controller')"
+          v-if="this.typeParam === 'failed' && checkPermission(this.role, 'controller')"
           label="Retry"
           icon="replay"
           color="white"
@@ -265,7 +265,7 @@
         />
         <q-btn
           flat
-          v-if="this.typeParam === 'failed' && hasPermission('administrator')"
+          v-if="this.typeParam === 'failed' && checkPermission(this.role, 'controller')"
           label="Retry All"
           icon="replay"
           color="white"
@@ -278,7 +278,7 @@
           icon="delete_forever"
           color="red"
           class="q-ml-xl"
-          v-if="hasPermission('administrator')"
+          v-if="checkPermission(this.role, 'administrator')"
           :disabled="selected.length === 0"
           @click="deleteRows"
         />
@@ -380,14 +380,14 @@
     <q-linear-progress
       size="10px"
       :value="
-        getProgress(
+        calculateProgress(
           this.dash.health_value,
           this.jobCounts.waiting,
           this.jobCounts.paused
         )
       "
       :color="
-        getHealthColor(
+        calculateHealthColor(
           this.dash.health_value,
           this.jobCounts.waiting,
           this.jobCounts.paused
@@ -494,14 +494,14 @@
 
       <template v-slot:header-selection="scope">
         <q-checkbox
-          v-if="hasPermission('controller')"
+          v-if="checkPermission(this.role, 'controller')"
           v-model="scope.selected"
         />
       </template>
 
       <template v-slot:body-selection="scope">
         <q-checkbox
-          v-if="hasPermission('controller')"
+          v-if="checkPermission(this.role, 'controller')"
           :model-value="scope.selected"
           @update:model-value="
             (val, evt) => {
@@ -522,16 +522,14 @@
 <script>
 import axios from 'axios';
 import { ref, toRaw, nextTick } from 'vue';
-import { store, initializeStore } from 'src/store';
-import { checkPermission } from 'src/utils/permissions';
-import {
-  calculateHealthColor,
-  calculateStatusColor,
-  calculateActionColor,
-  calculateProgress
-} from 'src/utils/colors';
+import colorsMixin from 'src/mixins/colorsMixin';
+import sessionMixin from 'src/mixins/sessionMixin';
 
 export default {
+  mixins: [
+    colorsMixin,
+    sessionMixin,
+  ],
   data() {
     return {
       loading: true,
@@ -548,6 +546,7 @@ export default {
       currentAction: '',
       showDialogActionConfirm: false,
       showDialogDeleteConfirm: false,
+      role: '',
       row: {
         name: '',
         group: '',
@@ -674,9 +673,6 @@ export default {
     };
   },
   computed: {
-    getActionColor() {
-      return calculateActionColor(this.currentAction);
-    },
     updateListSelection() {
       const type = this.$route.query.type;
       return type ? `${type}-tab` : 'waiting-tab';
@@ -716,8 +712,7 @@ export default {
     }
   },
   async mounted() {
-    initializeStore();
-    this.role = store.user.role;
+    this.role = await this.validateUser();
     this.queueId = this.$route.params.uuid;
     this.typeParam = this.$route.query.type
       ? this.$route.query.type
@@ -726,9 +721,6 @@ export default {
     await this.refreshAllData();
   },
   methods: {
-    hasPermission(requiredRole) {
-      return checkPermission(store.user.role, requiredRole);
-    },
     openCreateJobModal() {
       this.createJobModalOpen = true;
     },
@@ -770,15 +762,9 @@ export default {
         const data = {
           data: jobData
         };
-        const token = sessionStorage.getItem('user-token');
         await axios.post(
-          `http://localhost:3333/queue/${this.queueId}/job`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
+          `queue/${this.queueId}/job`,
+          data
         );
         works = true;
       } catch (error) {
@@ -850,13 +836,9 @@ export default {
         let data = {
           jobIds: uniqueIds
         };
-        const token = sessionStorage.getItem('user-token');
         await axios.post(
-          `http://localhost:3333/queue/${this.dash.id}/job/retry`,
-          data,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
+          `queue/${this.dash.id}/job/retry`,
+          data
         );
         works = true;
       } catch (error) {
@@ -894,13 +876,9 @@ export default {
         const data = {
           ids: [this.queueId]
         };
-        const token = sessionStorage.getItem('user-token');
         await axios.put(
-          `http://localhost:3333/queue/${this.currentAction}`,
-          data,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
+          `queue/${this.currentAction}`,
+          data
         );
         works = true;
       } catch (error) {
@@ -957,15 +935,6 @@ export default {
     updateRouteQuery(type) {
       this.$router.push({ query: { ...this.$route.query, type: type } });
     },
-    getProgress(health_value, waiting, paused) {
-      return calculateProgress(health_value, waiting, paused);
-    },
-    getHealthColor(health_value, waiting, paused) {
-      return calculateHealthColor(health_value, waiting, paused);
-    },
-    getStatusColor(status) {
-      return calculateStatusColor(status);
-    },
     selectTab(tab) {
       this.listSelection = tab;
       this.updateRouteQuery(tab.replace('-tab', ''));
@@ -984,15 +953,9 @@ export default {
     async cloneOneJob(jobId) {
       try {
         var works = false;
-        const token = sessionStorage.getItem('user-token');
         await axios.post(
-          `http://localhost:3333/queue/${this.queueId}/job/${jobId}/clone`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
+          `queue/${this.queueId}/job/${jobId}/clone`,
+          {}
         );
         await this.refreshAllData();
         works = true;
@@ -1028,15 +991,9 @@ export default {
     async retryAllJobs() {
       try {
         var works = false;
-        const token = sessionStorage.getItem('user-token');
         await axios.post(
-          `http://localhost:3333/queue/${this.queueId}/job/retry-all`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
+          `queue/${this.queueId}/job/retry-all`,
+          {}
         );
         await this.refreshAllData();
         this.showDialogActionConfirm = false;
@@ -1072,18 +1029,12 @@ export default {
     async retryOneJob(jobId) {
       try {
         var works = false;
-        const token = sessionStorage.getItem('user-token');
         const data = {
           jobIds: [jobId]
         };
         await axios.post(
-          `http://localhost:3333/queue/${this.queueId}/job/retry`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
+          `queue/${this.queueId}/job/retry`,
+          data
         );
         await this.refreshAllData();
         this.payloadJobModalOpen = false;
@@ -1120,17 +1071,11 @@ export default {
       this.loading = true;
       try {
         const { page, rowsPerPage } = this.pagination;
-        const token = sessionStorage.getItem('user-token');
         if (this.typeParam == undefined) {
           this.typeParam = 'waiting';
         }
         const response = await axios.get(
-          `http://localhost:3333/queue/${this.queueId}/job?state=${this.typeParam}&page=${page}&size=${rowsPerPage}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
+          `queue/${this.queueId}/job?state=${this.typeParam}&page=${page}&size=${rowsPerPage}`
         );
 
         this.rows = response.data.jobs;
@@ -1143,14 +1088,8 @@ export default {
     },
     async fetchDash() {
       try {
-        const token = sessionStorage.getItem('user-token');
         const response = await axios.get(
-          `http://localhost:3333/queue/${this.queueId}/dashboard`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
+          `queue/${this.queueId}/dashboard`
         );
         this.dash = response.data;
         this.jobCounts = response.data.jobCounts;
@@ -1160,12 +1099,8 @@ export default {
     },
     async fetchGroup() {
       try {
-        const token = sessionStorage.getItem('user-token');
         const response = await axios.get(
-          `http://localhost:3333/group/${this.dash.groupId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
+          `group/${this.dash.groupId}`
         );
         this.group = response.data;
       } catch (error) {
@@ -1174,14 +1109,8 @@ export default {
     },
     async fetchJob(jobId) {
       try {
-        const token = sessionStorage.getItem('user-token');
         const response = await axios.get(
-          `http://localhost:3333/queue/${this.queueId}/job/${jobId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
+          `queue/${this.queueId}/job/${jobId}`
         );
         this.jobData = response.data;
         this.jobData.data = JSON.stringify(this.jobData.data, null, 4);
@@ -1218,11 +1147,10 @@ export default {
         let data = {
           jobIds: uniqueIds
         };
-        const token = sessionStorage.getItem('user-token');
-        await axios.delete(`http://localhost:3333/queue/${this.dash.id}/job`, {
-          headers: { Authorization: `Bearer ${token}` },
-          data
-        });
+        await axios.delete(
+          `queue/${this.dash.id}/job`,
+          {data: data}
+        );
         works = true;
       } catch (error) {
         works = false;

@@ -6,6 +6,7 @@ import {
   createMemoryHistory,
 } from 'vue-router';
 import routes from './routes';
+import Cookies from 'js-cookie';
 
 export default route(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
@@ -21,7 +22,7 @@ export default route(function (/* { store, ssrContext } */) {
   });
 
   Router.beforeEach((to, from, next) => {
-    const isAuthenticated = sessionStorage.getItem('user-token');
+    const isAuthenticated = Cookies.get('isLogged');
 
     if (to.meta.requiresAuth && !isAuthenticated) {
       next({ path: '/login' });

@@ -9,6 +9,11 @@ const userController = new UserController();
 router.use(checkAuth);
 
 router.post(
+  '/validate',
+  userController.validate,
+);
+
+router.post(
   '/',
   celebrate({
     [Segments.BODY]: {

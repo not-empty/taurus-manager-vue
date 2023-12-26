@@ -8,6 +8,10 @@ import UpdateUserService from '../../services/UpdateUserService';
 import DeleteUserService from '../../services/DeleteUserService';
 
 class UserController {
+  public async validate(request: Request, response: Response): Promise<Response> {
+    return response.json(instanceToInstance(request.user));
+  }
+
   public async create(request: Request, response: Response): Promise<Response> {
     const {
       name,

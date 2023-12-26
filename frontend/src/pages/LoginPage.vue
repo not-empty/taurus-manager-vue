@@ -75,6 +75,7 @@
 
 <script>
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 export default {
   data() {
@@ -104,17 +105,13 @@ export default {
       }
 
       try {
-        const response = await axios.post('http://localhost:3333/session', {
+        await axios.post(`session`, {
           login: this.login,
           password: this.password
         });
 
-        const token = response.data.token;
-        const role = response.data.user.role;
-        const login = response.data.user.login;
-        sessionStorage.setItem('user-token', token);
-        sessionStorage.setItem('user-role', role);
-        sessionStorage.setItem('user-login', login);
+        const expires = new Date(new Date().getTime() + 8 * 60 * 59 * 1000);
+        Cookies.set('isLogged', 'true', { expires });
 
         this.$router.push('/view/dashboard');
       } catch (error) {

@@ -47,7 +47,26 @@ Monitor Screen (Monitoring only unhealth queues with autorefresh)
 
 [Release 1.0.0](https://github.com/not-empty/taurus-queue-nodejs/releases/tag/1.0.0) Requires [NodeJs](https://nodejs.org) 20.x
 
-When running Docker all the ecosystem will automatically be running and you just need to scan your files and use the manager.
+First, you need to setup you `/etc/hosts`
+
+For security measures, this project runs with CORs in strict mode, so to the backend and frontend can communicate correctly, they must both run on the same sub-domain
+
+Configure your hosts file to redirect 127.0.0.1 to the frontend and backend domains adding this lines into your `/etc/hosts`:
+
+Edit you hosts file with:
+```sh
+sudo vi /etc/hosts
+```
+
+Add this two lines
+```
+127.0.0.1 api.local.taurus.com
+127.0.0.1 local.taurus.com
+```
+
+Save and exit
+
+Now you can run Docker and all the ecosystem will automatically be running and you just need to scan your queues and use the manager.
 :)
 
 ```sh
@@ -67,7 +86,7 @@ npm ts-node scanQueues.ts taurus-redis
 
 ### Login And Use
 
-Now you can access your development environment `http://localhost:9000`, login using these credentials: username: `admin` password:`admin` and use the manager.
+Now you can access your development environment `http://local.taurus.com:9000`, login using these credentials: username: `admin` password:`admin` and use the manager.
 
 ### Change Your Password
 
