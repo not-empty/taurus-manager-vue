@@ -23,7 +23,7 @@ Monitor Screen (Monitoring only unhealth queues with auto-refresh)
    - [PHP Taurus Queue Publisher](https://github.com/not-empty/taurus-publisher-php-lib)
    - [Go Bull Publisher](https://github.com/not-empty/taurus-publisher-golang)
    - Node.js (native support with examples included in [Taurus Queue](https://github.com/not-empty/taurus-queue-nodejs) repository)
-   - Use Taurus Manager interface to create new job to an existent file
+   - Use Taurus Manager interface to create new job to an existent queue
    - Python (Currently in development)
 
 ### Queue Management with Taurus Manager
