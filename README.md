@@ -21,10 +21,10 @@ Monitor Screen (Monitoring only unhealth queues with auto-refresh)
 1. Starting in [Taurus Queue](https://github.com/not-empty/taurus-queue-nodejs) for creating and running your first queue:
 2. Publish jobs to your queues using our publishers, compatible with multiple programming languages:
    - [PHP Taurus Queue Publisher](https://github.com/not-empty/taurus-publisher-php-lib)
-   - [Go Bull Publisher](https://github.com/not-empty/taurus-publisher-golang)
+   - [Go Taurus Queue Publisher](https://github.com/not-empty/taurus-publisher-golang)
+   - [Python Taurus Queue Publisher](https://github.com/not-empty/taurus-publisher-python)
    - Node.js (native support with examples included in [Taurus Queue](https://github.com/not-empty/taurus-queue-nodejs) repository)
    - Use Taurus Manager interface to create new job to an existent queue
-   - Python (Currently in development)
 
 ### Queue Management with Taurus Manager
 3. Utilize this repository for managing your queues including:
