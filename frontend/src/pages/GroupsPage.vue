@@ -231,7 +231,7 @@ export default {
           );
         } else {
           await axios.post(
-            `group`, this.row
+            'group', this.row
           );
         }
         works = true;

@@ -105,7 +105,7 @@ export default {
       }
 
       try {
-        await axios.post(`session`, {
+        await axios.post('session', {
           login: this.login,
           password: this.password
         });
