@@ -70,8 +70,8 @@
 <script setup lang="ts">
 import axios, { AxiosError } from 'axios';
 import { Notify, QTableColumn } from 'quasar';
-import { errorRequest } from 'src/api/types';
-import { Group, ListGroup } from 'src/api/types/GroupTypes';
+import { errorRequest } from 'src/types';
+import { Group, ListGroup } from 'src/types/GroupTypes';
 import sessionMixin from 'src/mixins/sessionMixin';
 import { onMounted, ref } from 'vue';
 
@@ -142,7 +142,8 @@ async function fetchRows() {
     const response = await axios.get<ListGroup>(
       'group'
     );
-    rows.value = response.data.groups;
+
+    rows.value = response.data.data;
   } catch (err) {
     const error = err as AxiosError<errorRequest>;
     Notify.create({

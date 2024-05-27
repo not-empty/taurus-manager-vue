@@ -7,7 +7,9 @@ class ShowGroupService {
   constructor(
     @inject('GroupRepository')
     private groupRepository: GroupRepository,
-  ) {}
+  ) {
+    //
+  }
 
   public async execute(id: string): Promise<Group> {
     const group = await this.groupRepository.getById(id);

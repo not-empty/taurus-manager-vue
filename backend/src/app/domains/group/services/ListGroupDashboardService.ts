@@ -1,8 +1,8 @@
-import { inject, injectable } from "tsyringe";
-import IQueueProvider from "../../../providers/QueueProvider/models/IQueueProvider";
-import BullQueueProvider from "../../../providers/QueueProvider/BullQueueProvider";
-import GroupRepository, { Group } from "../repositories/GroupRepository";
-import QueueRepository, { Queue } from "../../queue/repositories/QueueRepository";
+import { inject, injectable } from 'tsyringe';
+import IQueueProvider from '../../../providers/QueueProvider/models/IQueueProvider';
+import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
+import GroupRepository, { Group } from '../repositories/GroupRepository';
+import QueueRepository, { Queue } from '../../queue/repositories/QueueRepository';
 
 interface IRequest {
   user: Express.IUserSession;
@@ -16,12 +16,14 @@ interface IDashboardItem {
 @injectable()
 class ListGroupDashboardService {
   constructor(
-    @inject("GroupRepository")
+    @inject('GroupRepository')
     private groupRepository: GroupRepository,
 
-    @inject("QueueRepository")
-    private queueRepository: QueueRepository
-  ) {}
+    @inject('QueueRepository')
+    private queueRepository: QueueRepository,
+  ) {
+    //
+  }
 
   public async execute({ user }: IRequest): Promise<IDashboardItem[]> {
     let groupIds: string[];
@@ -38,6 +40,7 @@ class ListGroupDashboardService {
       const group = await this.groupRepository.getById(groupId);
 
       if (!group) {
+        // eslint-disable-next-line no-continue
         continue;
       }
 
@@ -50,7 +53,7 @@ class ListGroupDashboardService {
           await queueProvider.close();
 
           return describedQueue;
-        })
+        }),
       );
 
       dashboard.push({
@@ -63,7 +66,7 @@ class ListGroupDashboardService {
   }
 
   public async getGroups(user: Express.IUserSession): Promise<Group[]> {
-    if (user.role === "administrator") {
+    if (user.role === 'administrator') {
       return this.groupRepository.listAll();
     }
     return this.groupRepository.getBulk(user.groups);

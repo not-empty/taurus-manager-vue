@@ -47,7 +47,7 @@
         <q-table flat bordered color="primary" :rows="group.queues" :columns="columns" row-key="id"
           :rows-per-page-options="[10000]" selection="multiple" v-model:selected="selected" :hide-bottom="true"
           :loading="loading">
-          <template v-slot:header-cell-health_value="props">
+          <template v-slot:header-cell-healthValue="props">
             <q-th :props="props">
               <q-icon name="favorite" size="2em" />
               {{ props.col.label }}
@@ -113,16 +113,16 @@
             }" />
           </template>
 
-          <template v-slot:body-cell-health_value="props">
+          <template v-slot:body-cell-healthValue="props">
             <q-td :props="props">
               <div @click="onRowClick(props.row.id)" class="cursor-pointer">
                 <q-chip :color="calculateHealthColor(
-                  props.row.health_value,
+                  props.row.healthValue,
                   props.row.jobCounts.waiting,
                   props.row.jobCounts.paused
                 )
                   ">
-                  Max: {{ props.row.health_value }}
+                  Max: {{ props.row.healthValue }}
                 </q-chip>
               </div>
             </q-td>
@@ -198,8 +198,8 @@ import { onMounted, computed, ref } from 'vue';
 import colorsMixin from 'src/mixins/colorsMixin';
 import sessionMixin from 'src/mixins/sessionMixin';
 import { Notify, QTableColumn } from 'quasar';
-import { errorRequest } from 'src/api/types';
-import { DashboardItem, Queue } from 'src/api/types/QueueTypes';
+import { errorRequest } from 'src/types';
+import { DashboardItem, Queue } from 'src/types/QueueTypes';
 import { useRouter } from 'vue-router';
 
 const { calculateHealthColor, calculateStatusColor, calculateActionColor } = colorsMixin();
@@ -217,10 +217,10 @@ const selected = ref<Queue[]>([]);
 
 const columns: QTableColumn[] = [
   {
-    name: 'health_value',
+    name: 'healthValue',
     align: 'center',
     label: 'Health',
-    field: 'health_value',
+    field: 'healthValue',
     sortable: true
   },
   {
@@ -307,6 +307,7 @@ async function fetchRows() {
     const response = await axios.get<DashboardItem[]>(
       'group/dashboard'
     );
+    console.log(response);
     groups.value = response.data;
   } catch (err) {
     const error = err as AxiosError<errorRequest>;

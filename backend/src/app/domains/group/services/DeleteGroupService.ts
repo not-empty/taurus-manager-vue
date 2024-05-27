@@ -11,7 +11,9 @@ class DeleteGroupService {
 
     @inject('QueueRepository')
     private queueRepository: QueueRepository,
-  ) {}
+  ) {
+    //
+  }
 
   public async execute(id: string): Promise<boolean> {
     const group = await this.groupRepository.getById(id);

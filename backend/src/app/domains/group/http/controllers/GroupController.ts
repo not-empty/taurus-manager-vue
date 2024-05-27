@@ -59,7 +59,7 @@ class GroupController {
 
   public async listMonitor(
     request: Request,
-    response: Response
+    response: Response,
   ): Promise<Response> {
     const { user } = request;
     const listGroupMonitor = container.resolve(ListGroupMonitorService);

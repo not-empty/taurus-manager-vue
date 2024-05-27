@@ -1,21 +1,21 @@
 
 export default function colorsMixin() {
   function calculateHealthColor(
-    health_value: number,
+    healthValue: number,
     waiting: number,
     paused: number
   ): string {
-    if (health_value === 0) {
+    if (healthValue === 0) {
       return 'gray';
     }
-    const double = health_value * 2;
+    const double = healthValue * 2;
     if (waiting >= double || paused >= double) {
       return 'purple';
     }
-    if (waiting >= health_value || paused >= health_value) {
+    if (waiting >= healthValue || paused >= healthValue) {
       return 'red';
     }
-    const half = health_value / 2;
+    const half = healthValue / 2;
     if (waiting >= half || paused >= half) {
       return 'orange';
     }
@@ -43,21 +43,21 @@ export default function colorsMixin() {
   }
 
   function calculateProgress(
-    health_value: number,
+    healthValue: number,
     waiting: number,
     paused: number
   ): number {
-    if (health_value === 0) {
+    if (healthValue === 0) {
       return 0;
     }
-    const double = health_value * 2;
+    const double = healthValue * 2;
     if (waiting >= double || paused >= double) {
       return 1;
     }
-    if (waiting >= health_value || paused >= health_value) {
+    if (waiting >= healthValue || paused >= healthValue) {
       return 0.75;
     }
-    const half = health_value / 2;
+    const half = healthValue / 2;
     if (waiting >= half || paused >= half) {
       return 0.5;
     }

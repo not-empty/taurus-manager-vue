@@ -16,7 +16,9 @@ class ListGroupService {
   constructor(
     @inject('GroupRepository')
     private groupRepository: GroupRepository,
-  ) {}
+  ) {
+    //
+  }
 
   public async execute({
     page,

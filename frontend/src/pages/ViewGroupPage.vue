@@ -58,11 +58,11 @@
             <div class="row">
               <div class="col-12 flex">
                 <q-badge rounded :color="calculateHealthColor(
-                  queue.health_value,
+                  queue.healthValue,
                   queue.jobCounts.waiting,
                   queue.jobCounts.paused
                 )
-                  " :label="queue.health_value" />
+                  " :label="queue.healthValue" />
                 <q-badge class="q-ml-md" rounded :color="calculateStatusColor(queue.status)" :label="queue.status" />
                 <div class="q-ml-md">
                   {{ queue.jobCounts.completed }} completed
@@ -123,12 +123,12 @@
           </q-card-section>
 
           <q-linear-progress size="10px" :value="calculateProgress(
-            queue.health_value,
+            queue.healthValue,
             queue.jobCounts.waiting,
             queue.jobCounts.paused
           )
             " :color="calculateHealthColor(
-              queue.health_value,
+              queue.healthValue,
               queue.jobCounts.waiting,
               queue.jobCounts.paused
             )
@@ -140,14 +140,18 @@
 </template>
 
 <script setup lang="ts">
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { Notify } from 'quasar';
-import { errorRequest } from 'src/api/types';
-import { DashboardItem, Group, Queue } from 'src/api/types/QueueTypes';
+import { errorRequest } from 'src/types';
+import { Queue } from 'src/types/QueueTypes';
 import colorsMixin from 'src/mixins/colorsMixin';
 import sessionMixin from 'src/mixins/sessionMixin';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { Api } from 'src/api';
+import { IGroup } from 'src/types/group';
+
+const api = new Api();
 
 const { calculateHealthColor, calculateStatusColor, calculateActionColor, calculateProgress } = colorsMixin();
 const { validateUser, checkPermission } = sessionMixin();
@@ -157,11 +161,11 @@ const route = useRoute();
 const role = ref<string>('');
 
 const filter = ref<string>('');
-const currentAction = ref<string>('');
+const currentAction = ref<'resume' | 'pause'>('pause');
 const selectAll = ref<boolean | null>(false);
 
 const groupId = ref<string>('');
-const group = ref<Group>();
+const group = ref<IGroup>();
 const queues = ref<Queue[]>();
 
 const selectedQueues = ref<string[]>([]);
@@ -211,12 +215,10 @@ watch(() => filteredQueues.value, (filtered) => {
 
 async function fetchRows() {
   try {
-    const response = await axios.get<DashboardItem>(
-      `/group/dashboard/${groupId.value}`
-    );
+    const response = await api.group.getDashboardByGroupId(groupId.value);
 
-    group.value = response.data.group;
-    queues.value = response.data.queues;
+    group.value = response.group;
+    queues.value = response.queues;
   } catch (err) {
     const error = err as AxiosError<errorRequest>;
 
@@ -244,9 +246,9 @@ async function confirmAction() {
       ids: uniqueIds
     };
 
-    await axios.put(
-      `queue/${currentAction.value}`,
-      data
+    await api.queue.chageQueueStatus(
+      currentAction.value,
+      data,
     );
 
     clearSelection();

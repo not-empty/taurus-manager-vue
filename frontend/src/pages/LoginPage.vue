@@ -40,10 +40,11 @@
 <script setup lang="ts">
 import Cookies from 'js-cookie';
 import { nextTick, ref } from 'vue';
-import axios, { AxiosError } from 'axios';
 import { Notify } from 'quasar';
-import { errorRequest } from 'src/api/types';
 import { useRouter } from 'vue-router';
+import { Api } from 'src/api';
+
+const api = new Api();
 
 const router = useRouter();
 
@@ -74,19 +75,8 @@ async function handleLogin() {
     return;
   }
 
-  try {
-    await axios.post('session', {
-      login: login.value,
-      password: password.value
-    });
-
-    const expires = new Date(new Date().getTime() + 8 * 60 * 59 * 1000);
-    Cookies.set('isLogged', 'true', { expires });
-
-    router.push('/view/dashboard')
-  } catch (err) {
-    const error = err as AxiosError<errorRequest>;
-
+  const res = await api.loginAuth(login.value, password.value);
+  if (!res) {
     nextTick(() => {
       shakeError.value = true;
     })
@@ -94,12 +84,7 @@ async function handleLogin() {
     Notify.create({
       color: 'negative',
       position: 'top',
-      message:
-        error.response && error.response.data.message
-          ? '<span class="nofification">' +
-          error.response.data.message +
-          '</span>'
-          : 'There was an error processing your request.',
+      message: 'Incorrect login or password',
       html: true,
       timeout: 2500
     });
@@ -112,7 +97,13 @@ async function handleLogin() {
     setTimeout(() => {
       shakeError.value = false;
     }, 500);
+    return;
   }
+
+  const expires = new Date(new Date().getTime() + 8 * 60 * 59 * 1000);
+  Cookies.set('isLogged', 'true', { expires });
+
+  router.push('/view/dashboard');
 }
 
 function focusOnPass() {

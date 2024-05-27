@@ -1,26 +1,24 @@
-import { inject, injectable } from "tsyringe";
-import IQueueProvider, { DescribedQueue } from "../../../providers/QueueProvider/models/IQueueProvider";
-import BullQueueProvider from "../../../providers/QueueProvider/BullQueueProvider";
-import GroupRepository, { Group } from "../repositories/GroupRepository";
-import QueueRepository, { Queue } from "../../queue/repositories/QueueRepository";
+import { inject, injectable } from 'tsyringe';
+import IQueueProvider, { DescribedQueue } from '../../../providers/QueueProvider/models/IQueueProvider';
+import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
+import GroupRepository, { Group } from '../repositories/GroupRepository';
+import QueueRepository, { Queue } from '../../queue/repositories/QueueRepository';
 
 interface IRequest {
   user: Express.IUserSession;
 }
 
-interface IMonitorItem {
-  queues: Queue[];
-}
-
 @injectable()
 class ListGroupMonitorService {
   constructor(
-    @inject("GroupRepository")
+    @inject('GroupRepository')
     private groupRepository: GroupRepository,
 
-    @inject("QueueRepository")
-    private queueRepository: QueueRepository
-  ) {}
+    @inject('QueueRepository')
+    private queueRepository: QueueRepository,
+  ) {
+    //
+  }
 
   public async execute({ user }: IRequest): Promise<{}> {
     let groupIds: string[];
@@ -31,14 +29,12 @@ class ListGroupMonitorService {
       groupIds = user.groups;
     }
 
-    const monitor: IMonitorItem[] = [];
-
     const allQueues: DescribedQueue[] = [];
     for (const group of groupIds) {
       const queues = await this.queueRepository.listByGroup(group);
 
       const describedQueues: DescribedQueue[] = [];
-      
+
       for (const queue of queues) {
         const queueProvider = this.newBullQueueProvider(queue);
         const describedQueue = await queueProvider.describe();
@@ -63,8 +59,9 @@ class ListGroupMonitorService {
     };
     return result;
   }
+
   public async getGroups(user: Express.IUserSession): Promise<Group[]> {
-    if (user.role === "administrator") {
+    if (user.role === 'administrator') {
       return this.groupRepository.listAll();
     }
     return this.groupRepository.getBulk(user.groups);

@@ -17,7 +17,7 @@ export interface newQueue {
   group?: Group,
   host: string,
   port: number,
-  health_value: number
+  healthValue: number
 }
 
 export interface Queue {
@@ -31,7 +31,7 @@ export interface Queue {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
-  health_value: number;
+  healthValue: number;
   group: Group;
   status: QueueStatus;
   jobCounts: QueueJobCounts;

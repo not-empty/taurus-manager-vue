@@ -81,7 +81,7 @@ docker exec -it taurus-manager-back bash
 ```
 
 ```sh
-npm ts-node scanQueues.ts taurus-redis
+npx ts-node scanQueues.ts taurus-redis
 ```
 
 ### Login And Use

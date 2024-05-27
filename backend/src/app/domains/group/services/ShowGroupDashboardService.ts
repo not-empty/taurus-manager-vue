@@ -1,9 +1,9 @@
-import { inject, injectable } from "tsyringe";
-import IQueueProvider from "../../../providers/QueueProvider/models/IQueueProvider";
-import BullQueueProvider from "../../../providers/QueueProvider/BullQueueProvider";
-import CustomError from "../../../errors/CustomError";
-import GroupRepository, { Group } from "../repositories/GroupRepository";
-import QueueRepository, { Queue } from "../../queue/repositories/QueueRepository";
+import { inject, injectable } from 'tsyringe';
+import IQueueProvider from '../../../providers/QueueProvider/models/IQueueProvider';
+import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
+import CustomError from '../../../errors/CustomError';
+import GroupRepository, { Group } from '../repositories/GroupRepository';
+import QueueRepository, { Queue } from '../../queue/repositories/QueueRepository';
 
 interface IRequest {
   groupId: string;
@@ -18,12 +18,14 @@ interface IDashboardItem {
 @injectable()
 class ShowGroupDashboardService {
   constructor(
-    @inject("GroupRepository")
+    @inject('GroupRepository')
     private groupRepository: GroupRepository,
 
-    @inject("QueueRepository")
-    private queueRepository: QueueRepository
-  ) {}
+    @inject('QueueRepository')
+    private queueRepository: QueueRepository,
+  ) {
+    //
+  }
 
   public async execute({ groupId, user }: IRequest): Promise<IDashboardItem> {
     let groupIds: string[];
@@ -36,15 +38,15 @@ class ShowGroupDashboardService {
 
     if (!groupIds.includes(groupId)) {
       throw new CustomError(
-        "User has no permission to access this group.",
-        403
+        'User has no permission to access this group.',
+        403,
       );
     }
-    
+
     const group = await this.groupRepository.getById(groupId);
 
     if (!group) {
-      throw new CustomError("Group not found.", 404);
+      throw new CustomError('Group not found.', 404);
     }
 
     const queues = await this.queueRepository.listByGroup(group.id);
@@ -55,7 +57,7 @@ class ShowGroupDashboardService {
         await queueProvider.close();
 
         return describedQueue;
-      })
+      }),
     );
 
     return {

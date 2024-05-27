@@ -1,6 +1,6 @@
-import { ulid } from "ulid";
-import knex from "../../database";
-import { Knex } from "knex";
+import { ulid } from 'ulid';
+import { Knex } from 'knex';
+import knex from '../../database';
 
 export interface BaseEntity {
   id: string;
@@ -24,12 +24,11 @@ export interface ListOptions<T> {
 }
 
 export class BaseRepository<T extends BaseEntity> {
-
   public tableName: string;
 
   public db: Knex;
 
-  constructor () {
+  constructor() {
     this.db = knex;
   }
 
@@ -39,7 +38,7 @@ export class BaseRepository<T extends BaseEntity> {
 
   public async count(): Promise<number> {
     const result = await this.db(this.tableName)
-      .count({ 'total': 'id'})
+      .count({ total: 'id' })
       .whereNull('deletedAt')
       .first();
 
@@ -55,7 +54,7 @@ export class BaseRepository<T extends BaseEntity> {
     await this.db(this.tableName)
       .insert({
         id,
-        ...payload
+        ...payload,
       });
 
     return id;
@@ -98,24 +97,23 @@ export class BaseRepository<T extends BaseEntity> {
     if (options.fields) {
       selectFields = options.fields as string[];
     }
-    
+
     const data = await this.db(this.tableName)
       .select(selectFields)
       .whereNull('deletedAt')
       .offset((page - 1) * limit)
-      .limit(limit) as T[]; 
+      .limit(limit) as T[];
 
     return {
       data,
       page,
       limit,
-    }
+    };
   }
 
   public async listAll(): Promise<T[]> {
-
     const data = await this.db(this.tableName)
-      .select('*') as T[]; 
+      .select('*') as T[];
 
     return data;
   }
@@ -125,9 +123,8 @@ export class BaseRepository<T extends BaseEntity> {
       .select('*')
       .whereIn('id', ids);
 
-    return data
+    return data;
   }
-
 
   public async getById(id: string): Promise<T | null> {
     const data = await this.db(this.tableName)
@@ -136,8 +133,7 @@ export class BaseRepository<T extends BaseEntity> {
       .whereNull('deletedAt')
       .limit(1)
       .first() as T;
-    
+
     return data || null;
   }
-
 }

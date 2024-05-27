@@ -29,7 +29,7 @@
             class="q-mb-md" />
           <q-input filled v-model="row.host" label="Host*" class="q-mb-md" />
           <q-input filled v-model="row.port" type="number" label="Port*" class="q-mb-md" />
-          <q-input filled v-model="row.health_value" type="number" label="Health Value*" class="q-mb-md" />
+          <q-input filled v-model="row.healthValue" type="number" label="Health Value*" class="q-mb-md" />
 
           <q-input filled v-model="row.description" label="Description" class="q-mb-md" />
           <div>*Required</div>
@@ -77,11 +77,15 @@
 <script setup lang="ts">
 import axios, { AxiosError } from 'axios';
 import { Notify, QTableColumn } from 'quasar';
-import { errorRequest } from 'src/api/types';
-import { Group, ListGroup } from 'src/api/types/GroupTypes';
-import { ListQueue, Queue, newQueue } from 'src/api/types/QueueTypes';
+import { errorRequest } from 'src/types';
+import { newQueue } from 'src/types/QueueTypes';
 import sessionMixin from 'src/mixins/sessionMixin';
 import { onMounted, ref } from 'vue';
+import { Api } from 'src/api';
+import { INewQueue, IQueue } from 'src/types/queues';
+import { IGroup } from 'src/types/group';
+
+const api = new Api();
 
 const { validateUserRole } = sessionMixin();
 
@@ -89,17 +93,17 @@ const entityName = 'Queue';
 const filter = ref<string>('');
 
 const role = ref<string>('');
-const rows = ref<Queue[]>();
-const groups = ref<Group[]>();
+const rows = ref<IQueue[]>();
+const groups = ref<IGroup[]>();
 
-const itemToDelete = ref<Queue | null>(null);
+const itemToDelete = ref<IQueue | null>(null);
 
-const row = ref<newQueue | Queue>({
+const row = ref<newQueue | IQueue>({
   name: '',
   description: '',
   host: '',
   port: 6379,
-  health_value: 100
+  healthValue: 100
 } as newQueue);
 const isEditMode = ref<boolean>(false);
 
@@ -144,10 +148,10 @@ const columns : QTableColumn[] = [
     sortable: true
   },
   {
-    name: 'health_value',
+    name: 'healthValue',
     align: 'left',
     label: 'Health Val.',
-    field: 'health_value',
+    field: 'healthValue',
     sortable: true
   },
   {
@@ -181,11 +185,8 @@ onMounted(async () => {
 
 async function fetchRows() {
   try {
-    const response = await axios.get<ListQueue>(
-      'queue'
-    );
-
-    rows.value = response.data.queues;
+    const response = await api.queue.getPaginate();
+    rows.value = response.data;
   } catch (err) {
     const error = err as AxiosError<errorRequest>;
     Notify.create({
@@ -205,10 +206,8 @@ async function fetchRows() {
 
 async function fetchGroups() {
   try {
-    const response = await axios.get<ListGroup>(
-      'group'
-    );
-    groups.value = response.data.groups;
+    const response = await api.group.getPaginate();
+    groups.value = response.data;
   } catch (err) {
     const error = err as AxiosError<errorRequest>;
     Notify.create({
@@ -233,18 +232,20 @@ async function saveRow() {
     }
 
     if (isEditMode.value) {
-      const queue = row.value as Queue;
-      queue.groupId = queue.group.id;
+      const queue = row.value as IQueue;
+      queue.groupId = queue.group?.id || '';
       delete queue.group;
 
-      await axios.put(
-        `queue/${queue.id}`,
-        queue
-      );
+      await api.queue.put({
+        id: queue.id,
+        data: queue,
+      })
     } else {
-      await axios.post(
-        'queue', row.value as newQueue
-      );
+      const queue = row.value as INewQueue;
+      queue.groupId = queue.group?.id || '';
+      delete queue.group;
+
+      await api.queue.queueAdd(row.value as INewQueue);
     }
 
     Notify.create({
@@ -320,22 +321,22 @@ function newRow() {
     description: '',
     host: '',
     port: 6379,
-    health_value: 100
+    healthValue: 100
   } as newQueue;
 
   showDialogSave.value = true;
 }
 
-function editRow(rowData: Queue | null = null) {
+function editRow(rowData: IQueue | null = null) {
   if (rowData) {
     isEditMode.value = true;
-    row.value = { ...rowData, groupId: rowData.group.id };
+    row.value = { ...rowData, groupId: rowData.group?.id || '' };
   }
 
   showDialogSave.value = true;
 }
 
-function deleteRow(row: Queue) {
+function deleteRow(row: IQueue) {
   itemToDelete.value = row;
   showDialogDeleteConfirm.value = true;
 }

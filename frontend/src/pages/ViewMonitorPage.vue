@@ -21,7 +21,7 @@
       </q-breadcrumbs>
 
       <div class="text-h7">
-        only shows queues that are out of normal health according to the configured health_value.
+        only shows queues that are out of normal health according to the configured healthValue.
         <q-spinner v-if="showSpinner" color="primary" class="q-ml-lg" size="1.2em" />
       </div>
     </div>
@@ -71,11 +71,11 @@
             <div class="row">
               <div class="col-12 flex">
                 <q-badge rounded :color="calculateHealthColor(
-                  queue.health_value,
+                  queue.healthValue,
                   queue.jobCounts.waiting,
                   queue.jobCounts.paused
                 )
-                  " :label="queue.health_value" />
+                  " :label="queue.healthValue" />
                 <q-badge class="q-ml-md" rounded :color="calculateStatusColor(queue.status)" :label="queue.status" />
                 <div class="q-ml-md">
                   {{ queue.jobCounts.completed }} completed
@@ -136,8 +136,8 @@
           </q-card-section>
 
           <q-linear-progress size="10px"
-            :value="calculateProgress(queue.health_value, queue.jobCounts.waiting, queue.jobCounts.paused)"
-            :color="calculateHealthColor(queue.health_value, queue.jobCounts.waiting, queue.jobCounts.paused)"
+            :value="calculateProgress(queue.healthValue, queue.jobCounts.waiting, queue.jobCounts.paused)"
+            :color="calculateHealthColor(queue.healthValue, queue.jobCounts.waiting, queue.jobCounts.paused)"
             class="q-mt-md" />
         </q-card>
       </div>
@@ -148,8 +148,8 @@
 <script setup lang="ts">
 import axios, { AxiosError } from 'axios';
 import { Notify } from 'quasar';
-import { errorRequest } from 'src/api/types';
-import { Queue } from 'src/api/types/QueueTypes';
+import { errorRequest } from 'src/types';
+import { Queue } from 'src/types/QueueTypes';
 import colorsMixin from 'src/mixins/colorsMixin';
 import sessionMixin from 'src/mixins/sessionMixin';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';

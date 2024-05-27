@@ -103,12 +103,12 @@
       <div class="text-h4 q-ml-lg">
         {{ dash.name }}
         <q-chip :color="calculateHealthColor(
-          dash.health_value,
+          dash.healthValue,
           jobCounts.waiting,
           jobCounts.paused
         )
           ">
-          {{ dash.health_value }}
+          {{ dash.healthValue }}
         </q-chip>
         <q-chip :color="calculateStatusColor(dash.status)">
           {{ dash.status }}
@@ -188,12 +188,12 @@
     </div>
 
     <q-linear-progress size="10px" :value="calculateProgress(
-      dash.health_value,
+      dash.healthValue,
       jobCounts.waiting,
       jobCounts.paused
     )
       " :color="calculateHealthColor(
-        dash.health_value,
+        dash.healthValue,
         jobCounts.waiting,
         jobCounts.paused
       )
@@ -279,16 +279,20 @@
 </template>
 
 <script setup lang="ts">
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { Notify, QTableColumn } from 'quasar';
-import { errorRequest } from 'src/api/types';
-import { Group } from 'src/api/types/GroupTypes';
-import { Job, ListJob } from 'src/api/types/JobTypes';
-import { Queue, QueueJobCounts } from 'src/api/types/QueueTypes';
+import { errorRequest } from 'src/types';
+import { Group } from 'src/types/GroupTypes';
+import { Job } from 'src/types/JobTypes';
+import { Queue, QueueJobCounts } from 'src/types/QueueTypes';
 import colorsMixin from 'src/mixins/colorsMixin';
 import sessionMixin from 'src/mixins/sessionMixin';
 import { nextTick, onMounted, ref, toRaw, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { IJobState } from 'src/types/job';
+import { Api } from 'src/api';
+
+const api = new Api();
 
 const { calculateHealthColor, calculateStatusColor, calculateActionColor, calculateProgress } = colorsMixin();
 const { validateUser, checkPermission } = sessionMixin();
@@ -300,7 +304,7 @@ const role = ref<string>('');
 const loading = ref<boolean>(false);
 
 const queueId = ref<string>('');
-const typeParam = ref<string>('');
+const typeParam = ref<IJobState>('waiting');
 const listSelection = ref<string>('');
 
 const rows = ref<Job[]>();
@@ -326,7 +330,7 @@ const showDialogDeleteConfirm = ref<boolean>(false);
 const payloadJobModalOpen = ref<boolean>(false);
 const createJobModalOpen = ref<boolean>(false);
 
-const currentAction = ref<'' | 'pause' | 'resume' | 'retry' | 'retry all'>('');
+const currentAction = ref<'pause' | 'resume' | 'retry' | 'retry all'>('pause');
 
 const jobJson = ref<string>('');
 const jsonError = ref<boolean>(false);
@@ -391,7 +395,7 @@ onMounted(async () => {
   role.value = await validateUser();
 
   queueId.value = String(route.params?.id || '');
-  typeParam.value = String(route.query?.type ? route.query?.type : 'waiting');
+  typeParam.value = String(route.query?.type ? route.query?.type : 'waiting') as IJobState;
   listSelection.value = `${typeParam.value}-tab`;
 
   await refreshAllData();
@@ -399,7 +403,7 @@ onMounted(async () => {
 
 watch(() => route.query.type, async (type) => {
   const newType = String(type || 'waiting');
-  typeParam.value = newType;
+  typeParam.value = newType as IJobState;
   listSelection.value = `${newType}-tab`;
   await refreshAllData();
 }, {
@@ -466,34 +470,34 @@ async function fetchRows() {
     typeParam.value = 'waiting';
   }
 
-  const response = await axios.get<ListJob>(
-    `queue/${queueId.value}/job?state=${typeParam.value}&page=${page}&size=${rowsPerPage}`
+  const response = await api.queue.getJobPaginated(
+    queueId.value,
+    {
+      page: page,
+      size: rowsPerPage,
+      state: typeParam.value,
+    }
   );
 
-  rows.value = response.data.jobs;
-  pagination.value.rowsNumber = response.data.total;
+  rows.value = response.data;
+  pagination.value.rowsNumber = response.pagination.size;
 }
 
 async function fetchDash() {
-  const response = await axios.get<Queue>(
-    `queue/${queueId.value}/dashboard`
-  );
+  const response = await api.queue.getQueueDashboard(queueId.value);
 
-  dash.value = response.data;
-  jobCounts.value = response.data.jobCounts;
+  dash.value = response;
+  jobCounts.value = response.jobCounts;
 }
 
 async function fetchGroup() {
-  const response = await axios.get<Group>(
-    `group/${dash.value?.groupId}`
-  );
-
-  group.value = response.data;
+  const response = await api.group.getById(dash.value?.groupId || '');
+  group.value = response;
 }
 
 async function confirmAction() {
   if (currentAction.value === 'pause' || currentAction.value === 'resume') {
-    await pauseResumeAction();
+    await pauseResumeAction(currentAction.value);
   }
 
   if (currentAction.value === 'retry') {
@@ -505,10 +509,10 @@ async function confirmAction() {
   }
 }
 
-async function pauseResumeAction() {
+async function pauseResumeAction(action: 'resume' | 'pause') {
   try {
-    await axios.put(
-      `queue/${currentAction.value}`,
+    await api.queue.chageQueueStatus(
+      action,
       { ids: [queueId.value] }
     );
 
@@ -543,16 +547,20 @@ async function pauseResumeAction() {
 
 async function retryAction() {
   try {
+    if (!dash.value?.id) {
+      return;
+    }
+
     const selectedIds = selected.value.map((item) => item.id);
     const uniqueIds = [...new Set(selectedIds)];
     let data = {
       jobIds: uniqueIds
     };
 
-    await axios.post(
-      `queue/${dash.value?.id}/job/retry`,
+    await api.queue.retryAction(
+      dash.value.id,
       data
-    );
+    )
 
     await refreshAllData();
     Notify.create({
@@ -584,10 +592,13 @@ async function retryAction() {
 
 async function retryAllJobs() {
   try {
-    await axios.post(
-      `queue/${queueId.value}/job/retry-all`,
-      {}
-    );
+    if (!dash.value?.id) {
+      return;
+    }
+
+    await api.queue.retryAllAction(
+      dash.value.id,
+    )
 
     await refreshAllData();
     Notify.create({
@@ -619,16 +630,18 @@ async function retryAllJobs() {
 
 async function confirmDelete() {
   try {
+    if (!dash.value?.id) {
+      return;
+    }
+
     const selectedIds = selected.value.map((item) => item.id);
     const uniqueIds = [...new Set(selectedIds)];
 
-    let data = {
-      jobIds: uniqueIds
-    };
-
-    await axios.delete(
-      `queue/${dash.value?.id}/job`,
-      { data: data }
+    await api.queue.deleteJob(
+      dash.value.id,
+      {
+        jobIds: uniqueIds
+      },
     );
 
     await refreshAllData();
@@ -680,13 +693,12 @@ async function createJob() {
 
   try {
     const jobData = JSON.parse(jobJson.value);
-    const data = {
-      data: jobData
-    };
 
-    await axios.post(
-      `queue/${queueId.value}/job`,
-      data
+    await api.queue.createJob(
+      queueId.value,
+      {
+        data: jobData
+      }
     );
 
     await refreshAllData();
@@ -719,9 +731,9 @@ async function createJob() {
 
 async function cloneOneJob(jobId: string) {
   try {
-    await axios.post(
-      `queue/${queueId.value}/job/${jobId}/clone`,
-      {}
+    await api.queue.cloneJob(
+      queueId.value,
+      jobId,
     );
 
     await refreshAllData();
@@ -760,10 +772,7 @@ async function retryOneJob(jobId: string) {
       jobIds: [jobId]
     };
 
-    await axios.post(
-      `queue/${queueId.value}/job/retry`,
-      data
-    );
+    await api.queue.retryAction(queueId.value, data);
 
     await refreshAllData();
     payloadJobModalOpen.value = false;
@@ -796,9 +805,12 @@ async function retryOneJob(jobId: string) {
 
 async function fetchJob(jobId: string) {
   try {
-    const response = await axios.get<Job>(`queue/${queueId.value}/job/${jobId}`);
+    const response = await api.queue.getJobById(
+      queueId.value,
+      jobId
+    );
 
-    jobData.value = response.data;
+    jobData.value = response;
     jobData.value.data = JSON.stringify(jobData.value.data, null, 4);
     jobData.value.failedReason = JSON.stringify(
       jobData.value.failedReason,

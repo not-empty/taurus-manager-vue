@@ -22,7 +22,7 @@
         </q-card-section>
         <form>
           <q-card-section>
-            <q-input filled v-if="isEditMode" v-model="row.id" label="ID" readonly class="q-mb-md" />
+            <q-input filled v-if="isEditMode && 'id' in row" v-model="row.id" label="ID" readonly class="q-mb-md" />
             <q-input filled v-model="row.name" label="Name*" autofocus class="q-mb-md" />
             <q-input filled v-model="row.login" label="Login*" class="q-mb-md" />
             <q-select filled v-model="row.role" :options="categoryOptions" label="Role*" class="q-mb-md" />
@@ -113,27 +113,29 @@
 </template>
 
 <script setup lang="ts">
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { Notify, QTableColumn } from 'quasar';
-import { errorRequest } from 'src/api/types';
-import { ListGroup } from 'src/api/types/GroupTypes';
-import { ListUsers, User, newUser } from 'src/api/types/UsersTypes';
+import { errorRequest } from 'src/types';
 import sessionMixin from 'src/mixins/sessionMixin';
 import { ref, onMounted } from 'vue';
+import { Api } from 'src/api';
+import { IUser, IUserAdd } from 'src/types/user';
+
+const api = new Api();
 
 const { validateUserRole } = sessionMixin();
 
 const entityName = 'User';
 const role = ref<string>('');
 
-const row = ref<User | newUser>({
+const row = ref<IUser | IUserAdd>({
   name: '',
   login: '',
   password: '',
   role: '',
-} as newUser);
-const rows = ref<User[]>([]);
-const itemToDelete = ref<User | null>(null);
+} as IUserAdd);
+const rows = ref<IUser[]>([]);
+const itemToDelete = ref<IUser | null>(null);
 
 const filter = ref<string>('');
 const categoryOptions = ['administrator', 'controller', 'guest'];
@@ -226,11 +228,8 @@ onMounted(async () => {
 
 async function fetchRows() {
   try {
-    const response = await axios.get<ListUsers>(
-      'user'
-    );
-
-    rows.value = response.data.users;
+    const res = await api.user.getPaginate();
+    rows.value = res.data;
   } catch (err) {
     const error = err as AxiosError<errorRequest>;
     Notify.create({
@@ -250,11 +249,9 @@ async function fetchRows() {
 
 async function fetchGroups() {
   try {
-    const response = await axios.get<ListGroup>(
-      'group'
-    );
+    const res = await api.group.getPaginate();
 
-    groupsOptions.value = response.data.groups.map((group) => ({
+    groupsOptions.value = res.data.map((group) => ({
       label: group.name,
       value: group.id
     }));
@@ -282,16 +279,14 @@ async function saveRow() {
     }
 
     if (isEditMode.value) {
-      const user = row.value as User;
-      await axios.put(
-        `user/${user.id}`,
-        user
-      );
+      const user = row.value as IUser;
+
+      await api.user.put({
+        id: user.id,
+        data: user
+      });
     } else {
-      await axios.post(
-        'user',
-        row.value
-      );
+      await api.userAdd.post(row.value);
     }
 
     await fetchRows();
@@ -342,11 +337,11 @@ async function saveGroups() {
       groups: JSON.stringify(uniqueIds)
     };
 
-    const user = row.value as User;
-    await axios.put(
-      `user/${user.id}`,
-      updatedGroupData
-    );
+    const user = row.value as IUser;
+    await api.user.put({
+      id: user.id,
+      data: updatedGroupData,
+    })
 
     await fetchRows();
     Notify.create({
@@ -382,9 +377,7 @@ async function confirmDelete() {
       return;
     }
 
-    await axios.delete(
-      `user/${itemToDelete.value.id}`
-    );
+    await api.user.deleteById(itemToDelete.value.id);
 
     await fetchRows();
     Notify.create({
@@ -414,23 +407,7 @@ async function confirmDelete() {
   }
 }
 
-function newRow() {
-  isEditMode.value = false;
-  row.value = {
-    name: '',
-    login: '',
-    role: '',
-    password: ''
-  } as newUser;
-  showDialogSave.value = true;
-}
-
-function deleteRow(row: User) {
-  itemToDelete.value = row;
-  showDialogDelete.value = true;
-}
-
-async function editGroups(rowData: User) {
+async function editGroups(rowData: IUser) {
   await fetchGroups();
 
   row.value = { ...rowData };
@@ -455,11 +432,27 @@ async function editGroups(rowData: User) {
   showDialogGroups.value = true;
 }
 
+function newRow() {
+  isEditMode.value = false;
+  row.value = {
+    name: '',
+    login: '',
+    role: '',
+    password: ''
+  } as IUserAdd;
+  showDialogSave.value = true;
+}
+
+function deleteRow(row: IUser) {
+  itemToDelete.value = row;
+  showDialogDelete.value = true;
+}
+
 function addGroup() {
   groups.value.push({ selectedGroup: null });
 }
 
-function editRow(rowData: User | null = null) {
+function editRow(rowData: IUser | null = null) {
   if (rowData) {
     isEditMode.value = true;
     row.value = { ...rowData };

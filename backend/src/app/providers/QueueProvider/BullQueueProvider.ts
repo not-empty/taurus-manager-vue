@@ -72,8 +72,8 @@ export class BullQueueProvider implements IQueueProvider {
     const describedQueue: DescribedQueue = {
       ...this.queue,
       status: this.status,
-      jobCounts: this.jobCounts
-    }
+      jobCounts: this.jobCounts,
+    };
 
     return describedQueue;
   }
@@ -84,14 +84,15 @@ export class BullQueueProvider implements IQueueProvider {
       return null;
     }
 
-    if (role != 'administrator') {
+    if (role !== 'administrator') {
       const state = await job.getState();
 
       let canRetry = false;
-      if (state == 'failed') {
+      if (state === 'failed') {
         canRetry = true;
       }
-      var jobTaurus = {
+
+      const jobTaurus = {
         id: job.id,
         data: job.data,
         attemptsMade: job.attemptsMade,
@@ -105,7 +106,7 @@ export class BullQueueProvider implements IQueueProvider {
         failedReason: job.failedReason || null,
         stacktrace: this.formatJobStacktrace(job.stacktrace),
       } as Job;
-      
+
       queueCompliance(jobTaurus, this.queue);
     }
     return JSON.stringify(job.toJSON(), null, 2);
@@ -131,7 +132,7 @@ export class BullQueueProvider implements IQueueProvider {
     const state = await job.getState();
 
     let canRetry = false;
-    if (state == 'failed') {
+    if (state === 'failed') {
       canRetry = true;
     }
     return {
@@ -173,7 +174,7 @@ export class BullQueueProvider implements IQueueProvider {
     );
 
     let canRetry = false;
-    if (state == 'failed') {
+    if (state === 'failed') {
       canRetry = true;
     }
 
@@ -181,7 +182,7 @@ export class BullQueueProvider implements IQueueProvider {
       id: job.id.toString(),
       attemptsMade: job.attemptsMade,
       name: job.name,
-      canRetry: canRetry,
+      canRetry,
       timestamp: job.timestamp,
       createdAt: timestampToDate(job.timestamp),
       processedAt: timestampToDate(job.processedOn),
