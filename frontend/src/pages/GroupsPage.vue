@@ -3,9 +3,7 @@
     <q-dialog v-model="showDialogDeleteConfirm" class="crud-dialog">
       <q-card>
         <q-card-section class="row items-center">
-          <span class="q-ml-sm"
-            >Are you sure you want to delete this item?</span
-          >
+          <span class="q-ml-sm">Are you sure you want to delete this item?</span>
         </q-card-section>
 
         <q-card-actions align="right">
@@ -24,27 +22,9 @@
         </q-card-section>
 
         <q-card-section>
-          <q-input
-            filled
-            v-if="isEditMode"
-            v-model="row.id"
-            label="ID"
-            readonly
-            class="q-mb-md"
-          />
-          <q-input
-            filled
-            v-model="row.name"
-            label="Name*"
-            autofocus
-            class="q-mb-md"
-          />
-          <q-input
-            filled
-            v-model="row.description"
-            label="Description"
-            class="q-mb-md"
-          />
+          <q-input filled v-if="isEditMode" v-model="row.id" label="ID" readonly class="q-mb-md" />
+          <q-input filled v-model="row.name" label="Name*" autofocus class="q-mb-md" />
+          <q-input filled v-model="row.description" label="Description" class="q-mb-md" />
           <div>*Required</div>
         </q-card-section>
 
@@ -61,41 +41,18 @@
       </q-breadcrumbs>
     </div>
 
-    <div
-      class="q-gutter-md"
-      style="display: flex; justify-content: space-between; align-items: center"
-    >
-      <q-input
-        outlined
-        v-model="filter"
-        placeholder="Filter in data"
-        style="max-width: 300px"
-        autofocus
-      >
+    <div class="q-gutter-md" style="display: flex; justify-content: space-between; align-items: center">
+      <q-input outlined v-model="filter" placeholder="Filter in data" style="max-width: 300px" autofocus>
         <template v-slot:append>
           <q-icon name="search" />
         </template>
       </q-input>
-      <q-btn
-        color="primary"
-        :label="'New ' + entityName"
-        class="q-ml-md"
-        @click="newRow"
-      />
+      <q-btn color="primary" :label="'New ' + entityName" class="q-ml-md" @click="newRow" />
     </div>
     <br />
 
-    <q-table
-      flat
-      bordered
-      color="primary"
-      :title="entityName + 's'"
-      :rows="rows"
-      :columns="columns"
-      :filter="filter"
-      :rows-per-page-options="[15]"
-      row-key="id"
-    >
+    <q-table flat bordered color="primary" :title="entityName + 's'" :rows="rows" :columns="columns" :filter="filter"
+      :rows-per-page-options="[15]" row-key="id">
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
           <q-btn flat icon="edit" @click="editRow(props.row)">
@@ -110,198 +67,193 @@
   </q-page>
 </template>
 
-<script>
-import axios from 'axios';
+<script setup lang="ts">
+import axios, { AxiosError } from 'axios';
+import { Notify, QTableColumn } from 'quasar';
+import { errorRequest } from 'src/api/types';
+import { Group, ListGroup } from 'src/api/types/GroupTypes';
 import sessionMixin from 'src/mixins/sessionMixin';
+import { onMounted, ref } from 'vue';
 
-export default {
-  mixins: [
-    sessionMixin,
-  ],
-  data() {
-    return {
-      entityName: 'Group',
-      showDialogSave: false,
-      showDialogDeleteConfirm: false,
-      itemToDelete: null,
-      role: '',
-      row: {
-        name: '',
-        description: ''
-      },
-      isEditMode: false,
-      filter: '',
-      rows: [],
-      columns: [
-        {
-          id: 'id',
-          align: 'left',
-          label: 'Id',
-          field: 'id',
-          sortable: false,
-          style: 'width: 300px'
-        },
-        {
-          name: 'name',
-          align: 'left',
-          label: 'Name',
-          field: 'name',
-          sortable: true
-        },
-        {
-          name: 'description',
-          align: 'left',
-          label: 'Description',
-          field: 'description',
-          sortable: true
-        },
-        {
-          name: 'createdAt',
-          align: 'left',
-          label: 'Created',
-          field: 'createdAt',
-          sortable: true
-        },
-        {
-          name: 'updatedAt',
-          align: 'left',
-          label: 'Updated',
-          field: 'updatedAt',
-          sortable: true
-        },
-        {
-          name: 'actions',
-          label: 'Actions',
-          field: 'actions',
-          align: 'center',
-          sortable: false
-        }
-      ]
-    };
+const { validateUserRole } = sessionMixin();
+
+const entityName = 'Group';
+const showDialogSave = ref(false);
+const showDialogDeleteConfirm = ref<boolean>(false);
+const itemToDelete = ref<Group | null>(null);
+const role = ref('');
+const row = ref({ id: '', name: '', description: '' });
+const isEditMode = ref(false);
+const filter = ref('');
+const rows = ref<Group[]>([]);
+const columns : QTableColumn[] = [
+  {
+    name: 'id',
+    align: 'left',
+    label: 'Id',
+    field: 'id',
+    sortable: false,
+    style: 'width: 300px'
   },
-  async mounted() {
-    this.role = await this.validateUserRole('administrator');
-    await this.fetchRows();
+  {
+    name: 'name',
+    align: 'left',
+    label: 'Name',
+    field: 'name',
+    sortable: true
   },
-  methods: {
-    newRow() {
-      this.isEditMode = false;
-      this.row = { name: '', description: '' };
-      this.showDialogSave = true;
-    },
-    editRow(rowData = null) {
-      if (rowData) {
-        this.isEditMode = true;
-        this.row = { ...rowData };
-      }
-      this.showDialogSave = true;
-    },
-    deleteRow(row) {
-      this.itemToDelete = row;
-      this.showDialogDeleteConfirm = true;
-    },
-    async fetchRows() {
-      try {
-        const response = await axios.get(
-          'group'
-        );
-        this.rows = response.data.groups;
-      } catch (error) {
-        this.$q.notify({
-          type: 'negative',
-          position: 'top',
-          message:
-            error.response && error.response.data.message
-              ? '<span class="nofification">' +
-                error.response.data.message +
-                '</span>'
-              : 'There was an error processing your request.',
-          html: true,
-          timeout: 2500
-        });
-      }
-    },
-    async saveRow() {
-      try {
-        var works = false;
-        if (this.isEditMode) {
-          await axios.put(
-            `group/${this.row.id}`,
-            this.row
-          );
-        } else {
-          await axios.post(
-            'group', this.row
-          );
-        }
-        works = true;
-      } catch (error) {
-        works = false;
-        this.$q.notify({
-          type: 'negative',
-          position: 'top',
-          message:
-            error.response && error.response.data.message
-              ? '<span class="nofification">' +
-                error.response.data.message +
-                '</span>'
-              : 'There was an error processing your request.',
-          html: true,
-          timeout: 2500
-        });
-      } finally {
-        if (works) {
-          this.$q.notify({
-            type: 'positive',
-            position: 'top',
-            message:
-              '<span class="nofification">Item successfuly saved.</sapn>',
-            html: true,
-            timeout: 2500
-          });
-          await this.fetchRows();
-          this.showDialogSave = false;
-        }
-      }
-    },
-    async confirmDelete() {
-      try {
-        var works = false;
-        await axios.delete(
-          `group/${this.itemToDelete.id}`
-        );
-        works = true;
-      } catch (error) {
-        works = false;
-        this.$q.notify({
-          type: 'negative',
-          position: 'top',
-          message:
-            error.response && error.response.data.message
-              ? '<span class="nofification">' +
-                error.response.data.message +
-                '</span>'
-              : 'There was an error processing your request.',
-          html: true,
-          timeout: 2500
-        });
-      } finally {
-        if (works) {
-          await this.fetchRows();
-          this.$q.notify({
-            type: 'positive',
-            position: 'top',
-            message:
-              '<span class="nofification">Item successfuly deleted.</sapn>',
-            html: true,
-            timeout: 2500
-          });
-        }
-        this.showDialogDeleteConfirm = false;
-      }
-    }
+  {
+    name: 'description',
+    align: 'left',
+    label: 'Description',
+    field: 'description',
+    sortable: true
+  },
+  {
+    name: 'createdAt',
+    align: 'left',
+    label: 'Created',
+    field: 'createdAt',
+    sortable: true
+  },
+  {
+    name: 'updatedAt',
+    align: 'left',
+    label: 'Updated',
+    field: 'updatedAt',
+    sortable: true
+  },
+  {
+    name: 'actions',
+    label: 'Actions',
+    field: 'actions',
+    align: 'center',
+    sortable: false
   }
-};
-</script>
+];
 
-<style scoped></style>
+onMounted(async () => {
+  role.value = await validateUserRole('administrator');
+  await fetchRows();
+})
+
+async function fetchRows() {
+  try {
+    const response = await axios.get<ListGroup>(
+      'group'
+    );
+    rows.value = response.data.groups;
+  } catch (err) {
+    const error = err as AxiosError<errorRequest>;
+    Notify.create({
+      type: 'negative',
+      position: 'top',
+      message:
+        error.response && error.response.data.message
+          ? '<span class="nofification">' +
+          error.response.data.message +
+          '</span>'
+          : 'There was an error processing your request.',
+      html: true,
+      timeout: 2500
+    });
+  }
+}
+
+async function confirmDelete() {
+  try {
+    if (!itemToDelete.value) {
+      return;
+    }
+
+    await axios.delete(
+      `group/${itemToDelete.value.id}`
+    );
+
+    await fetchRows();
+    Notify.create({
+      type: 'positive',
+      position: 'top',
+      message:
+        '<span class="nofification">Item successfuly deleted.</sapn>',
+      html: true,
+      timeout: 2500
+    });
+  } catch (err) {
+    const error = err as AxiosError<errorRequest>;
+    Notify.create({
+      type: 'negative',
+      position: 'top',
+      message:
+        error.response && error.response.data.message
+          ? '<span class="nofification">' +
+          error.response.data.message +
+          '</span>'
+          : 'There was an error processing your request.',
+      html: true,
+      timeout: 2500
+    });
+  } finally {
+    showDialogDeleteConfirm.value = false;
+  }
+}
+
+async function saveRow() {
+  try {
+    if (isEditMode.value) {
+      await axios.put(
+        `group/${row.value.id}`,
+        row.value
+      );
+    } else {
+      await axios.post('group', row.value);
+    }
+
+    Notify.create({
+      type: 'positive',
+      position: 'top',
+      message:
+        '<span class="nofification">Item successfuly saved.</sapn>',
+      html: true,
+      timeout: 2500
+    });
+
+    await fetchRows();
+    showDialogSave.value = false;
+  } catch (err) {
+    const error = err as AxiosError<errorRequest>;
+    Notify.create({
+      type: 'negative',
+      position: 'top',
+      message:
+        error.response && error.response.data.message
+          ? '<span class="nofification">' +
+          error.response.data.message +
+          '</span>'
+          : 'There was an error processing your request.',
+      html: true,
+      timeout: 2500
+    });
+  }
+}
+
+function newRow() {
+  isEditMode.value = false;
+  row.value = { id: '', name: '', description: '' };
+  showDialogSave.value = true;
+}
+
+function editRow(rowData : {id: string, name: string, description: string} | null = null) {
+  if (rowData) {
+    isEditMode.value = true;
+    row.value = { ...rowData };
+  }
+
+  showDialogSave.value = true;
+}
+
+function deleteRow(row: Group) {
+  itemToDelete.value = row;
+  showDialogDeleteConfirm.value = true;
+}
+</script>

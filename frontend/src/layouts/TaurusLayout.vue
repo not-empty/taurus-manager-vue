@@ -46,7 +46,7 @@
           <q-separator />
           <q-item
             clickable
-            v-if="this.role === 'administrator'"
+            v-if="role === 'administrator'"
             v-ripple
             to="/manager/groups"
           >
@@ -57,7 +57,7 @@
           </q-item>
           <q-item
             clickable
-            v-if="this.role === 'administrator'"
+            v-if="role === 'administrator'"
             v-ripple
             to="/manager/queues"
           >
@@ -68,7 +68,7 @@
           </q-item>
           <q-item
             clickable
-            v-if="this.role === 'administrator'"
+            v-if="role === 'administrator'"
             v-ripple
             to="/manager/users"
           >
@@ -94,25 +94,17 @@
   </q-layout>
 </template>
 
-<script>
-import { ref } from 'vue';
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
 import sessionMixin from 'src/mixins/sessionMixin';
 
-export default {
-  name: 'TaurusLayout',
-  methods: {},
-  mixins: [sessionMixin],
-  setup() {
-    return {
-      drawer: ref(false),
-      miniState: ref(true),
-      role: ''
-    };
-  },
-  async mounted() {
-    this.role = await this.validateUser();
-  },
-  methods: {
-  }
-};
+const { validateUser } = sessionMixin();
+
+const drawer = ref(false);
+const miniState = ref(true);
+const role = ref<string>('');
+
+onMounted(async () => {
+  role.value = await validateUser();
+});
 </script>
