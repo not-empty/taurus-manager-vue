@@ -1,14 +1,21 @@
-import Queue from '../../../domains/queue/entities/Queue';
+import { Group } from '../../../domains/group/repositories/GroupRepository';
+import { Queue } from '../../../domains/queue/repositories/QueueRepository';
 import {
   Job, JobStacktrace, JobState, QueueJobCounts, QueueStatus,
 } from '../types';
 
-interface IQueueProvider {
+export interface DescribedQueue extends Queue {
+  status: QueueStatus;
+  jobCounts: QueueJobCounts;
+  group?: Group;
+}
+
+export interface IQueueProvider {
   addJob(data: any): Promise<boolean>;
   cloneJob(jobId: string): Promise<boolean>;
   close(): Promise<void>;
   deleteJobs(jobIds: string[]): Promise<boolean>;
-  describe(): Promise<Queue>;
+  describe(): Promise<DescribedQueue>;
   exportJob(jobId: string, role: string): Promise<string | null>;
   formatJobStacktrace(stacktrace?: string[]): JobStacktrace[] | null;
   getJob(jobId: string): Promise<Job | undefined>;

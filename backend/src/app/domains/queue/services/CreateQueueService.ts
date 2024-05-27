@@ -1,6 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import Queue from "../entities/Queue";
-import IQueueRepository from "../repositories/models/IQueueRepository";
+import QueueRepository, { Queue } from "../repositories/QueueRepository";
 
 interface IRequest {
   name: string;
@@ -8,7 +7,7 @@ interface IRequest {
   compliance?: string;
   host: string;
   port: number;
-  health_value: number;
+  healthValue: number;
   groupId: string;
 }
 
@@ -16,7 +15,7 @@ interface IRequest {
 class CreateQueueService {
   constructor(
     @inject("QueueRepository")
-    private queueRepository: IQueueRepository
+    private queueRepository: QueueRepository
   ) {}
 
   public async execute({
@@ -25,20 +24,21 @@ class CreateQueueService {
     compliance,
     host,
     port,
-    health_value,
+    healthValue,
     groupId,
   }: IRequest): Promise<Queue> {
-    const queue = await this.queueRepository.create({
+    const queueId = await this.queueRepository.insert({
       name,
       description,
       compliance,
       host,
       port,
-      health_value,
-      groupId,
+      healthValue,
+      groupId
     });
-    await this.queueRepository.save(queue);
-    return queue;
+    const queue = await this.queueRepository.getById(queueId);
+
+    return queue as Queue;
   }
 }
 

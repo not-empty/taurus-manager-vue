@@ -1,4 +1,4 @@
-import Queue from '../domains/queue/entities/Queue';
+import { Queue } from '../domains/queue/repositories/QueueRepository';
 import { Job } from '../providers/QueueProvider/types';
 
 export const queueCompliance = (job: Job | undefined, queue: Queue): Job | undefined => {
@@ -16,7 +16,3 @@ export const queueCompliance = (job: Job | undefined, queue: Queue): Job | undef
   }
   return job;
 }
-
-export default {
-  queueCompliance,
-};

@@ -1,16 +1,16 @@
 import { injectable, inject } from 'tsyringe';
 import CustomError from '../../../errors/CustomError';
-import IUserRepository from '../repositories/models/IUserRepository';
+import UserRepository from '../repositories/UserRepository';
 
 @injectable()
 class DeleteUserService {
   constructor(
     @inject('UserRepository')
-    private userRepository: IUserRepository,
+    private userRepository: UserRepository,
   ) {}
 
   public async execute(id: string): Promise<boolean> {
-    const user = await this.userRepository.find(id);
+    const user = await this.userRepository.getById(id);
     if (!user) {
       throw new CustomError('User not found', 404);
     }

@@ -2,8 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import CustomError from '../../../errors/CustomError';
 import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
 import IQueueProvider from '../../../providers/QueueProvider/models/IQueueProvider';
-import Queue from '../entities/Queue';
-import IQueueRepository from '../repositories/models/IQueueRepository';
+import QueueRepository, { Queue } from '../repositories/QueueRepository';
 
 interface IRequest {
   ids: string[];
@@ -13,13 +12,13 @@ interface IRequest {
 class PauseQueueBulkService {
   constructor(
     @inject('QueueRepository')
-    private queueRepository: IQueueRepository,
+    private queueRepository: QueueRepository,
   ) {}
 
   public async execute({
     ids,
   }: IRequest): Promise<boolean> {
-    const queues = await this.queueRepository.findByIds(ids);
+    const queues = await this.queueRepository.getBulk(ids);
 
     if (queues.length !== ids.length) {
       throw new CustomError('Could not find all the provided queue ids.', 400);

@@ -1,7 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import CustomError from '../../../errors/CustomError';
-import Group from '../entities/Group';
-import IGroupRepository from '../repositories/models/IGroupRepository';
+import GroupRepository, { Group } from '../repositories/GroupRepository';
 
 interface IRequest {
   id: string;
@@ -13,7 +12,7 @@ interface IRequest {
 class UpdateGroupService {
   constructor(
     @inject('GroupRepository')
-    private groupRepository: IGroupRepository,
+    private groupRepository: GroupRepository,
   ) {}
 
   public async execute({
@@ -21,7 +20,7 @@ class UpdateGroupService {
     name,
     description,
   }: IRequest): Promise<Group> {
-    const group = await this.groupRepository.find(id);
+    const group = await this.groupRepository.getById(id);
     if (!group) {
       throw new CustomError('Group not found', 404);
     }
@@ -29,7 +28,7 @@ class UpdateGroupService {
     group.name = name || group.name;
     group.description = description || group.description;
 
-    await this.groupRepository.save(group);
+    await this.groupRepository.update(id, group);
 
     return group;
   }

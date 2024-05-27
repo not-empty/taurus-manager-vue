@@ -2,8 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import CustomError from '../../../errors/CustomError';
 import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
 import IQueueProvider from '../../../providers/QueueProvider/models/IQueueProvider';
-import Queue from '../../queue/entities/Queue';
-import IQueueRepository from '../../queue/repositories/models/IQueueRepository';
+import QueueRepository, { Queue } from '../../queue/repositories/QueueRepository';
 
 interface IRequest {
   queueId: string;
@@ -14,14 +13,14 @@ interface IRequest {
 class RetryJobService {
   constructor(
     @inject('QueueRepository')
-    private queueRepository: IQueueRepository,
+    private queueRepository: QueueRepository,
   ) {}
 
   public async execute({
     queueId,
     jobIds,
   }: IRequest): Promise<boolean> {
-    const queue = await this.queueRepository.find(queueId);
+    const queue = await this.queueRepository.getById(queueId);
     if (!queue) {
       throw new CustomError('Queue not found', 404);
     }

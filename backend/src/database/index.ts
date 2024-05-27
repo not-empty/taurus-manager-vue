@@ -1,22 +1,19 @@
-import 'dotenv/config';
-import { DataSource } from 'typeorm';
+import knex from 'knex';
+import { Model, knexSnakeCaseMappers } from 'objection';
+import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from '../config/db';
 
-const AppDataSource = new DataSource({
-  type: 'mysql',
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '0'),
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-  migrations: [
-    './src/database/migrations/**.ts',
-  ],
-  entities: [
-    './src/app/domains/*/entities/**.ts',
-  ],
-  logging: false,
+const connection = knex({
+  client: 'mysql',
+  connection: {
+    host: DB_HOST,
+    port: DB_PORT,
+    user: DB_USERNAME,
+    password: DB_PASSWORD,
+    database: DB_DATABASE,
+  },
+  ...knexSnakeCaseMappers()
 });
 
-AppDataSource.initialize();
+Model.knex(connection);
 
-export default AppDataSource;
+export default connection;

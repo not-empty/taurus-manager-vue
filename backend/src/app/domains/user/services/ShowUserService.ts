@@ -1,17 +1,16 @@
 import { injectable, inject } from 'tsyringe';
 import CustomError from '../../../errors/CustomError';
-import User from '../entities/User';
-import IUserRepository from '../repositories/models/IUserRepository';
+import UserRepository, { User } from '../repositories/UserRepository';
 
 @injectable()
 class ShowUserService {
   constructor(
     @inject('UserRepository')
-    private userRepository: IUserRepository,
+    private userRepository: UserRepository,
   ) {}
 
   public async execute(id: string): Promise<User> {
-    const user = await this.userRepository.find(id);
+    const user = await this.userRepository.getById(id);
     if (!user) {
       throw new CustomError('User not found', 404);
     }
