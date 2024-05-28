@@ -307,7 +307,6 @@ async function fetchRows() {
     const response = await axios.get<DashboardItem[]>(
       'group/dashboard'
     );
-    console.log(response);
     groups.value = response.data;
   } catch (err) {
     const error = err as AxiosError<errorRequest>;

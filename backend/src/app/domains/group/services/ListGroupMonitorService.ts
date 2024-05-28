@@ -31,11 +31,11 @@ class ListGroupMonitorService {
 
     const allQueues: DescribedQueue[] = [];
     for (const group of groupIds) {
-      const queues = await this.queueRepository.listByGroup(group);
+      const queues = await this.queueRepository.listWithGroupByGroupId(group);
 
       const describedQueues: DescribedQueue[] = [];
 
-      for (const queue of queues) {
+      for (const queue of queues.data) {
         const queueProvider = this.newBullQueueProvider(queue);
         const describedQueue = await queueProvider.describe();
         await queueProvider.close();

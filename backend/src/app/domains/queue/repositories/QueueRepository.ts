@@ -35,6 +35,39 @@ export class QueueRepository extends BaseRepository<Queue> {
     return data;
   }
 
+  public async listWithGroupByGroupId(
+    groupId: string,
+    options: ListOptions<QueueWithGroup> = {},
+  ): Promise<PaginatedResult<QueueWithGroup>> {
+    const page = options.page || 1;
+    const limit = options.limit || 25;
+
+    const data = await this.db<Queue>(this.tableName)
+      .select('queue.*', 'group.name as groupName')
+      .where({ groupId })
+      .whereNull('queue.deletedAt')
+      .leftJoin<Group>('group', 'queue.groupId', 'group.id')
+      .offset((page - 1) * limit)
+      .limit(limit);
+
+    const result: QueueWithGroup[] = data.map((v) => {
+      const queue = { ...v };
+      queue.group = {
+        id: queue.groupId,
+        name: queue.groupName,
+      };
+      delete queue.groupName;
+
+      return queue;
+    });
+
+    return {
+      data: result,
+      page,
+      limit,
+    };
+  }
+
   public async listWithGroup(
     options: ListOptions<QueueWithGroup> = {},
   ): Promise<PaginatedResult<QueueWithGroup>> {

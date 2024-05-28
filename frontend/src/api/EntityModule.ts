@@ -63,8 +63,6 @@ export class EntityModule<T> extends Module {
       payload.data,
     );
 
-    console.log(result.data);
-
     return result.data;
   }
 
