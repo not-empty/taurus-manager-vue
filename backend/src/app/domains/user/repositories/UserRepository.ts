@@ -1,4 +1,4 @@
-import { BaseEntity, BaseRepository } from "../../../core/BaseRepository";
+import { BaseEntity, BaseRepository } from '../../../core/BaseRepository';
 
 export interface User extends BaseEntity {
   name: string,
@@ -18,7 +18,7 @@ export class UserRepository extends BaseRepository<User> {
       .where({ login })
       .limit(1)
       .first();
-    
+
     return data || null;
   }
 }

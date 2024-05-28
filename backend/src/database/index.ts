@@ -1,6 +1,12 @@
 import knex from 'knex';
 import { Model, knexSnakeCaseMappers } from 'objection';
-import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from '../config/db';
+import {
+  DB_DATABASE,
+  DB_HOST,
+  DB_PASSWORD,
+  DB_PORT,
+  DB_USERNAME,
+} from '../config/db';
 
 const connection = knex({
   client: 'mysql',
@@ -11,7 +17,11 @@ const connection = knex({
     password: DB_PASSWORD,
     database: DB_DATABASE,
   },
-  ...knexSnakeCaseMappers()
+  migrations: {
+    directory: './migrations',
+    database: 'migrations',
+  },
+  ...knexSnakeCaseMappers(),
 });
 
 Model.knex(connection);

@@ -4,11 +4,12 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node build/app/server.js",
+    "start": "node src/server.js",
     "dev": "ts-node-dev --inspect --respawn --transpile-only --ignore-watch node_modules src/server.ts",
     "build": "tsc",
-    "typeorm": "ts-node-dev node_modules/typeorm/cli.js",
-    "migrate": "ts-node-dev node_modules/typeorm/cli.js migration:run -d ./ormconfig.ts"
+    "lint": "eslint ./src",
+    "migrate": "knex migrate:latest",
+    "migrate:make": "knex migrate:make new-migration -x ts"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
