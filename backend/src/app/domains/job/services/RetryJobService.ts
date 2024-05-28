@@ -14,7 +14,9 @@ class RetryJobService {
   constructor(
     @inject('QueueRepository')
     private queueRepository: QueueRepository,
-  ) {}
+  ) {
+    //
+  }
 
   public async execute({
     queueId,

@@ -7,7 +7,9 @@ class ShowUserService {
   constructor(
     @inject('UserRepository')
     private userRepository: UserRepository,
-  ) {}
+  ) {
+    //
+  }
 
   public async execute(id: string): Promise<User> {
     const user = await this.userRepository.getById(id);

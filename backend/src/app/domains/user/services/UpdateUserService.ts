@@ -1,8 +1,8 @@
-import { injectable, inject } from "tsyringe";
-import CustomError from "../../../errors/CustomError";
-import IHashProvider from "../providers/HashProvider/models/IHashProvider";
-import UserRepository, { User } from "../repositories/UserRepository";
-import { MakeOptional } from "../../../utils/types";
+import { injectable, inject } from 'tsyringe';
+import CustomError from '../../../errors/CustomError';
+import IHashProvider from '../providers/HashProvider/models/IHashProvider';
+import UserRepository, { User } from '../repositories/UserRepository';
+import { MakeOptional } from '../../../utils/types';
 
 interface IRequest {
   id: string;
@@ -17,12 +17,14 @@ interface IRequest {
 @injectable()
 class UpdateUserService {
   constructor(
-    @inject("UserRepository")
+    @inject('UserRepository')
     private userRepository: UserRepository,
 
-    @inject("HashProvider")
+    @inject('HashProvider')
     private hashProvider: IHashProvider
-  ) {}
+  ) {
+    //
+  }
 
   public async execute({
     id,
@@ -34,9 +36,9 @@ class UpdateUserService {
     groups,
   }: IRequest): Promise<MakeOptional<User, 'password'>> {
     const user = await this.userRepository.getById(id) as MakeOptional<User, 'password'>;
-  
+
     if (!user) {
-      throw new CustomError("User not found", 404);
+      throw new CustomError('User not found', 404);
     }
 
     user.name = name || user.name;

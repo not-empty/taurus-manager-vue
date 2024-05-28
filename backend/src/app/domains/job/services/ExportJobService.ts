@@ -24,7 +24,9 @@ class ExportJobService {
   constructor(
     @inject('QueueRepository')
     private queueRepository: QueueRepository,
-  ) {}
+  ) {
+    //
+  }
 
   public async execute({
     queueId,

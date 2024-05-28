@@ -1,6 +1,6 @@
-import { inject, injectable } from "tsyringe";
-import CustomError from "../../../errors/CustomError";
-import QueueRepository, { Queue } from "../repositories/QueueRepository";
+import { inject, injectable } from 'tsyringe';
+import CustomError from '../../../errors/CustomError';
+import QueueRepository, { Queue } from '../repositories/QueueRepository';
 
 interface IRequest {
   id: string;
@@ -16,9 +16,11 @@ interface IRequest {
 @injectable()
 class UpdateQueueService {
   constructor(
-    @inject("QueueRepository")
-    private queueRepository: QueueRepository
-  ) {}
+    @inject('QueueRepository')
+    private queueRepository: QueueRepository,
+  ) {
+    //
+  }
 
   public async execute({
     id,
@@ -32,12 +34,12 @@ class UpdateQueueService {
   }: IRequest): Promise<Queue> {
     const queue = await this.queueRepository.getById(id);
     if (!queue) {
-      throw new CustomError("Queue not found", 404);
+      throw new CustomError('Queue not found', 404);
     }
 
     queue.name = name || queue.name;
-    queue.description = description || "";
-    queue.compliance = compliance || "";
+    queue.description = description || '';
+    queue.compliance = compliance || '';
     queue.host = host || queue.host;
     queue.port = port || queue.port;
     queue.healthValue = healthValue || queue.healthValue;

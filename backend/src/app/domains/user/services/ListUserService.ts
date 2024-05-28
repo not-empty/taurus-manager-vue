@@ -16,7 +16,9 @@ class ListUserService {
   constructor(
     @inject('UserRepository')
     private userRepository: UserRepository,
-  ) {}
+  ) {
+    //
+  }
 
   public async execute({
     page,
@@ -32,11 +34,11 @@ class ListUserService {
         'login',
         'role',
         'allowAll',
-        'groups' ,
+        'groups',
         'updatedAt',
         'deletedAt',
-        'createdAt'
-      ]
+        'createdAt',
+      ],
     });
 
     return {

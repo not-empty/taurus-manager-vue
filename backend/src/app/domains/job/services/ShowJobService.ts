@@ -16,7 +16,9 @@ class ShowJobService {
   constructor(
     @inject('QueueRepository')
     private queueRepository: QueueRepository,
-  ) {}
+  ) {
+    //
+  }
 
   public async execute({
     queueId,
@@ -29,7 +31,7 @@ class ShowJobService {
 
     const queueProvider = this.newQueueProvider(queue);
     const job = await queueProvider.getJob(jobId);
-    queueCompliance(job , queue);
+    queueCompliance(job, queue);
     await queueProvider.close();
 
     return job;

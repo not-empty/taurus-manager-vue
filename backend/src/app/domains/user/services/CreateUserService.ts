@@ -18,7 +18,9 @@ class CreateUserService {
 
     @inject('HashProvider')
     private hashProvider: IHashProvider,
-  ) {}
+  ) {
+    //
+  }
 
   public async execute({
     name,
@@ -38,7 +40,7 @@ class CreateUserService {
       login,
       password: hashedPassword,
       role,
-      allowAll: 1
+      allowAll: 1,
     });
 
     const user = await this.userRepository.getById(userId) as User;

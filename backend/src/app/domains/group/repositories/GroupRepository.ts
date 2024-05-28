@@ -1,4 +1,4 @@
-import { BaseEntity, BaseRepository } from "../../../core/BaseRepository";
+import { BaseEntity, BaseRepository } from '../../../core/BaseRepository';
 
 export interface Group extends BaseEntity {
   name: string,
@@ -14,10 +14,9 @@ export class GroupRepository extends BaseRepository<Group> {
       .where({ name })
       .limit(1)
       .first();
-    
+
     return data || null;
   }
 }
-
 
 export default GroupRepository;

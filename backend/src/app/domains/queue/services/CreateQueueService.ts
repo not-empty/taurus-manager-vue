@@ -1,5 +1,5 @@
-import { inject, injectable } from "tsyringe";
-import QueueRepository, { Queue } from "../repositories/QueueRepository";
+import { inject, injectable } from 'tsyringe';
+import QueueRepository, { Queue } from '../repositories/QueueRepository';
 
 interface IRequest {
   name: string;
@@ -14,9 +14,11 @@ interface IRequest {
 @injectable()
 class CreateQueueService {
   constructor(
-    @inject("QueueRepository")
-    private queueRepository: QueueRepository
-  ) {}
+    @inject('QueueRepository')
+    private queueRepository: QueueRepository,
+  ) {
+    //
+  }
 
   public async execute({
     name,
@@ -34,7 +36,7 @@ class CreateQueueService {
       host,
       port,
       healthValue,
-      groupId
+      groupId,
     });
     const queue = await this.queueRepository.getById(queueId);
 

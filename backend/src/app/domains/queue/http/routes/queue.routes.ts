@@ -26,7 +26,7 @@ router.post(
       name: Joi.string().required(),
       host: Joi.string().required(),
       port: Joi.number().required(),
-      health_value: Joi.number().required(),
+      healthValue: Joi.number().required(),
       groupId: Joi.string().required(),
       description: Joi.string().allow(null, ''),
       compliance: Joi.string().allow(null, ''),
@@ -216,6 +216,7 @@ router.put(
       groupId: Joi.string(),
       description: Joi.string().allow(null, ''),
       compliance: Joi.string().allow(null, ''),
+      healthValue: Joi.number().required(),
     },
   }, {
     allowUnknown: true,

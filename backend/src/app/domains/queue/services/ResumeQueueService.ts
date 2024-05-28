@@ -13,7 +13,9 @@ class ResumeQueueService {
   constructor(
     @inject('QueueRepository')
     private queueRepository: QueueRepository,
-  ) {}
+  ) {
+    //
+  }
 
   public async execute({
     id,

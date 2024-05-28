@@ -7,7 +7,9 @@ class DeleteUserService {
   constructor(
     @inject('UserRepository')
     private userRepository: UserRepository,
-  ) {}
+  ) {
+    //
+  }
 
   public async execute(id: string): Promise<boolean> {
     const user = await this.userRepository.getById(id);

@@ -1,14 +1,14 @@
-import { instanceToInstance } from "class-transformer";
-import { Request, Response } from "express";
-import { container } from "tsyringe";
-import CreateGroupService from "../../services/CreateGroupService";
-import DeleteGroupService from "../../services/DeleteGroupService";
-import ListGroupDashboardService from "../../services/ListGroupDashboardService";
-import ListGroupMonitorService from "../../services/ListGroupMonitorService";
-import ListGroupService from "../../services/ListGroupService";
-import ShowGroupDashboardService from "../../services/ShowGroupDashboardService";
-import ShowGroupService from "../../services/ShowGroupService";
-import UpdateGroupService from "../../services/UpdateGroupService";
+import { instanceToInstance } from 'class-transformer';
+import { Request, Response } from 'express';
+import { container } from 'tsyringe';
+import CreateGroupService from '../../services/CreateGroupService';
+import DeleteGroupService from '../../services/DeleteGroupService';
+import ListGroupDashboardService from '../../services/ListGroupDashboardService';
+import ListGroupMonitorService from '../../services/ListGroupMonitorService';
+import ListGroupService from '../../services/ListGroupService';
+import ShowGroupDashboardService from '../../services/ShowGroupDashboardService';
+import ShowGroupService from '../../services/ShowGroupService';
+import UpdateGroupService from '../../services/UpdateGroupService';
 
 class GroupController {
   public async create(request: Request, response: Response): Promise<Response> {
@@ -47,7 +47,7 @@ class GroupController {
 
   public async listDashboard(
     request: Request,
-    response: Response
+    response: Response,
   ): Promise<Response> {
     const { user } = request;
     const listGroupDashboard = container.resolve(ListGroupDashboardService);
@@ -71,7 +71,7 @@ class GroupController {
 
   public async showDashboard(
     request: Request,
-    response: Response
+    response: Response,
   ): Promise<Response> {
     const { id } = request.params;
     const { user } = request;
