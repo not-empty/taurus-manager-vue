@@ -282,15 +282,14 @@
 import { AxiosError } from 'axios';
 import { Notify, QTableColumn } from 'quasar';
 import { errorRequest } from 'src/types';
-import { Group } from 'src/types/GroupTypes';
-import { Job } from 'src/types/JobTypes';
-import { Queue, QueueJobCounts } from 'src/types/QueueTypes';
 import colorsMixin from 'src/mixins/colorsMixin';
 import sessionMixin from 'src/mixins/sessionMixin';
 import { nextTick, onMounted, ref, toRaw, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { IJobState } from 'src/types/job';
+import { IJob, IJobState } from 'src/types/job';
 import { Api } from 'src/api';
+import { IGroup } from 'src/types/group';
+import { IQueueDash, IQueueJobCounts } from 'src/types/queues';
 
 const api = new Api();
 
@@ -307,13 +306,13 @@ const queueId = ref<string>('');
 const typeParam = ref<IJobState>('waiting');
 const listSelection = ref<string>('');
 
-const rows = ref<Job[]>();
-const dash = ref<Queue>();
-const jobCounts = ref<QueueJobCounts>();
-const group = ref<Group>();
-const jobData = ref<Job>();
+const rows = ref<IJob[]>();
+const dash = ref<IQueueDash>();
+const jobCounts = ref<IQueueJobCounts>();
+const group = ref<IGroup>();
+const jobData = ref<IJob>();
 
-const selected = ref<Job[]>([]);
+const selected = ref<IJob[]>([]);
 const storedSelectedRow = ref([]);
 const pagination = ref<{
   page: number,

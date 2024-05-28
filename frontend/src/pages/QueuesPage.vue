@@ -75,10 +75,9 @@
 </template>
 
 <script setup lang="ts">
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { Notify, QTableColumn } from 'quasar';
 import { errorRequest } from 'src/types';
-import { newQueue } from 'src/types/QueueTypes';
 import sessionMixin from 'src/mixins/sessionMixin';
 import { onMounted, ref } from 'vue';
 import { Api } from 'src/api';
@@ -98,13 +97,13 @@ const groups = ref<IGroup[]>();
 
 const itemToDelete = ref<IQueue | null>(null);
 
-const row = ref<newQueue | IQueue>({
+const row = ref<INewQueue | IQueue>({
   name: '',
   description: '',
   host: '',
   port: 6379,
   healthValue: 100
-} as newQueue);
+} as INewQueue);
 const isEditMode = ref<boolean>(false);
 
 const showDialogDeleteConfirm = ref<boolean>(false);
@@ -282,9 +281,7 @@ async function confirmDelete() {
       return;
     }
 
-    await axios.delete(
-      `queue/${itemToDelete.value.id}`
-    );
+    await api.queue.deleteById(itemToDelete.value.id);
 
     await fetchRows();
     Notify.create({
@@ -322,7 +319,7 @@ function newRow() {
     host: '',
     port: 6379,
     healthValue: 100
-  } as newQueue;
+  } as INewQueue;
 
   showDialogSave.value = true;
 }

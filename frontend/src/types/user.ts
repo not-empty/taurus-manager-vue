@@ -1,3 +1,8 @@
+export interface IUserValidate {
+  id: string,
+  role: 'controller' | 'administrator' | 'guest',
+}
+
 export interface IUser {
   id: string;
   name: string;

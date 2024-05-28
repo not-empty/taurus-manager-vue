@@ -1,4 +1,9 @@
-import { Queue } from './QueueTypes';
+import { IQueueDash } from './queues';
+
+export interface IDashboardResponse {
+  group: IGroup;
+  queues: IQueueDash[];
+}
 
 export interface IGroup {
   id: string;
@@ -7,5 +12,5 @@ export interface IGroup {
   createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date;
-  queues: Queue[];
+  queues: IQueueDash[];
 }

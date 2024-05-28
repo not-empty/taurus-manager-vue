@@ -54,10 +54,10 @@ class ListGroupMonitorService {
       }
     }
 
-    const result = {
-      queues: allQueues,
+    return {
+      total: allQueues.length,
+      data: allQueues,
     };
-    return result;
   }
 
   public async getGroups(user: Express.IUserSession): Promise<Group[]> {
