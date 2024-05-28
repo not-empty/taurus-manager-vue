@@ -1,6 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import Group from '../entities/Group';
-import IGroupRepository from '../repositories/models/IGroupRepository';
+import GroupRepository, { Group } from '../repositories/GroupRepository';
 
 interface IRequest {
   page?: number;
@@ -9,29 +8,31 @@ interface IRequest {
 
 interface IResponse {
   total: number;
-  groups: Group[];
+  data: Group[];
 }
 
 @injectable()
 class ListGroupService {
   constructor(
     @inject('GroupRepository')
-    private groupRepository: IGroupRepository,
-  ) {}
+    private groupRepository: GroupRepository,
+  ) {
+    //
+  }
 
   public async execute({
     page,
     size,
   }: IRequest): Promise<IResponse> {
     const total = await this.groupRepository.count();
-    const groups = await this.groupRepository.findAll(
+    const groups = await this.groupRepository.list({
       page,
-      size,
-    );
+      limit: size,
+    });
 
     return {
       total,
-      groups,
+      data: groups.data,
     };
   }
 }

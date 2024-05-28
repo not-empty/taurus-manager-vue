@@ -62,11 +62,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/ViewDashboardPage.vue')
       },
       {
-        path: 'group/:uuid',
+        path: 'group/:id',
         component: () => import('pages/ViewGroupPage.vue')
       },
       {
-        path: 'queue/:uuid',
+        path: 'queue/:id',
         component: () => import('pages/ViewQueuePage.vue')
       },
       {

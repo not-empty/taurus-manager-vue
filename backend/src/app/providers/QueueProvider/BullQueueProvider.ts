@@ -1,16 +1,19 @@
 import Bull from 'bull';
 import { ulid } from 'ulid';
-import Queue from '../../domains/queue/entities/Queue';
-import IQueueProvider from './models/IQueueProvider';
+import IQueueProvider, { DescribedQueue } from './models/IQueueProvider';
 import { timestampToDate } from '../../utils/dateUtils';
 import { queueCompliance } from '../../utils/compliceUtils';
-
+import { Queue } from '../../domains/queue/repositories/QueueRepository';
 import {
   Job, JobStacktrace, JobState, QueueJobCounts, QueueStatus,
 } from './types';
 
-class BullQueueProvider implements IQueueProvider {
+export class BullQueueProvider implements IQueueProvider {
   private queue: Queue;
+
+  private status: QueueStatus;
+
+  private jobCounts: QueueJobCounts;
 
   private bullQueue: Bull.Queue;
 
@@ -62,10 +65,17 @@ class BullQueueProvider implements IQueueProvider {
     return true;
   }
 
-  public async describe(): Promise<Queue> {
-    this.queue.status = await this.getStatus();
-    this.queue.jobCounts = await this.getJobCounts();
-    return this.queue;
+  public async describe(): Promise<DescribedQueue> {
+    this.status = await this.getStatus();
+    this.jobCounts = await this.getJobCounts();
+
+    const describedQueue: DescribedQueue = {
+      ...this.queue,
+      status: this.status,
+      jobCounts: this.jobCounts,
+    };
+
+    return describedQueue;
   }
 
   public async exportJob(jobId: string, role: string): Promise<string | null> {
@@ -74,14 +84,15 @@ class BullQueueProvider implements IQueueProvider {
       return null;
     }
 
-    if (role != 'administrator') {
+    if (role !== 'administrator') {
       const state = await job.getState();
 
       let canRetry = false;
-      if (state == 'failed') {
+      if (state === 'failed') {
         canRetry = true;
       }
-      var jobTaurus = {
+
+      const jobTaurus = {
         id: job.id,
         data: job.data,
         attemptsMade: job.attemptsMade,
@@ -95,7 +106,7 @@ class BullQueueProvider implements IQueueProvider {
         failedReason: job.failedReason || null,
         stacktrace: this.formatJobStacktrace(job.stacktrace),
       } as Job;
-      
+
       queueCompliance(jobTaurus, this.queue);
     }
     return JSON.stringify(job.toJSON(), null, 2);
@@ -121,7 +132,7 @@ class BullQueueProvider implements IQueueProvider {
     const state = await job.getState();
 
     let canRetry = false;
-    if (state == 'failed') {
+    if (state === 'failed') {
       canRetry = true;
     }
     return {
@@ -163,7 +174,7 @@ class BullQueueProvider implements IQueueProvider {
     );
 
     let canRetry = false;
-    if (state == 'failed') {
+    if (state === 'failed') {
       canRetry = true;
     }
 
@@ -171,7 +182,7 @@ class BullQueueProvider implements IQueueProvider {
       id: job.id.toString(),
       attemptsMade: job.attemptsMade,
       name: job.name,
-      canRetry: canRetry,
+      canRetry,
       timestamp: job.timestamp,
       createdAt: timestampToDate(job.timestamp),
       processedAt: timestampToDate(job.processedOn),
@@ -202,7 +213,7 @@ class BullQueueProvider implements IQueueProvider {
 
   public async retryAllJobs(): Promise<boolean> {
     try {
-      let allFailedJobs = [];
+      const allFailedJobs: Bull.Job<any>[] = [];
       let start = 0;
       let end = 99;
       let jobs = await this.bullQueue.getJobs(['failed'], start, end);

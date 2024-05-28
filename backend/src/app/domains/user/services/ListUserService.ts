@@ -1,6 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import User from '../entities/User';
-import IUserRepository from '../repositories/models/IUserRepository';
+import { UserRepository, User } from '../repositories/UserRepository';
 
 interface IRequest {
   page?: number;
@@ -9,29 +8,42 @@ interface IRequest {
 
 interface IResponse {
   total: number;
-  users: User[];
+  data: User[];
 }
 
 @injectable()
 class ListUserService {
   constructor(
     @inject('UserRepository')
-    private userRepository: IUserRepository,
-  ) {}
+    private userRepository: UserRepository,
+  ) {
+    //
+  }
 
   public async execute({
     page,
     size,
   }: IRequest): Promise<IResponse> {
     const total = await this.userRepository.count();
-    const users = await this.userRepository.findAll(
+    const users = await this.userRepository.list({
       page,
-      size,
-    );
+      limit: size,
+      fields: [
+        'id',
+        'name',
+        'login',
+        'role',
+        'allowAll',
+        'groups',
+        'updatedAt',
+        'deletedAt',
+        'createdAt',
+      ],
+    });
 
     return {
       total,
-      users,
+      data: users.data,
     };
   }
 }

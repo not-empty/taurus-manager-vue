@@ -3,8 +3,7 @@ import CustomError from '../../../errors/CustomError';
 import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
 import IQueueProvider from '../../../providers/QueueProvider/models/IQueueProvider';
 import { Job, JobState } from '../../../providers/QueueProvider/types';
-import Queue from '../../queue/entities/Queue';
-import IQueueRepository from '../../queue/repositories/models/IQueueRepository';
+import QueueRepository, { Queue } from '../../queue/repositories/QueueRepository';
 
 interface IRequest {
   queueId: string;
@@ -15,15 +14,17 @@ interface IRequest {
 
 interface IResponse {
   total: number;
-  jobs: Job[];
+  data: Job[];
 }
 
 @injectable()
 class ListJobService {
   constructor(
     @inject('QueueRepository')
-    private queueRepository: IQueueRepository,
-  ) {}
+    private queueRepository: QueueRepository,
+  ) {
+    //
+  }
 
   public async execute({
     queueId,
@@ -31,7 +32,7 @@ class ListJobService {
     page,
     size,
   }: IRequest): Promise<IResponse> {
-    const queue = await this.queueRepository.find(queueId);
+    const queue = await this.queueRepository.getById(queueId);
     if (!queue) {
       throw new CustomError('Queue not found', 404);
     }
@@ -45,7 +46,7 @@ class ListJobService {
 
     return {
       total,
-      jobs,
+      data: jobs,
     };
   }
 

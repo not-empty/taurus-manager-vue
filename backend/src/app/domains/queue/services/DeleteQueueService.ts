@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import IQueueRepository from '../repositories/models/IQueueRepository';
+import QueueRepository from '../repositories/QueueRepository';
 
 interface IRequest {
   id: string;
@@ -9,8 +9,10 @@ interface IRequest {
 class DeleteQueueService {
   constructor(
     @inject('QueueRepository')
-    private queueRepository: IQueueRepository,
-  ) {}
+    private queueRepository: QueueRepository,
+  ) {
+    //
+  }
 
   public async execute({
     id,

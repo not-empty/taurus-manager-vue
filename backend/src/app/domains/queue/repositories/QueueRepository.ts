@@ -1,97 +1,102 @@
-import AppDataSource from "../../../../database";
-import { In, Repository } from "typeorm";
-import ICreateQueueDTO from "../dtos/ICreateQueueDTO";
-import Queue from "../entities/Queue";
-import IQueueRepository from "./models/IQueueRepository";
+import {
+  BaseEntity,
+  BaseRepository,
+  ListOptions,
+  PaginatedResult,
+} from '../../../core/BaseRepository';
+import { Group } from '../../group/repositories/GroupRepository';
 
-class QueueRepository implements IQueueRepository {
-  private ormRepository: Repository<Queue>;
+export interface Queue extends BaseEntity {
+  name: string,
+  description?: string,
+  host: string,
+  port: number,
+  compliance?: string,
+  groupId: string,
+  healthValue: number
+}
 
-  constructor() {
-    this.ormRepository = AppDataSource.getRepository(Queue);
+export interface QueueWithGroupFields extends Queue {
+  group_name: string;
+}
+
+export interface QueueWithGroup extends Queue {
+  group: Group;
+}
+export class QueueRepository extends BaseRepository<Queue> {
+  public tableName: string = 'queue';
+
+  public async listByGroup(groupId: string): Promise<Queue[]> {
+    const data = await this.db<Queue>(this.tableName)
+      .select('*')
+      .where({ groupId })
+      .whereNull('deletedAt');
+
+    return data;
   }
 
-  public async count(): Promise<number> {
-    return this.ormRepository.count();
-  }
+  public async listWithGroupByGroupId(
+    groupId: string,
+    options: ListOptions<QueueWithGroup> = {},
+  ): Promise<PaginatedResult<QueueWithGroup>> {
+    const page = options.page || 1;
+    const limit = options.limit || 25;
 
-  public async create({
-    name,
-    description,
-    compliance,
-    host,
-    port,
-    health_value,
-    groupId,
-  }: ICreateQueueDTO): Promise<Queue> {
-    const queue = this.ormRepository.create({
-      name,
-      description,
-      compliance,
-      host,
-      port,
-      health_value,
-      groupId,
+    const data = await this.db<Queue>(this.tableName)
+      .select('queue.*', 'group.name as groupName')
+      .where({ groupId })
+      .whereNull('queue.deletedAt')
+      .leftJoin<Group>('group', 'queue.groupId', 'group.id')
+      .offset((page - 1) * limit)
+      .limit(limit);
+
+    const result: QueueWithGroup[] = data.map((v) => {
+      const queue = { ...v };
+      queue.group = {
+        id: queue.groupId,
+        name: queue.groupName,
+      };
+      delete queue.groupName;
+
+      return queue;
     });
-    await this.ormRepository.save(queue);
-    return queue;
+
+    return {
+      data: result,
+      page,
+      limit,
+    };
   }
 
-  public async delete(id: string): Promise<boolean> {
-    await this.ormRepository.softDelete(id);
-    return true;
-  }
+  public async listWithGroup(
+    options: ListOptions<QueueWithGroup> = {},
+  ): Promise<PaginatedResult<QueueWithGroup>> {
+    const page = options.page || 1;
+    const limit = options.limit || 25;
 
-  public async find(id: string): Promise<Queue | null> {
-    const queue = await this.ormRepository.findOneBy({
-      id: id,
+    const data = await this.db<Queue>(this.tableName)
+      .select('queue.*', 'group.name as groupName')
+      .whereNull('queue.deletedAt')
+      .leftJoin<Group>('group', 'queue.groupId', 'group.id')
+      .offset((page - 1) * limit)
+      .limit(limit);
+
+    const result: QueueWithGroup[] = data.map((v) => {
+      const queue = { ...v };
+      queue.group = {
+        id: queue.groupId,
+        name: queue.groupName,
+      };
+      delete queue.groupName;
+
+      return queue;
     });
-    return queue;
-  }
 
-  public async findAll(page?: number, size?: number): Promise<Queue[]> {
-    const queues = await this.ormRepository.find({
-      where: {},
-      relations: ["group"],
-      order: {
-        id: "ASC",
-      },
-      take: size || undefined,
-      skip: page && size ? (page - 1) * size : undefined,
-    });
-    return queues;
-  }
-
-  public async findByGroup(groupId: string): Promise<Queue[]> {
-    if (!groupId) {
-      return this.ormRepository.find();
-    }
-    const queues = await this.ormRepository.find({
-      where: {
-        groupId,
-      },
-      relations: ["group"],
-      order: {
-        id: "ASC",
-      },
-    });
-    return queues;
-  }
-
-  public async findByIds(ids: string[]): Promise<Queue[]> {
-    const queues = await this.ormRepository.find({
-      where: {
-        id: In(ids),
-      },
-      order: {
-        id: "ASC",
-      },
-    });
-    return queues;
-  }
-
-  public async save(queue: Queue): Promise<Queue> {
-    return this.ormRepository.save(queue);
+    return {
+      data: result,
+      page,
+      limit,
+    };
   }
 }
 

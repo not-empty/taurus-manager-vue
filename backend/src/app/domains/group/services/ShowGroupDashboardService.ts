@@ -1,21 +1,13 @@
-import { inject, injectable } from "tsyringe";
-import IQueueProvider from "../../../providers/QueueProvider/models/IQueueProvider";
-import Queue from "../../queue/entities/Queue";
-import IQueueRepository from "../../queue/repositories/models/IQueueRepository";
-import BullQueueProvider from "../../../providers/QueueProvider/BullQueueProvider";
-import Group from "../entities/Group";
-import IGroupRepository from "../repositories/models/IGroupRepository";
-import CustomError from "../../../errors/CustomError";
-
-interface IUser {
-  id: string;
-  role: string;
-  groups: string;
-}
+import { inject, injectable } from 'tsyringe';
+import IQueueProvider from '../../../providers/QueueProvider/models/IQueueProvider';
+import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
+import CustomError from '../../../errors/CustomError';
+import GroupRepository, { Group } from '../repositories/GroupRepository';
+import QueueRepository, { Queue } from '../../queue/repositories/QueueRepository';
 
 interface IRequest {
   groupId: string;
-  user: IUser;
+  user: Express.IUserSession;
 }
 
 interface IDashboardItem {
@@ -26,36 +18,38 @@ interface IDashboardItem {
 @injectable()
 class ShowGroupDashboardService {
   constructor(
-    @inject("GroupRepository")
-    private groupRepository: IGroupRepository,
+    @inject('GroupRepository')
+    private groupRepository: GroupRepository,
 
-    @inject("QueueRepository")
-    private queueRepository: IQueueRepository
-  ) {}
+    @inject('QueueRepository')
+    private queueRepository: QueueRepository,
+  ) {
+    //
+  }
 
   public async execute({ groupId, user }: IRequest): Promise<IDashboardItem> {
     let groupIds: string[];
-    if (user.groups === "" || user.groups === null) {
-      const allGroups = await this.groupRepository.findAll();
+    if (!user.groups) {
+      const allGroups = await this.groupRepository.listAll();
       groupIds = allGroups.map((group) => group.id);
     } else {
-      groupIds = JSON.parse(user.groups);
+      groupIds = user.groups;
     }
 
     if (!groupIds.includes(groupId)) {
       throw new CustomError(
-        "User has no permission to access this group.",
-        403
+        'User has no permission to access this group.',
+        403,
       );
     }
 
-    const group = await this.groupRepository.find(groupId);
+    const group = await this.groupRepository.getById(groupId);
 
     if (!group) {
-      throw new CustomError("Group not found.", 404);
+      throw new CustomError('Group not found.', 404);
     }
 
-    const queues = await this.queueRepository.findByGroup(group.id);
+    const queues = await this.queueRepository.listByGroup(group.id);
     const describedQueues = await Promise.all(
       queues.map(async (queue) => {
         const queueProvider = this.newBullQueueProvider(queue);
@@ -63,7 +57,7 @@ class ShowGroupDashboardService {
         await queueProvider.close();
 
         return describedQueue;
-      })
+      }),
     );
 
     return {

@@ -29,7 +29,7 @@ services:
     volumes:
       - ./backend:/app
     networks:
-      - taurus-network     
+      - taurus-network
 
   taurus-manager-front:
     build:

@@ -1,9 +1,8 @@
-import { injectable, inject } from "tsyringe";
-import CustomError from "../../../errors/CustomError";
-import IGroupRepository from "../../group/repositories/models/IGroupRepository";
-import IHashProvider from "../providers/HashProvider/models/IHashProvider";
-import IUserRepository from "../repositories/models/IUserRepository";
-import User from "../entities/User";
+import { injectable, inject } from 'tsyringe';
+import CustomError from '../../../errors/CustomError';
+import IHashProvider from '../providers/HashProvider/models/IHashProvider';
+import UserRepository, { User } from '../repositories/UserRepository';
+import { MakeOptional } from '../../../utils/types';
 
 interface IRequest {
   id: string;
@@ -18,15 +17,14 @@ interface IRequest {
 @injectable()
 class UpdateUserService {
   constructor(
-    @inject("UserRepository")
-    private userRepository: IUserRepository,
+    @inject('UserRepository')
+    private userRepository: UserRepository,
 
-    @inject("GroupRepository")
-    private groupRepository: IGroupRepository,
-
-    @inject("HashProvider")
+    @inject('HashProvider')
     private hashProvider: IHashProvider
-  ) {}
+  ) {
+    //
+  }
 
   public async execute({
     id,
@@ -36,10 +34,11 @@ class UpdateUserService {
     role,
     allowAll,
     groups,
-  }: IRequest): Promise<User> {
-    const user = await this.userRepository.find(id);
+  }: IRequest): Promise<MakeOptional<User, 'password'>> {
+    const user = await this.userRepository.getById(id) as MakeOptional<User, 'password'>;
+
     if (!user) {
-      throw new CustomError("User not found", 404);
+      throw new CustomError('User not found', 404);
     }
 
     user.name = name || user.name;
@@ -55,14 +54,16 @@ class UpdateUserService {
     }
 
     if (allowAll == 1) {
-      user.groups = '';
+      user.groups = null;
     }
 
     if (password) {
       user.password = await this.hashProvider.generate(password);
     }
 
-    await this.userRepository.save(user);
+    await this.userRepository.update(id, user);
+
+    delete user.password;
 
     return user;
   }

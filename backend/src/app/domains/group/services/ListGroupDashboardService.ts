@@ -1,19 +1,11 @@
-import { inject, injectable } from "tsyringe";
-import IQueueProvider from "../../../providers/QueueProvider/models/IQueueProvider";
-import Queue from "../../queue/entities/Queue";
-import IQueueRepository from "../../queue/repositories/models/IQueueRepository";
-import BullQueueProvider from "../../../providers/QueueProvider/BullQueueProvider";
-import Group from "../entities/Group";
-import IGroupRepository from "../repositories/models/IGroupRepository";
-
-interface IUser {
-  id: string;
-  role: string;
-  groups: string;
-}
+import { inject, injectable } from 'tsyringe';
+import IQueueProvider from '../../../providers/QueueProvider/models/IQueueProvider';
+import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
+import GroupRepository, { Group } from '../repositories/GroupRepository';
+import QueueRepository, { Queue } from '../../queue/repositories/QueueRepository';
 
 interface IRequest {
-  user: IUser;
+  user: Express.IUserSession;
 }
 
 interface IDashboardItem {
@@ -24,34 +16,44 @@ interface IDashboardItem {
 @injectable()
 class ListGroupDashboardService {
   constructor(
-    @inject("GroupRepository")
-    private groupRepository: IGroupRepository,
+    @inject('GroupRepository')
+    private groupRepository: GroupRepository,
 
-    @inject("QueueRepository")
-    private queueRepository: IQueueRepository
-  ) {}
+    @inject('QueueRepository')
+    private queueRepository: QueueRepository,
+  ) {
+    //
+  }
 
   public async execute({ user }: IRequest): Promise<IDashboardItem[]> {
     let groupIds: string[];
-    if (user.groups === "" || user.groups === null) {
-      const allGroups = await this.groupRepository.findAll();
+    if (!user.groups) {
+      const allGroups = await this.groupRepository.listAll();
       groupIds = allGroups.map((group) => group.id);
     } else {
-      groupIds = JSON.parse(user.groups);
+      groupIds = user.groups;
     }
 
     const dashboard: IDashboardItem[] = [];
 
-    for (const group of groupIds) {
-      const queues = await this.queueRepository.findByGroup(group);
+    for (const groupId of groupIds) {
+      const group = await this.groupRepository.getById(groupId);
+
+      if (!group) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      const queues = await this.queueRepository.listByGroup(groupId);
       const describedQueues = await Promise.all(
         queues.map(async (queue) => {
           const queueProvider = this.newBullQueueProvider(queue);
           const describedQueue = await queueProvider.describe();
+          describedQueue.group = group;
           await queueProvider.close();
 
           return describedQueue;
-        })
+        }),
       );
 
       dashboard.push({
@@ -63,11 +65,11 @@ class ListGroupDashboardService {
     return dashboard;
   }
 
-  public async getGroups(user: IUser): Promise<Group[]> {
-    if (user.role === "administrator") {
-      return this.groupRepository.findAll();
+  public async getGroups(user: Express.IUserSession): Promise<Group[]> {
+    if (user.role === 'administrator') {
+      return this.groupRepository.listAll();
     }
-    return this.groupRepository.findByIds(JSON.parse(user.groups));
+    return this.groupRepository.getBulk(user.groups);
   }
 
   public newBullQueueProvider(queue: Queue): IQueueProvider {

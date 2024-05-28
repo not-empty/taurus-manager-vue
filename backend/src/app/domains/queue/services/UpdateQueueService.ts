@@ -1,7 +1,6 @@
-import { inject, injectable } from "tsyringe";
-import CustomError from "../../../errors/CustomError";
-import Queue from "../entities/Queue";
-import IQueueRepository from "../repositories/models/IQueueRepository";
+import { inject, injectable } from 'tsyringe';
+import CustomError from '../../../errors/CustomError';
+import QueueRepository, { Queue } from '../repositories/QueueRepository';
 
 interface IRequest {
   id: string;
@@ -10,16 +9,18 @@ interface IRequest {
   compliance?: string;
   host?: string;
   port?: number;
-  health_value?: number;
+  healthValue?: number;
   groupId?: string;
 }
 
 @injectable()
 class UpdateQueueService {
   constructor(
-    @inject("QueueRepository")
-    private queueRepository: IQueueRepository
-  ) {}
+    @inject('QueueRepository')
+    private queueRepository: QueueRepository,
+  ) {
+    //
+  }
 
   public async execute({
     id,
@@ -28,23 +29,23 @@ class UpdateQueueService {
     compliance,
     host,
     port,
-    health_value,
+    healthValue,
     groupId,
   }: IRequest): Promise<Queue> {
-    const queue = await this.queueRepository.find(id);
+    const queue = await this.queueRepository.getById(id);
     if (!queue) {
-      throw new CustomError("Queue not found", 404);
+      throw new CustomError('Queue not found', 404);
     }
 
     queue.name = name || queue.name;
-    queue.description = description || "";
-    queue.compliance = compliance || "";
+    queue.description = description || '';
+    queue.compliance = compliance || '';
     queue.host = host || queue.host;
     queue.port = port || queue.port;
-    queue.health_value = health_value || queue.health_value;
+    queue.healthValue = healthValue || queue.healthValue;
     queue.groupId = groupId || queue.groupId;
 
-    await this.queueRepository.save(queue);
+    await this.queueRepository.update(id, queue);
 
     return queue;
   }

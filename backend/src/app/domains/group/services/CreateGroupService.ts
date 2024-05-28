@@ -1,7 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import CustomError from '../../../errors/CustomError';
-import Group from '../entities/Group';
-import IGroupRepository from '../repositories/models/IGroupRepository';
+import GroupRepository, { Group } from '../repositories/GroupRepository';
 
 interface IRequest {
   name: string;
@@ -12,24 +11,27 @@ interface IRequest {
 class CreateGroupService {
   constructor(
     @inject('GroupRepository')
-    private groupRepository: IGroupRepository,
-  ) {}
+    private groupRepository: GroupRepository,
+  ) {
+    //
+  }
 
   public async execute({
     name,
     description,
   }: IRequest): Promise<Group> {
-    const groupExists = await this.groupRepository.findByName(name);
+    const groupExists = await this.groupRepository.getByName(name);
     if (groupExists) {
       throw new CustomError('Group already exists', 400);
     }
 
-    const group = await this.groupRepository.create({
+    const groupId = await this.groupRepository.insert({
       name,
       description,
     });
 
-    return group;
+    const group = await this.groupRepository.getById(groupId);
+    return group as Group;
   }
 }
 

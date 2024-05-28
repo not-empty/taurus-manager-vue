@@ -10,12 +10,7 @@
 
         <q-card-actions align="right">
           <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn
-            flat
-            :label="currentAction"
-            :color="calculateActionColor(this.currentAction)"
-            @click="confirmAction"
-          />
+          <q-btn flat :label="currentAction" :color="calculateActionColor(currentAction)" @click="confirmAction" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -26,75 +21,33 @@
       </q-breadcrumbs>
     </div>
 
-    <div
-      class="q-gutter-md"
-      style="display: flex; justify-content: space-between; align-items: center"
-    >
-      <q-input
-        outlined
-        v-model="filter"
-        placeholder="Filter in queues"
-        style="max-width: 300px"
-        autofocus
-      >
+    <div class="q-gutter-md" style="display: flex; justify-content: space-between; align-items: center">
+      <q-input outlined v-model="filter" placeholder="Filter in queues" style="max-width: 300px" autofocus>
         <template v-slot:append>
           <q-icon name="search" />
         </template>
       </q-input>
       <div>
-        <q-btn
-          flat
-          label="Refresh"
-          icon="refresh"
-          color="white"
-          @click="fetchRows"
-        />
-        <q-btn
-          flat
-          label="Pause"
-          icon="pause"
-          color="primary"
-          class="q-ml-xl"
-          v-if="checkPermission(this.role, 'controller')"
-          :disabled="selected.length === 0"
-          @click="pauseSelected"
-        />
-        <q-btn
-          flat
-          label="Resume"
-          icon="play_arrow"
-          color="primary"
-          v-if="checkPermission(this.role, 'controller')"
-          :disabled="selected.length === 0"
-          @click="resumeSelected"
-        />
+        <q-btn flat label="Refresh" icon="refresh" color="white" @click="fetchRows" />
+        <q-btn flat label="Pause" icon="pause" color="primary" class="q-ml-xl"
+          v-if="sessionMixin().checkPermission(role, 'controller')" :disabled="selected.length === 0"
+          @click="pauseSelected" />
+        <q-btn flat label="Resume" icon="play_arrow" color="primary" v-if="checkPermission(role, 'controller')"
+          :disabled="selected.length === 0" @click="resumeSelected" />
       </div>
     </div>
 
-    <div v-for="group in filteredGroups" :key="group.group">
-      <div
-        v-if="group.queues.length > 0"
-        class="text-h6 q-my-md q-mt-xl cursor-pointer"
-        @click="openGroup(group.group)"
-      >
+    <div v-for="group in filteredGroups" :key="group.group.id">
+      <div v-if="group.queues.length > 0" class="text-h6 q-my-md q-mt-xl cursor-pointer"
+        @click="openGroup(group.group.id)">
         <q-icon name="table_view" size="1em" />
-        {{ group.queues[0].group.name }}
+        {{ group.queues?.[0]?.group?.name }}
       </div>
       <div v-if="group.queues.length > 0">
-        <q-table
-          flat
-          bordered
-          color="primary"
-          :rows="group.queues"
-          :columns="columns"
-          row-key="id"
-          :rows-per-page-options="[10000]"
-          selection="multiple"
-          v-model:selected="selected"
-          :hide-bottom="true"
-          :loading="loading"
-        >
-          <template v-slot:header-cell-health_value="props">
+        <q-table flat bordered color="primary" :rows="group.queues" :columns="columns" row-key="id"
+          :rows-per-page-options="[10000]" selection="multiple" v-model:selected="selected" :hide-bottom="true"
+          :loading="loading">
+          <template v-slot:header-cell-healthValue="props">
             <q-th :props="props">
               <q-icon name="favorite" size="2em" />
               {{ props.col.label }}
@@ -151,40 +104,29 @@
           </template>
 
           <template v-slot:header-selection="scope">
-            <q-checkbox
-              v-model="scope.selected"
-              v-if="checkPermission(this.role, 'controller')"
-            />
+            <q-checkbox v-model="scope.selected" v-if="checkPermission(role, 'controller')" />
           </template>
 
           <template v-slot:body-selection="scope">
-            <q-checkbox
-              v-if="checkPermission(this.role, 'controller')"
-              :model-value="scope.selected"
-              @update:model-value="
-                (val, evt) => {
-                  Object.getOwnPropertyDescriptor(scope, 'selected').set(
-                    val,
-                    evt
-                  );
-                }
-              "
-            />
+            <q-checkbox v-if="checkPermission(role, 'controller')" :model-value="scope.selected" @update:model-value="(val, evt) => {
+              const v = Object.getOwnPropertyDescriptor(scope, 'selected');
+              if (v && v.set) {
+                // @ts-ignore
+                v.set(val, evt);
+              }
+            }" />
           </template>
 
-          <template v-slot:body-cell-health_value="props">
+          <template v-slot:body-cell-healthValue="props">
             <q-td :props="props">
               <div @click="onRowClick(props.row.id)" class="cursor-pointer">
-                <q-chip
-                  :color="
-                    calculateHealthColor(
-                      props.row.health_value,
-                      props.row.jobCounts.waiting,
-                      props.row.jobCounts.paused
-                    )
-                  "
-                >
-                  Max: {{ props.row.health_value }}
+                <q-chip :color="calculateHealthColor(
+                  props.row.healthValue,
+                  props.row.jobCounts.waiting,
+                  props.row.jobCounts.paused
+                )
+                  ">
+                  Max: {{ props.row.healthValue }}
                 </q-chip>
               </div>
             </q-td>
@@ -210,10 +152,7 @@
 
           <template v-slot:body-cell-waiting="props">
             <q-td :props="props">
-              <div
-                @click="onRowClickType(props.row.id, 'waiting')"
-                class="cursor-pointer"
-              >
+              <div @click="onRowClickType(props.row.id, 'waiting')" class="cursor-pointer">
                 {{ props.row.jobCounts.waiting }}
               </div>
             </q-td>
@@ -221,10 +160,7 @@
 
           <template v-slot:body-cell-paused="props">
             <q-td :props="props">
-              <div
-                @click="onRowClickType(props.row.id, 'paused')"
-                class="cursor-pointer"
-              >
+              <div @click="onRowClickType(props.row.id, 'paused')" class="cursor-pointer">
                 {{ props.row.jobCounts.paused }}
               </div>
             </q-td>
@@ -232,10 +168,7 @@
 
           <template v-slot:body-cell-active="props">
             <q-td :props="props">
-              <div
-                @click="onRowClickType(props.row.id, 'active')"
-                class="cursor-pointer"
-              >
+              <div @click="onRowClickType(props.row.id, 'active')" class="cursor-pointer">
                 {{ props.row.jobCounts.active }}
               </div>
             </q-td>
@@ -243,10 +176,7 @@
 
           <template v-slot:body-cell-delayed="props">
             <q-td :props="props">
-              <div
-                @click="onRowClickType(props.row.id, 'delayed')"
-                class="cursor-pointer"
-              >
+              <div @click="onRowClickType(props.row.id, 'delayed')" class="cursor-pointer">
                 {{ props.row.jobCounts.delayed }}
               </div>
             </q-td>
@@ -254,10 +184,7 @@
 
           <template v-slot:body-cell-failed="props">
             <q-td :props="props">
-              <div
-                @click="onRowClickType(props.row.id, 'failed')"
-                class="cursor-pointer"
-              >
+              <div @click="onRowClickType(props.row.id, 'failed')" class="cursor-pointer">
                 {{ props.row.jobCounts.failed }}
               </div>
             </q-td>
@@ -268,206 +195,208 @@
   </q-page>
 </template>
 
-<script>
-import axios from 'axios';
-import { ref } from 'vue';
+<script setup lang="ts">
+import { AxiosError } from 'axios';
+import { onMounted, computed, ref } from 'vue';
+
 import colorsMixin from 'src/mixins/colorsMixin';
 import sessionMixin from 'src/mixins/sessionMixin';
+import { Notify, QTableColumn } from 'quasar';
+import { errorRequest } from 'src/types';
+import { useRouter } from 'vue-router';
+import { Api } from 'src/api';
+import { IDashboardResponse } from 'src/types/group';
+import { IQueueDash } from 'src/types/queues';
 
-export default {
-  mixins: [
-    colorsMixin,
-    sessionMixin,
-  ],
-  data() {
-    return {
-      loading: false,
-      role: '',
-      groups: [],
-      selectedGroups: [{ selectedGroup: null }],
-      showDialogActionConfirm: false,
-      currentAction: '',
-      filter: '',
-      rows: [],
-      columns: [
-        {
-          name: 'health_value',
-          align: 'center',
-          label: 'Health',
-          field: 'health_value',
-          sortable: true
-        },
-        {
-          name: 'name',
-          align: 'center',
-          label: 'Name',
-          field: 'name',
-          sortable: true
-        },
-        {
-          name: 'waiting',
-          align: 'center',
-          label: 'Waiting',
-          field: (row) => row.jobCounts.waiting,
-          sortable: true
-        },
-        {
-          name: 'paused',
-          align: 'center',
-          label: 'Paused',
-          field: (row) => row.jobCounts.paused,
-          sortable: true
-        },
-        {
-          name: 'active',
-          align: 'center',
-          label: 'Active',
-          field: (row) => row.jobCounts.active,
-          sortable: true
-        },
-        {
-          name: 'delayed',
-          align: 'center',
-          label: 'Delayed',
-          field: (row) => row.jobCounts.delayed,
-          sortable: true
-        },
-        {
-          name: 'failed',
-          align: 'center',
-          label: 'Failed',
-          field: (row) => row.jobCounts.failed,
-          sortable: true
-        },
-        {
-          name: 'status',
-          align: 'center',
-          label: 'Status',
-          field: 'status',
-          sortable: true
-        }
-      ]
-    };
+const api = new Api();
+
+const { calculateHealthColor, calculateStatusColor, calculateActionColor } = colorsMixin();
+const { validateUser, checkPermission } = sessionMixin();
+
+const router = useRouter();
+
+const loading = ref(false);
+const role = ref<string>('');
+const groups = ref<IDashboardResponse[]>();
+const showDialogActionConfirm = ref(false);
+const currentAction = ref<'resume' | 'pause'>('pause');
+const filter = ref<string>('');
+const selected = ref<IQueueDash[]>([]);
+
+const columns: QTableColumn[] = [
+  {
+    name: 'healthValue',
+    align: 'center',
+    label: 'Health',
+    field: 'healthValue',
+    sortable: true
   },
-  setup() {
-    const selected = ref([]);
-    return {
-      selected
-    };
+  {
+    name: 'name',
+    align: 'center',
+    label: 'Name',
+    field: 'name',
+    sortable: true
   },
-  async mounted() {
-    this.role = await this.validateUser();
-    await this.fetchRows();
+  {
+    name: 'waiting',
+    align: 'center',
+    label: 'Waiting',
+    field: (row: IQueueDash) => row.jobCounts.waiting,
+    sortable: true
   },
-  methods: {
-    openGroup(id) {
-      this.$router.push(`/view/group/${id}`);
-    },
-    pauseSelected() {
-      if (this.selected.length > 0) {
-        this.currentAction = 'pause';
-        this.showDialogActionConfirm = true;
-      }
-    },
-    resumeSelected() {
-      if (this.selected.length > 0) {
-        this.currentAction = 'resume';
-        this.showDialogActionConfirm = true;
-      }
-    },
-    async confirmAction() {
-      var works = false;
-      try {
-        const selectedIds = this.selected.map((item) => item.id);
-        const uniqueIds = [...new Set(selectedIds)];
-        let data = {
-          ids: uniqueIds
-        };
-        await axios.put(
-          `queue/${this.currentAction}`,
-          data
-        );
-        works = true;
-      } catch (error) {
-        works = false;
-        works = false;
-        this.$q.notify({
-          type: 'negative',
-          position: 'top',
-          message:
-            error.response && error.response.data.message
-              ? '<span class="nofification">' +
-                error.response.data.message +
-                '</span>'
-              : 'There was an error processing your request.',
-          html: true,
-          timeout: 2500
-        });
-      } finally {
-        if (works) {
-          this.$q.notify({
-            type: 'positive',
-            position: 'top',
-            message: `<span class="nofification">Itens successfuly ${this.currentAction}d.</sapn>`,
-            html: true,
-            timeout: 2500
-          });
-          await this.fetchRows();
-        }
-        this.showDialogActionConfirm = false;
-      }
-    },
-    onRowClick(id) {
-      this.$router.push(`/view/queue/${id}`);
-    },
-    onRowClickType(id, type) {
-      this.$router.push(`/view/queue/${id}?type=${type}`);
-    },
-    async fetchRows() {
-      this.loading = true;
-      try {
-        const response = await axios.get(
-          'group/dashboard'
-        );
-        this.groups = response.data;
-      } catch (error) {
-        this.$q.notify({
-          type: 'negative',
-          position: 'top',
-          message:
-            error.response && error.response.data.message
-              ? '<span class="nofification">' +
-                error.response.data.message +
-                '</span>'
-              : 'There was an error processing your request.',
-          html: true,
-          timeout: 2500
-        });
-      } finally {
-        this.loading = false;
-      }
-    }
+  {
+    name: 'paused',
+    align: 'center',
+    label: 'Paused',
+    field: (row: IQueueDash) => row.jobCounts.paused,
+    sortable: true
   },
-  computed: {
-    filteredGroups() {
-      if (!this.filter) {
-        return this.groups;
-      }
-      return this.groups
-        .map((group) => {
-          return {
-            ...group,
-            queues: group.queues.filter((queue) => {
-              return queue.name
-                .toLowerCase()
-                .includes(this.filter.toLowerCase());
-            })
-          };
-        })
-        .filter((group) => group.queues.length > 0);
-    },
+  {
+    name: 'active',
+    align: 'center',
+    label: 'Active',
+    field: (row: IQueueDash) => row.jobCounts.active,
+    sortable: true
+  },
+  {
+    name: 'delayed',
+    align: 'center',
+    label: 'Delayed',
+    field: (row: IQueueDash) => row.jobCounts.delayed,
+    sortable: true
+  },
+  {
+    name: 'failed',
+    align: 'center',
+    label: 'Failed',
+    field: (row: IQueueDash) => row.jobCounts.failed,
+    sortable: true
+  },
+  {
+    name: 'status',
+    align: 'center',
+    label: 'Status',
+    field: 'status',
+    sortable: true
   }
-};
-</script>
+];
 
-<style scoped></style>
+const filteredGroups = computed(() => {
+  if (!groups.value) {
+    return [];
+  }
+
+  if (!filter.value) {
+    return groups.value;
+  }
+
+  return groups.value.map((group) => {
+    return {
+      ...group,
+      queues: group.queues.filter((queue) => {
+        return queue.name
+          .toLowerCase()
+          .includes(filter.value.toLowerCase());
+      })
+    };
+  })
+    .filter((group) => group.queues.length > 0);
+});
+
+onMounted(async () => {
+  const userRole = await validateUser();
+  if (!userRole) {
+    return;
+  }
+
+  role.value = userRole;
+  await fetchRows();
+});
+
+async function fetchRows() {
+  loading.value = true;
+  try {
+    const response = await api.group.getDashboard();
+    groups.value = response;
+  } catch (err) {
+    const error = err as AxiosError<errorRequest>;
+    Notify.create({
+      type: 'negative',
+      position: 'top',
+      message:
+        error.response && error?.response?.data?.message
+          ? '<span class="nofification">' +
+          error.response.data.message +
+          '</span>'
+          : 'There was an error processing your request.',
+      html: true,
+      timeout: 2500
+    });
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function confirmAction() {
+  try {
+    const selectedIds = selected.value.map((item) => item.id);
+    const uniqueIds = [...new Set(selectedIds)];
+
+    let data = { ids: uniqueIds };
+
+    await api.queue.chageQueueStatus(currentAction.value, data);
+
+    Notify.create({
+      type: 'positive',
+      position: 'top',
+      message: `<span class="nofification">Itens successfuly ${currentAction.value}d.</sapn>`,
+      html: true,
+      timeout: 2500
+    });
+    await fetchRows();
+  } catch (err) {
+    const error = err as AxiosError<errorRequest>;
+    Notify.create({
+      type: 'negative',
+      position: 'top',
+      message:
+        error.response && error.response.data.message
+          ? '<span class="nofification">' +
+          error.response.data.message +
+          '</span>'
+          : 'There was an error processing your request.',
+      html: true,
+      timeout: 2500
+    });
+  } finally {
+    showDialogActionConfirm.value = false;
+  }
+}
+
+function openGroup(id: string) {
+  router.push(`/view/group/${id}`);
+}
+
+function pauseSelected() {
+  if (selected.value.length > 0) {
+    currentAction.value = 'pause';
+    showDialogActionConfirm.value = true;
+  }
+}
+
+function resumeSelected() {
+  if (selected.value.length > 0) {
+    currentAction.value = 'resume';
+    showDialogActionConfirm.value = true;
+  }
+}
+
+function onRowClick(id: string) {
+  router.push(`/view/queue/${id}`);
+}
+
+function onRowClickType(id: string, type: string) {
+  router.push(`/view/queue/${id}?type=${type}`);
+}
+</script>
