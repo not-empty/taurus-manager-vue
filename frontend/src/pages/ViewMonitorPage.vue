@@ -171,13 +171,18 @@ const filter = ref<string>('');
 const queues = ref<IQueueDash[]>([]);
 
 const autoRefresh = ref<boolean>(false);
-const autoRefreshIntervalId = ref<boolean | null>(null);
+const autoRefreshIntervalId = ref<NodeJS.Timeout | null>(null);
 
 const showSpinner = ref<boolean>(false);
 const showDialogActionConfirm = ref<boolean>(false);
 
 onMounted(async () => {
-  role.value = await validateUser();
+  const userRole = await validateUser();
+  if (!userRole) {
+    return;
+  }
+
+  role.value = userRole;
   await fetchRows();
 });
 
@@ -253,7 +258,9 @@ function startAutoRefresh() {
 }
 
 function stopAutoRefresh() {
-  clearInterval(autoRefreshIntervalId.value);
+  if (autoRefreshIntervalId.value) {
+    clearInterval(autoRefreshIntervalId.value);
+  }
 }
 
 function toggleAutoRefresh() {

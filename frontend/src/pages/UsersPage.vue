@@ -221,7 +221,12 @@ const columns: QTableColumn[] = [
 ];
 
 onMounted(async () => {
-  role.value = await validateUserRole('administrator');
+  const userRole = await validateUserRole('administrator');
+  if (!userRole) {
+    return;
+  }
+
+  role.value = userRole;
   await fetchRows();
   await fetchGroups();
 });

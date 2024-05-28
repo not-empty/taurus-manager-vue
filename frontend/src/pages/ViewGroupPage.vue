@@ -172,7 +172,12 @@ const selectedQueues = ref<string[]>([]);
 const showDialogActionConfirm = ref<boolean>(false);
 
 onMounted(async () => {
-  role.value = await validateUser();
+  const userRole = await validateUser();
+  if (!userRole) {
+    return;
+  }
+
+  role.value = userRole;
   groupId.value = String(route.params?.id || '');
   await fetchRows();
 });

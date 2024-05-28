@@ -29,7 +29,7 @@
       :width="200"
       :breakpoint="500"
     >
-      <q-scroll-area class="fit" :horizontal-thumb-style="{ opacity: 0 }">
+      <q-scroll-area class="fit" :horizontal-thumb-style="{ opacity: '0' }">
         <q-list>
           <q-item clickable v-ripple to="/view/dashboard">
             <q-item-section avatar>
@@ -105,6 +105,11 @@ const miniState = ref(true);
 const role = ref<string>('');
 
 onMounted(async () => {
-  role.value = await validateUser();
+  const userRole = await validateUser();
+  if (!userRole) {
+    return;
+  }
+
+  role.value = userRole;
 });
 </script>

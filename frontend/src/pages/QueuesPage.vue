@@ -22,7 +22,7 @@
         </q-card-section>
 
         <q-card-section>
-          <q-input filled v-if="isEditMode" v-model="row.id" label="ID" readonly class="q-mb-md" />
+          <q-input filled v-if="isEditMode" v-model="(row as IQueue).id" label="ID" readonly class="q-mb-md" />
           <q-input filled v-model="row.name" label="Name*" autofocus class="q-mb-md" />
 
           <q-select filled v-model="row.group" label="Group*" :options="groups" option-value="id" option-label="name"
@@ -92,8 +92,8 @@ const entityName = 'Queue';
 const filter = ref<string>('');
 
 const role = ref<string>('');
-const rows = ref<IQueue[]>();
-const groups = ref<IGroup[]>();
+const rows = ref<IQueue[]>([]);
+const groups = ref<IGroup[]>([]);
 
 const itemToDelete = ref<IQueue | null>(null);
 
@@ -177,7 +177,12 @@ const columns : QTableColumn[] = [
 ];
 
 onMounted(async () => {
-  role.value = await validateUserRole('administrator');
+  const userRole = await validateUserRole('administrator');
+  if (!userRole) {
+    return;
+  }
+
+  role.value = userRole;
   await fetchRows();
   await fetchGroups();
 });

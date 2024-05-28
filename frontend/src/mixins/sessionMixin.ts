@@ -31,7 +31,7 @@ export default function sessionMixin() {
       const response = await api.validate();
       const role = response.role;
 
-      if (role !== 'administrator' && role !== 'controller') {
+      if (role !== 'administrator' && role !== 'controller' && role !== 'guest') {
         const error = 'Invalid Role';
         throw error;
       }

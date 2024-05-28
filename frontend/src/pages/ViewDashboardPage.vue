@@ -109,7 +109,11 @@
 
           <template v-slot:body-selection="scope">
             <q-checkbox v-if="checkPermission(role, 'controller')" :model-value="scope.selected" @update:model-value="(val, evt) => {
-              Object.getOwnPropertyDescriptor(scope, 'selected').set(val, evt);
+              const v = Object.getOwnPropertyDescriptor(scope, 'selected');
+              if (v && v.set) {
+                // @ts-ignore
+                v.set(val, evt);
+              }
             }" />
           </template>
 
@@ -301,7 +305,12 @@ const filteredGroups = computed(() => {
 });
 
 onMounted(async () => {
-  role.value = await validateUser();
+  const userRole = await validateUser();
+  if (!userRole) {
+    return;
+  }
+
+  role.value = userRole;
   await fetchRows();
 });
 
@@ -336,7 +345,7 @@ async function confirmAction() {
 
     let data = { ids: uniqueIds };
 
-    api.queue.chageQueueStatus(currentAction.value, data);
+    await api.queue.chageQueueStatus(currentAction.value, data);
 
     Notify.create({
       type: 'positive',

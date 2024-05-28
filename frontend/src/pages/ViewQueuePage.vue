@@ -201,7 +201,8 @@
 
     <q-table flat bordered color="primary" class="limited-table" ref="tableRef" :title="typeParam" :rows="rows"
       :columns="columns" v-model:pagination="pagination" :rows-per-page-options="[25, 100]" row-key="id"
-      selection="multiple" @selection="handleSelection" v-model:selected="selected" @request="request"
+      selection="multiple" @selection="handleSelection" v-model:selected="selected"
+      @request="(props) => request({ page: props.pagination.page, rowsPerPage: props.pagination.rowsPerPage })"
       :loading="loading">
       <template v-slot:body-cell-id="props">
         <q-td :props="props">
@@ -265,9 +266,12 @@
 
       <template v-slot:body-selection="scope">
         <q-checkbox v-if="checkPermission(role, 'controller')" :model-value="scope.selected" @update:model-value="(val, evt) => {
-          Object.getOwnPropertyDescriptor(scope, 'selected').set(val, evt);
-        }
-          " />
+          const v = Object.getOwnPropertyDescriptor(scope, 'selected');
+          if (v && v.set) {
+            // @ts-ignore
+            v.set(val, evt);
+          }
+        }" />
       </template>
     </q-table>
 
@@ -280,7 +284,7 @@
 
 <script setup lang="ts">
 import { AxiosError } from 'axios';
-import { Notify, QTableColumn } from 'quasar';
+import { Notify, QTableColumn, QTable } from 'quasar';
 import { errorRequest } from 'src/types';
 import colorsMixin from 'src/mixins/colorsMixin';
 import sessionMixin from 'src/mixins/sessionMixin';
@@ -306,14 +310,14 @@ const queueId = ref<string>('');
 const typeParam = ref<IJobState>('waiting');
 const listSelection = ref<string>('');
 
-const rows = ref<IJob[]>();
+const rows = ref<IJob[]>([]);
 const dash = ref<IQueueDash>();
 const jobCounts = ref<IQueueJobCounts>();
 const group = ref<IGroup>();
 const jobData = ref<IJob>();
 
 const selected = ref<IJob[]>([]);
-const storedSelectedRow = ref([]);
+const storedSelectedRow = ref<IJob>();
 const pagination = ref<{
   page: number,
   rowsPerPage: number,
@@ -391,8 +395,12 @@ const columns: QTableColumn[] = [
 ];
 
 onMounted(async () => {
-  role.value = await validateUser();
+  const userRole = await validateUser();
+  if (!userRole) {
+    return;
+  }
 
+  role.value = userRole;
   queueId.value = String(route.params?.id || '');
   typeParam.value = String(route.query?.type ? route.query?.type : 'waiting') as IJobState;
   listSelection.value = `${typeParam.value}-tab`;
@@ -840,24 +848,25 @@ async function fetchJob(jobId: string) {
 }
 
 async function request(props: {
-  pagination: {
-    page: number,
-    rowsPerPage: number,
-    rowsNumber: number,
-  }
+  page: number,
+  rowsPerPage: number
 }) {
-  pagination.value.page = props.pagination.page;
-  pagination.value.rowsPerPage = props.pagination.rowsPerPage;
+  pagination.value.page = props.page;
+  pagination.value.rowsPerPage = props.rowsPerPage;
 }
 
-function handleSelection({ rows, added, evt }) {
+function handleSelection({ rows, added, evt }: {
+  rows: readonly IJob[];
+  added: boolean;
+  evt: Event;
+}) {
   if (rows.length !== 1 || evt === void 0) {
     return;
   }
 
   const oldSelectedRow = storedSelectedRow.value;
   const [newSelectedRow] = rows;
-  const { ctrlKey, shiftKey } = evt;
+  const { ctrlKey, shiftKey } = evt as KeyboardEvent;
 
   if (shiftKey !== true) {
     storedSelectedRow.value = newSelectedRow;
@@ -877,8 +886,8 @@ function handleSelection({ rows, added, evt }) {
         [firstIndex, lastIndex] = [lastIndex, firstIndex];
       }
 
-      const rangeRows = tableRows.slice(firstIndex, lastIndex + 1).map(toRaw);
-      const selectedRows = selected.value.map(toRaw);
+      const rangeRows: IJob[] = tableRows.slice(firstIndex, lastIndex + 1).map(toRaw);
+      const selectedRows: IJob[] = selected.value.map(toRaw);
 
       selected.value = added ?
         selected.value = selectedRows.concat(
