@@ -41,7 +41,7 @@
       <div v-if="group.queues.length > 0" class="text-h6 q-my-md q-mt-xl cursor-pointer"
         @click="openGroup(group.group.id)">
         <q-icon name="table_view" size="1em" />
-        {{ group.queues[0].group.name }}
+        {{ group.queues?.[0]?.group?.name }}
       </div>
       <div v-if="group.queues.length > 0">
         <q-table flat bordered color="primary" :rows="group.queues" :columns="columns" row-key="id"
@@ -192,15 +192,19 @@
 </template>
 
 <script setup lang="ts">
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { onMounted, computed, ref } from 'vue';
 
 import colorsMixin from 'src/mixins/colorsMixin';
 import sessionMixin from 'src/mixins/sessionMixin';
 import { Notify, QTableColumn } from 'quasar';
 import { errorRequest } from 'src/types';
-import { DashboardItem, Queue } from 'src/types/QueueTypes';
 import { useRouter } from 'vue-router';
+import { Api } from 'src/api';
+import { IDashboardResponse } from 'src/types/group';
+import { IQueueDash } from 'src/types/queues';
+
+const api = new Api();
 
 const { calculateHealthColor, calculateStatusColor, calculateActionColor } = colorsMixin();
 const { validateUser, checkPermission } = sessionMixin();
@@ -209,11 +213,11 @@ const router = useRouter();
 
 const loading = ref(false);
 const role = ref<string>('');
-const groups = ref<DashboardItem[]>();
+const groups = ref<IDashboardResponse[]>();
 const showDialogActionConfirm = ref(false);
-const currentAction = ref<string>('');
+const currentAction = ref<'resume' | 'pause'>('pause');
 const filter = ref<string>('');
-const selected = ref<Queue[]>([]);
+const selected = ref<IQueueDash[]>([]);
 
 const columns: QTableColumn[] = [
   {
@@ -234,35 +238,35 @@ const columns: QTableColumn[] = [
     name: 'waiting',
     align: 'center',
     label: 'Waiting',
-    field: (row: Queue) => row.jobCounts.waiting,
+    field: (row: IQueueDash) => row.jobCounts.waiting,
     sortable: true
   },
   {
     name: 'paused',
     align: 'center',
     label: 'Paused',
-    field: (row: Queue) => row.jobCounts.paused,
+    field: (row: IQueueDash) => row.jobCounts.paused,
     sortable: true
   },
   {
     name: 'active',
     align: 'center',
     label: 'Active',
-    field: (row: Queue) => row.jobCounts.active,
+    field: (row: IQueueDash) => row.jobCounts.active,
     sortable: true
   },
   {
     name: 'delayed',
     align: 'center',
     label: 'Delayed',
-    field: (row: Queue) => row.jobCounts.delayed,
+    field: (row: IQueueDash) => row.jobCounts.delayed,
     sortable: true
   },
   {
     name: 'failed',
     align: 'center',
     label: 'Failed',
-    field: (row: Queue) => row.jobCounts.failed,
+    field: (row: IQueueDash) => row.jobCounts.failed,
     sortable: true
   },
   {
@@ -304,10 +308,8 @@ onMounted(async () => {
 async function fetchRows() {
   loading.value = true;
   try {
-    const response = await axios.get<DashboardItem[]>(
-      'group/dashboard'
-    );
-    groups.value = response.data;
+    const response = await api.group.getDashboard();
+    groups.value = response;
   } catch (err) {
     const error = err as AxiosError<errorRequest>;
     Notify.create({
@@ -334,10 +336,7 @@ async function confirmAction() {
 
     let data = { ids: uniqueIds };
 
-    await axios.put(
-      `queue/${currentAction.value}`,
-      data
-    );
+    api.queue.chageQueueStatus(currentAction.value, data);
 
     Notify.create({
       type: 'positive',

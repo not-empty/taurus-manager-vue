@@ -10,7 +10,7 @@
 
         <q-card-actions align="right">
           <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn flat :label="currentAction" :color="calculateActionColor(currentAction.value)"
+          <q-btn flat :label="currentAction" :color="calculateActionColor(currentAction)"
             @click="confirmAction" />
         </q-card-actions>
       </q-card>
@@ -143,13 +143,13 @@
 import { AxiosError } from 'axios';
 import { Notify } from 'quasar';
 import { errorRequest } from 'src/types';
-import { Queue } from 'src/types/QueueTypes';
 import colorsMixin from 'src/mixins/colorsMixin';
 import sessionMixin from 'src/mixins/sessionMixin';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { Api } from 'src/api';
 import { IGroup } from 'src/types/group';
+import { IQueueDash } from 'src/types/queues';
 
 const api = new Api();
 
@@ -166,7 +166,7 @@ const selectAll = ref<boolean | null>(false);
 
 const groupId = ref<string>('');
 const group = ref<IGroup>();
-const queues = ref<Queue[]>();
+const queues = ref<IQueueDash[]>();
 
 const selectedQueues = ref<string[]>([]);
 const showDialogActionConfirm = ref<boolean>(false);

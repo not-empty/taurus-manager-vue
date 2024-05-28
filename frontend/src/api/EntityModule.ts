@@ -66,7 +66,7 @@ export class EntityModule<T> extends Module {
     return result.data;
   }
 
-  public async deleteById(payload: string): Promise<void> {
-    await this.api.delete<T>(`/${this.path}/${payload}`);
+  public async deleteById(id: string): Promise<void> {
+    await this.api.delete<T>(`/${this.path}/${id}`);
   }
 }

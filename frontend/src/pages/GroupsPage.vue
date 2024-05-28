@@ -68,24 +68,27 @@
 </template>
 
 <script setup lang="ts">
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { Notify, QTableColumn } from 'quasar';
 import { errorRequest } from 'src/types';
-import { Group, ListGroup } from 'src/types/GroupTypes';
 import sessionMixin from 'src/mixins/sessionMixin';
 import { onMounted, ref } from 'vue';
+import { Api } from 'src/api';
+import { IGroup } from 'src/types/group';
+
+const api = new Api();
 
 const { validateUserRole } = sessionMixin();
 
 const entityName = 'Group';
 const showDialogSave = ref(false);
 const showDialogDeleteConfirm = ref<boolean>(false);
-const itemToDelete = ref<Group | null>(null);
+const itemToDelete = ref<IGroup | null>(null);
 const role = ref('');
 const row = ref({ id: '', name: '', description: '' });
 const isEditMode = ref(false);
 const filter = ref('');
-const rows = ref<Group[]>([]);
+const rows = ref<IGroup[]>([]);
 const columns : QTableColumn[] = [
   {
     name: 'id',
@@ -139,11 +142,8 @@ onMounted(async () => {
 
 async function fetchRows() {
   try {
-    const response = await axios.get<ListGroup>(
-      'group'
-    );
-
-    rows.value = response.data.data;
+    const response = await api.group.getPaginate();
+    rows.value = response.data;
   } catch (err) {
     const error = err as AxiosError<errorRequest>;
     Notify.create({
@@ -167,9 +167,7 @@ async function confirmDelete() {
       return;
     }
 
-    await axios.delete(
-      `group/${itemToDelete.value.id}`
-    );
+    await api.group.deleteById(itemToDelete.value.id);
 
     await fetchRows();
     Notify.create({
@@ -202,12 +200,12 @@ async function confirmDelete() {
 async function saveRow() {
   try {
     if (isEditMode.value) {
-      await axios.put(
-        `group/${row.value.id}`,
-        row.value
-      );
+      await api.group.put({
+        id: row.value.id,
+        data: row.value,
+      });
     } else {
-      await axios.post('group', row.value);
+      await api.group.newGroup(row.value);
     }
 
     Notify.create({
@@ -253,7 +251,7 @@ function editRow(rowData : {id: string, name: string, description: string} | nul
   showDialogSave.value = true;
 }
 
-function deleteRow(row: Group) {
+function deleteRow(row: IGroup) {
   itemToDelete.value = row;
   showDialogDeleteConfirm.value = true;
 }

@@ -146,13 +146,16 @@
 </template>
 
 <script setup lang="ts">
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { Notify } from 'quasar';
 import { errorRequest } from 'src/types';
-import { Queue } from 'src/types/QueueTypes';
 import colorsMixin from 'src/mixins/colorsMixin';
 import sessionMixin from 'src/mixins/sessionMixin';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { Api } from 'src/api';
+import { IQueueDash } from 'src/types/queues';
+
+const api = new Api();
 
 const { calculateHealthColor, calculateStatusColor, calculateActionColor, calculateProgress } = colorsMixin();
 const { validateUser, checkPermission } = sessionMixin();
@@ -162,10 +165,10 @@ const selectedQueues = ref<string[]>([]);
 
 const role = ref<string>('');
 
-const currentAction = ref<string>('');
+const currentAction = ref<'resume' | 'pause'>('pause');
 
 const filter = ref<string>('');
-const queues = ref<Queue[]>([]);
+const queues = ref<IQueueDash[]>([]);
 
 const autoRefresh = ref<boolean>(false);
 const autoRefreshIntervalId = ref<boolean | null>(null);
@@ -220,10 +223,8 @@ watch(filteredQueues, (filtered) => {
 async function fetchRows() {
   showSpinner.value = true;
   try {
-    const response = await axios.get<{ queues: Queue[] }>(
-      'group/monitor'
-    );
-    queues.value = response.data.queues;
+    const response = await api.group.getGroupMonitor();
+    queues.value = response.data;
   } catch (err) {
     const error = err as AxiosError<errorRequest>;
 
@@ -273,10 +274,12 @@ async function confirmAction() {
     let data = {
       ids: uniqueIds
     };
-    await axios.put(
-      `queue/${currentAction.value}`,
+
+    await api.queue.chageQueueStatus(
+      currentAction.value,
       data
     );
+
     clearSelection();
   } catch (err) {
     const error = err as AxiosError<errorRequest>;

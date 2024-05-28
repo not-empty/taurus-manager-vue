@@ -4,12 +4,14 @@ import axios, {
 } from 'axios';
 
 import { EntityModule } from './EntityModule';
-import { IUser, IUserAdd } from 'src/types/user';
+import { IUser, IUserAdd, IUserValidate } from 'src/types/user';
 import { ILogin } from 'src/types/auth';
 import { IGroup } from 'src/types/group';
 import { GroupEntityModule } from './EntityGroupModule';
 import { IQueue } from 'src/types/queues';
 import { QueueEntityModule } from './EntityQueueModule';
+
+import sessionMixin from 'src/mixins/sessionMixin';
 
 export class Api {
   private client: AxiosInstance;
@@ -29,6 +31,8 @@ export class Api {
       },
       withCredentials: true,
     });
+
+    this.interceptors();
 
     // modules
     this.user = this.getEntity('user');
@@ -50,6 +54,21 @@ export class Api {
     return new GroupEntityModule<T>({ path, api: this.client });
   }
 
+  private interceptors() {
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        console.log(error);
+        if (error.response && error.response.status === 401) {
+          sessionMixin().logoff();
+          return;
+        }
+
+        return Promise.reject(error);
+      }
+    );
+  }
+
   public async loginAuth(
     login: string,
     password: string,
@@ -67,5 +86,10 @@ export class Api {
     } catch (error) {
       return false;
     }
+  }
+
+  public async validate(): Promise<IUserValidate> {
+    const response = await this.client.post<IUserValidate>('user/validate', {});
+    return response.data;
   }
 }
