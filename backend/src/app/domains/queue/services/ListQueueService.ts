@@ -1,9 +1,12 @@
 import { inject, injectable } from 'tsyringe';
 import QueueRepository, { Queue } from '../repositories/QueueRepository';
+import { Filter, OrderBy } from '../../../core/BaseRepository';
 
 interface IRequest {
   page?: number;
   size?: number;
+  filters?: Filter<Queue>[];
+  order?: OrderBy<Queue>;
 }
 
 interface IResponse {
@@ -23,11 +26,15 @@ class ListQueueService {
   public async execute({
     page,
     size,
+    filters,
+    order,
   }: IRequest): Promise<IResponse> {
     const total = await this.queueRepository.count();
     const queues = await this.queueRepository.listWithGroup({
       page,
       limit: size,
+      filters,
+      order,
     });
 
     return {

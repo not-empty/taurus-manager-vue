@@ -6,6 +6,8 @@ import ListUserService from '../../services/ListUserService';
 import ShowUserService from '../../services/ShowUserService';
 import UpdateUserService from '../../services/UpdateUserService';
 import DeleteUserService from '../../services/DeleteUserService';
+import { getFilters, getOrderBy } from '../../../../core/BaseController';
+import { User } from '../../repositories/UserRepository';
 
 class UserController {
   public async validate(request: Request, response: Response): Promise<Response> {
@@ -47,6 +49,13 @@ class UserController {
     const users = await listUser.execute({
       page: page ? Number(page) : undefined,
       size: size ? Number(size) : undefined,
+      filters: getFilters<User>(request, ['name', 'login', 'role']),
+      order: getOrderBy<User>(request, [
+        'id',
+        'createdAt',
+        'updatedAt',
+        'deletedAt',
+      ]),
     });
     return response.json(instanceToInstance(users));
   }

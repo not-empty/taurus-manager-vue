@@ -1,6 +1,7 @@
 import {
   BaseEntity,
   BaseRepository,
+  Filter,
   ListOptions,
   PaginatedResult,
 } from '../../../core/BaseRepository';
@@ -42,11 +43,20 @@ export class QueueRepository extends BaseRepository<Queue> {
     const page = options.page || 1;
     const limit = options.limit || 25;
 
-    const data = await this.db<Queue>(this.tableName)
+    let query = this.db<Queue>(this.tableName)
       .select('queue.*', 'group.name as groupName')
       .where({ groupId })
-      .whereNull('queue.deletedAt')
-      .leftJoin<Group>('group', 'queue.groupId', 'group.id')
+      .whereNull('queue.deletedAt');
+
+    if (options.filters) {
+      query = this.applyFilters(query, options.filters as Filter<Queue>[], 'queue.');
+    }
+
+    if (options.order) {
+      query.orderBy(options.order.field, options.order.type);
+    }
+
+    const data = await query.leftJoin<Group>('group', 'queue.groupId', 'group.id')
       .offset((page - 1) * limit)
       .limit(limit);
 
@@ -74,11 +84,20 @@ export class QueueRepository extends BaseRepository<Queue> {
     const page = options.page || 1;
     const limit = options.limit || 25;
 
-    const data = await this.db<Queue>(this.tableName)
+    let query = this.db<Queue>(this.tableName)
       .select('queue.*', 'group.name as groupName')
       .whereNull('queue.deletedAt')
-      .leftJoin<Group>('group', 'queue.groupId', 'group.id')
-      .offset((page - 1) * limit)
+      .leftJoin<Group>('group', 'queue.groupId', 'group.id');
+
+    if (options.filters) {
+      query = this.applyFilters(query, options.filters as Filter<Queue>[], 'queue.');
+    }
+
+    if (options.order) {
+      query.orderBy(options.order.field, options.order.type);
+    }
+
+    const data = await query.offset((page - 1) * limit)
       .limit(limit);
 
     const result: QueueWithGroup[] = data.map((v) => {
