@@ -229,4 +229,21 @@ router.put(
   queueController.update,
 );
 
+router.post(
+  '/batch',
+  celebrate({
+    [Segments.BODY]: Joi.object({
+      ids: Joi.array().items(Joi.string().required()).required(),
+      data: Joi.object({
+        groupId: Joi.string(),
+        healthValue: Joi.number(),
+        description: Joi.string().allow(null, ''),
+        host: Joi.string(),
+        port: Joi.number(),
+      }),
+    }),
+  }),
+  queueController.batchUpdate,
+);
+
 export default router;
