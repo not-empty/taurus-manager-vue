@@ -20,6 +20,8 @@ import ResumeQueueService from '../../services/ResumeQueueService';
 import ShowQueueDashboardService from '../../services/ShowQueueDashboardService';
 import ShowQueueService from '../../services/ShowQueueService';
 import UpdateQueueService from '../../services/UpdateQueueService';
+import { getFilters, getOrderBy } from '../../../../core/BaseController';
+import { Queue } from '../../repositories/QueueRepository';
 
 class QueueController {
   public async cloneJob(
@@ -121,6 +123,13 @@ class QueueController {
     const queues = await listQueue.execute({
       page: page ? Number(page) : undefined,
       size: size ? Number(size) : undefined,
+      filters: getFilters<Queue>(request, ['name']),
+      order: getOrderBy<Queue>(request, [
+        'id',
+        'createdAt',
+        'updatedAt',
+        'deletedAt',
+      ]),
     });
     return response.json(instanceToInstance(queues));
   }

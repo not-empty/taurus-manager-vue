@@ -85,10 +85,15 @@ router.get(
 router.get(
   '/',
   celebrate({
-    [Segments.QUERY]: {
-      page: Joi.number(),
-      size: Joi.number(),
-    },
+    [Segments.QUERY]: Joi.object({
+      page: Joi.number().optional(),
+      size: Joi.number().optional(),
+      order: Joi.string()
+        .pattern(/^[a-zA-Z0-9_]+,(asc|desc)$/)
+        .optional(),
+    })
+      .pattern(/^filter_/, Joi.string().required())
+      .unknown(false),
   }),
   queueController.list,
 );
