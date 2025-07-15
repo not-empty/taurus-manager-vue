@@ -88,6 +88,19 @@ export class BaseRepository<T extends BaseEntity> {
     return id;
   }
 
+  public async bulkInsert(payloads: Array<Omit<T, keyof BaseEntity>>): Promise<string[]> {
+    const ids = payloads.map(() => this.generateId());
+    const insertPayloads = payloads.map((payload, index) => ({
+      id: ids[index],
+      ...payload,
+    }));
+
+    await this.db(this.tableName)
+      .insert(insertPayloads);
+
+    return ids;
+  }
+
   public async update(id: string, payload: Partial<Omit<T, keyof BaseEntity>>): Promise<boolean> {
     const date = new Date();
 

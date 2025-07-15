@@ -24,6 +24,7 @@ import ShowJobService from '../../../job/services/ShowJobService';
 import ShowQueueDashboardService from '../../services/ShowQueueDashboardService';
 import ShowQueueService from '../../services/ShowQueueService';
 import UpdateQueueService from '../../services/UpdateQueueService';
+import ImportQueuesService from '../../services/ImportQueuesService';
 
 class QueueController {
   public async cloneJob(
@@ -306,6 +307,27 @@ class QueueController {
     const batchUpdateQueue = container.resolve(BatchUpdateQueueService);
     const result = await batchUpdateQueue.execute({ ids, data: updateData });
     return response.json(result);
+  }
+
+  public async import(request: Request, response: Response): Promise<Response> {
+    const {
+      host,
+      port,
+      healthValue,
+      groupId,
+      password,
+    } = request.body;
+
+    const importQueues = container.resolve(ImportQueuesService);
+    const queue = await importQueues.execute({
+      host,
+      port,
+      userId: request.user.id,
+      password,
+      healthValue,
+      groupId,
+    });
+    return response.json(instanceToInstance(queue));
   }
 }
 

@@ -36,6 +36,20 @@ router.post(
 );
 
 router.post(
+  '/import',
+  celebrate({
+    [Segments.BODY]: {
+      host: Joi.string().required(),
+      port: Joi.number().required(),
+      groupId: Joi.string().required(),
+      password: Joi.string().required(),
+      healthValue: Joi.number().optional(),
+    },
+  }),
+  queueController.import,
+);
+
+router.post(
   '/:id/job',
   celebrate({
     [Segments.PARAMS]: {
