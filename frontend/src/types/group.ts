@@ -1,4 +1,4 @@
-import { IQueueDash } from './queues';
+import type { IQueueDash } from './queues';
 
 export interface IDashboardResponse {
   group: IGroup;

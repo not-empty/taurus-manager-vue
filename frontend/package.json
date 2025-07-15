@@ -1,41 +1,35 @@
 {
   "name": "taurus-manager-front",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Taurus Manager",
   "productName": "Taurus Manager",
   "author": "Not Empty",
   "scripts": {
-    "lint": "eslint --ext .js,.ts,.vue ./",
-    "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
-    "test": "echo \"No test specified\" && exit 0",
-    "dev": "quasar dev --host",
-    "build": "quasar build"
+    "dev": "vite --host",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@quasar/extras": "^1.16.9",
-    "axios": "^1.6.2",
-    "dotenv": "^16.3.1",
+    "@headlessui/vue": "^1.7.23",
+    "axios": "^1.10.0",
+    "flowbite": "^3.1.2",
+    "flowbite-vue": "^0.2.1",
     "js-cookie": "^3.0.5",
-    "quasar": "^2.14.2",
-    "vue": "^3.3.13",
-    "vue-router": "^4.2.5"
-  },
-  "engines": {
-    "node": "^20",
-    "npm": ">= 6.13.4",
-    "yarn": ">= 1.21.1"
+    "phosphor-icons": "^1.4.2",
+    "pinia": "^3.0.3",
+    "vue": "^3.5.17",
+    "vue-router": "^4.5.1",
+    "vue3-toastify": "^0.2.8"
   },
   "devDependencies": {
-    "@quasar/app-vite": "^1.7.1",
+    "@tailwindcss/vite": "^4.1.11",
     "@types/js-cookie": "^3.0.6",
-    "@types/node": "^20.10.5",
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
-    "@typescript-eslint/parser": "^6.15.0",
-    "autoprefixer": "^10.4.16",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-vue": "^9.19.2",
-    "prettier": "^3.1.1",
-    "typescript": "^5.3.3"
+    "@types/node": "^24.0.10",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "@vue/tsconfig": "^0.7.0",
+    "tailwindcss": "^4.1.11",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.0",
+    "vue-tsc": "^2.2.10"
   }
 }

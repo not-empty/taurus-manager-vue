@@ -41,16 +41,29 @@ export enum FilterType {
   FILTER_IN = 'in',
 }
 
-export interface Pagination {
+export interface Filter<T> {
+  field: keyof T & string;
+  value?: string;
+  type: FilterType;
+}
+
+export interface OrderBy<T> {
+  field: keyof T & string;
+  type: 'asc' | 'desc'
+}
+
+export interface Pagination<T> {
   page: number;
   size: number;
+  filters?: Filter<T>[];
+  order?: OrderBy<T>;
   total?: number,
   totalPages?: number,
 }
 
-export type PaginationPayload = Omit<Pagination, 'totalPages'>;
+export type PaginationPayload<T> = Omit<Pagination<T>, 'totalPages' | 'total'>;
 
 export interface PaginationResult<T> {
   data: T[];
-  pagination: Pagination;
+  pagination: Pagination<T>;
 }

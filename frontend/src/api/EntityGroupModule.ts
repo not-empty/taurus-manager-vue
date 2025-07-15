@@ -1,7 +1,7 @@
-import { IDashboardResponse, IGroup } from 'src/types/group';
+import type { IDashboardResponse, IGroup } from '@/types/group';
+import type { IQueueDash } from '@/types/queues';
+import type { ApiAddResponse, ApiListResponse } from './types';
 import { EntityModule } from './EntityModule';
-import { IQueueDash } from 'src/types/queues';
-import { ApiAddResponse, ApiListResponse } from './types';
 
 interface INewGroup {
   id: string;
