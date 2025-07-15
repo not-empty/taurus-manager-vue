@@ -65,7 +65,7 @@ class ShowGroupDashboardService {
         } catch (error) {
           describedQueue = {
             ...queue,
-            status: 'Unavailable',
+            status: 'unavailable',
             jobCounts: {
               waiting: -1,
               paused: -1,
