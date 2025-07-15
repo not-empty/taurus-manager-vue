@@ -53,8 +53,33 @@ class ShowGroupDashboardService {
     const describedQueues = await Promise.all(
       queues.map(async (queue) => {
         const queueProvider = this.newBullQueueProvider(queue);
-        const describedQueue = await queueProvider.describe();
-        await queueProvider.close();
+        let describedQueue;
+        try {
+          describedQueue = await Promise.race([
+            queueProvider.describe(),
+            new Promise((_, reject) => {
+              setTimeout(() => { reject(new Error('Timeout connecting to queue service')); }, 500);
+            }),
+          ]);
+          describedQueue.group = group;
+        } catch (error) {
+          describedQueue = {
+            ...queue,
+            status: 'Unavailable',
+            jobCounts: {
+              waiting: -1,
+              paused: -1,
+              active: -1,
+              delayed: -1,
+              failed: -1,
+              completed: -1,
+            },
+            group,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          };
+        } finally {
+          await queueProvider.close();
+        }
 
         return describedQueue;
       }),
