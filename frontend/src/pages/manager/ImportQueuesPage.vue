@@ -166,7 +166,6 @@ async function importQueues() {
     const error = err as AxiosError<ErrorRequest>;
     localStorage.removeItem('import_timeout');
     isImporting.value = false;
-    console.log('error: ', error);
     if (error.response?.status === 403) {
       toast.error('Wrong Authentication');
       return;

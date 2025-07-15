@@ -43,7 +43,6 @@ services:
       - "9000:9000"
     volumes:
       - ./frontend:/app
-      - /app/node_modules
     networks:
       - taurus-network
 

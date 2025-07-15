@@ -4,6 +4,7 @@
   "description": "Taurus Manager",
   "productName": "Taurus Manager",
   "author": "Not Empty",
+  "type": "module",
   "scripts": {
     "dev": "vite --host",
     "build": "vue-tsc -b && vite build",

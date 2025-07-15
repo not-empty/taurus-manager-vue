@@ -1,8 +1,11 @@
 import axios from 'axios';
+import router from '@/router';
+
 import type {
   AxiosInstance,
   AxiosResponse,
 } from 'axios';
+
 import type { IUser, IUserAdd, IUserValidate } from '@/types/user';
 import type { ILogin } from '@/types/auth';
 import type { IGroup } from '@/types/group';
@@ -12,8 +15,6 @@ import { GroupEntityModule } from './EntityGroupModule';
 import { QueueEntityModule } from './EntityQueueModule';
 import { EntityModule } from './EntityModule';
 import { API_URL } from '@/config/api';
-
-// const session = useSessionStore();
 
 export class Api {
   private client: AxiosInstance;
@@ -60,9 +61,8 @@ export class Api {
     this.client.interceptors.response.use(
       (response) => response,
       (error) => {
-        console.log(error);
         if (error.response && error.response.status === 401) {
-          // session.logout();
+          router.push('/logout');
           return;
         }
 
