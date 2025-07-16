@@ -7,7 +7,6 @@ interface IRequest {
   data: {
     groupId?: string;
     healthValue?: number;
-    description?: string;
     host?: string;
     port?: number;
   };
@@ -31,9 +30,8 @@ class BatchUpdateQueueService {
     const updatedQueues: Queue[] = [];
     for await (const queue of queues) {
       const updated: Partial<Queue> = { ...queue };
-      if (data.groupId !== undefined) updated.groupId = data.groupId;
-      if (data.healthValue !== undefined) updated.healthValue = data.healthValue;
-      if (data.description !== undefined) updated.description = data.description;
+      if (data.groupId) updated.groupId = data.groupId;
+      if (data.healthValue) updated.healthValue = data.healthValue;
       if (data.host !== undefined) updated.host = data.host;
       if (data.port !== undefined) updated.port = data.port;
 

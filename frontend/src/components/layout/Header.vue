@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-black text-white flex items-center justify-start gap-4 py-2">
+  <header class="bg-black text-white flex items-center justify-start gap-4 py-2 h-16">
     <button @click="collapsed = !collapsed" class="hover:text-shadow-white cursor-pointer w-16 flex justify-center items-center">
       <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
         xmlns="http://www.w3.org/2000/svg">
@@ -8,13 +8,16 @@
         </path>
       </svg>
     </button>
-    <img class="w-8 h-8" src="/taurus.svg" alt="logo">
-    <h1 class="text-xl font-bold">Taurus Manager</h1>
+    <router-link to="/" class="flex items-center gap-2 no-underline cursor-pointer">
+      <img class="w-8 h-8" src="/taurus.svg" alt="logo">
+      <h1 class="text-xl font-bold">Taurus Manager</h1>
+    </router-link>
   </header>
 </template>
 
 <script setup lang="ts">
 import { inject } from 'vue';
+import { RouterLink } from 'vue-router';
 
 const collapsed = inject('collapsed');
 </script>

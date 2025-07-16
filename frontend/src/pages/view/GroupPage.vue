@@ -14,7 +14,8 @@
         <label class="text-white mr-4">Select All</label>
 
         <fwb-button @click="pauseSelected" :disabled="selectedQueues.length === 0" class="pause-btn">Pause</fwb-button>
-        <fwb-button @click="resumeSelected" :disabled="selectedQueues.length === 0" class="resume-btn">Resume</fwb-button>
+        <fwb-button @click="resumeSelected" :disabled="selectedQueues.length === 0"
+          class="resume-btn">Resume</fwb-button>
       </template>
 
       <fwb-button color="dark" @click="fetchRows" v-if="!autoRefresh">
@@ -29,12 +30,12 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
     <div v-for="queue in filteredQueues" :key="queue.id">
-      <div class="rounded-lg border p-4 shadow-md bg-neutral-900 text-white hover:bg-neutral-800 transition-all"
+      <div class="rounded-lg border border-solid border-neutral-600 p-4 shadow-md bg-neutral-900 text-white hover:bg-neutral-800 transition-all"
         :class="{ 'ring-2 ring-green-500': isSelected(queue.id) }">
         <div class="flex items-center justify-between mb-4">
           <template v-if="hasMinRole('controller')">
             <fwb-checkbox class="cursor-pointer" :value="isSelected(queue.id)" @change="toggleSelection(queue.id)" />
-            <label class="ml-2 font-bold text-2xl ">{{ queue.name }}</label>
+            <label class="ml-2 font-bold text-2xl w-100 whitespace-nowrap" style="overflow: hidden; textOverflow: ellipsis">{{ queue.name }}</label>
           </template>
           <template v-else>
             <div class="font-bold text-lg">{{ queue.name }}</div>

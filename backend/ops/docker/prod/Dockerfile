@@ -1,4 +1,4 @@
-FROM node:16.20.2 as build
+FROM node:20.10.0 as build
 WORKDIR /app
 COPY ./package.json .
 COPY ./package-lock.json .
@@ -6,11 +6,11 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:16.20.2
+FROM node:20.10.0
 WORKDIR /app
 COPY --from=build ./app/node_modules ./node_modules
-COPY --from=build ./app/build ./build
+COPY --from=build ./app/build ./
 COPY --from=build ./app/package.json .
-COPY --from=build ./app/.env .
+COPY ./.env .
 EXPOSE 3333
-CMD ["npm","start"]
+CMD ["npm", "start"]

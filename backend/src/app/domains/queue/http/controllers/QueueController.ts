@@ -291,7 +291,7 @@ class QueueController {
       return response.status(400).json({ error: 'No IDs provided for batch update.' });
     }
 
-    const allowedFields = ['groupId', 'healthValue', 'description', 'host', 'port'];
+    const allowedFields = ['groupId', 'healthValue', 'host', 'port'];
     const updateData: Record<string, any> = {};
 
     for (const key of allowedFields) {
