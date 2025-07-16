@@ -9,10 +9,8 @@
 
     <div class="flex items-center gap-3">
       <template v-if="hasMinRole('controller')">
-        <input type="checkbox" :checked="selectAll"
-          @change="toggleSelectAll(($event.target as HTMLInputElement).checked)" />
+        <fwb-checkbox class="cursor-pointer mr-0" v-model="selectAll" @change="toggleSelectAll(($event.target as HTMLInputElement).checked)" />
         <label class="text-white mr-4">Select All</label>
-
         <fwb-button @click="pauseSelected" :disabled="selectedQueues.length === 0" class="pause-btn">Pause</fwb-button>
         <fwb-button @click="resumeSelected" :disabled="selectedQueues.length === 0"
           class="resume-btn">Resume</fwb-button>
@@ -34,7 +32,7 @@
         :class="{ 'ring-2 ring-green-500': isSelected(queue.id) }">
         <div class="flex items-center justify-between mb-4">
           <template v-if="hasMinRole('controller')">
-            <fwb-checkbox class="cursor-pointer" :value="isSelected(queue.id)" @change="toggleSelection(queue.id)" />
+            <fwb-checkbox class="cursor-pointer" :model-value="isSelected(queue.id)" @change="toggleSelection(queue.id)" />
             <label class="ml-2 font-bold text-2xl w-100 whitespace-nowrap" style="overflow: hidden; textOverflow: ellipsis">{{ queue.name }}</label>
           </template>
           <template v-else>

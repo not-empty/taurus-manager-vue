@@ -5,7 +5,7 @@
       <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-neutral-900 dark:text-white">
         <tr>
           <th v-if="selectable && data.length > 0" class="px-6 py-3">
-            <input type="checkbox" :checked="isAllSelected" @change="toggleAll" class="cursor-pointer" />
+            <fwb-checkbox class="cursor-pointer" v-model="isAllSelected" @change="toggleAll" />
           </th>
           <th v-for="column of columns" :key="column.name" scope="col" class="px-6 py-3">
             <div class="flex items-center gap-1">
@@ -30,7 +30,7 @@
           onRowClick(row);
         }">
             <td v-if="selectable" @click.stop class="px-6 py-4">
-              <input type="checkbox" :checked="isSelected(row)" @change="() => toggleRow(row)" class="cursor-pointer" />
+              <fwb-checkbox class="cursor-pointer"  :model-value="isSelected(row)" @change="() => toggleRow(row)" />
             </td>
 
             <td scope="row" v-for="column of columns" :key="column.name" :class="[
@@ -99,6 +99,7 @@
 
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
+import { FwbCheckbox } from 'flowbite-vue';
 
 export interface TableColumn<T> {
   name: string;
