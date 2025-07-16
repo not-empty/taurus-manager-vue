@@ -57,7 +57,6 @@ export interface IQueueJobCounts {
 export interface IQueueBatchEdit {
   groupId?: string;
   healthValue?: number;
-  description?: string;
   host?: string;
   port?: number;
 }

@@ -34,7 +34,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <div v-for="queue in filteredQueues" :key="queue.id">
-        <div class="rounded-lg border p-4 shadow-md bg-neutral-900 text-white hover:bg-neutral-800 transition-all"
+        <div class="rounded-lg border border-solid border-neutral-600 p-4 shadow-md bg-neutral-900 text-white hover:bg-neutral-800 transition-all"
           :class="{ 'ring-2 ring-green-500': isSelected(queue.id) }">
           <div class="flex items-center justify-between mb-4">
             <template v-if="hasMinRole('controller')">

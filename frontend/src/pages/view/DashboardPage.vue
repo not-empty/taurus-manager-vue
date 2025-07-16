@@ -8,7 +8,7 @@
         </template>
       </fwb-input>
       <div class="flex items-center gap-3">
-        <fwb-button color="light" :onclick="fetchRows" class="cursor-pointer">
+        <fwb-button color="dark" :onclick="fetchRows" class="cursor-pointer">
           <div class="flex items-center gap-2">
             <i class="ph ph-bold ph-arrow-clockwise"></i>
             Refresh
@@ -36,7 +36,7 @@
       <i class="ph-grid-four ph-fill"></i>
       {{ group.queues?.[0]?.group?.name }}
     </div>
-    <TableData v-if="group.queues.length > 0" :selectable="hasMinRole('controller')" :columns="columns"
+    <TableData :loading="loading" v-if="group.queues.length > 0" :selectable="hasMinRole('controller')" :columns="columns"
       :data="group.queues" @update:selected="rows => selected = rows" @row-click="onRowClick">
       <template v-slot:body-cell-healthValue="{ row }">
         <fwb-badge :type="calculateHealthColor(row.healthValue, row.jobCounts.waiting, row.jobCounts.paused)"
@@ -96,7 +96,10 @@ const columns: TableColumn<IQueueDash>[] = [
     label: 'Name',
     field: 'name',
     sortable: true,
-    icon: 'browsers ph-fill'
+    icon: 'browsers ph-fill',
+    width: '20em',
+    minWidth: '20em',
+    maxWidth: '20em',
   },
   {
     name: 'waiting',

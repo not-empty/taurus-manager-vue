@@ -249,9 +249,8 @@ router.post(
     [Segments.BODY]: Joi.object({
       ids: Joi.array().items(Joi.string().required()).required(),
       data: Joi.object({
-        groupId: Joi.string(),
-        healthValue: Joi.number(),
-        description: Joi.string().allow(null, ''),
+        groupId: Joi.string().allow(null, ''),
+        healthValue: Joi.number().allow(null, ''),
         host: Joi.string(),
         port: Joi.number(),
       }),

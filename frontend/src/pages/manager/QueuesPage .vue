@@ -43,8 +43,6 @@
       <Input label="Port*" name="port" v-model="batchEditSafe.port" type="number" />
 
       <Input label="Health Value" name="healthValue" v-model="batchEditSafe.healthValue" type="number" />
-
-      <Input label="Description" name="description" v-model="batchEditSafe.description" type="text" />
     </ModalBody>
 
     <ModalFooter>
@@ -122,7 +120,6 @@ const batchEdit = ref<IQueueBatchEdit>({});
 const batchEditSafe = computed(() => ({
   groupId: batchEdit.value.groupId ?? '',
   healthValue: batchEdit.value.healthValue ?? '',
-  description: batchEdit.value.description ?? '',
   host: batchEdit.value.host ?? '',
   port: batchEdit.value.port ?? '',
 }));
@@ -383,7 +380,6 @@ function openBatchEditModal() {
   batchEdit.value = {
     groupId: getCommonValue(item => item.group?.id),
     healthValue: getCommonValue(item => item.healthValue),
-    description: getCommonValue(item => item.description),
     host: getCommonValue(item => item.host),
     port: getCommonValue(item => item.port),
   };

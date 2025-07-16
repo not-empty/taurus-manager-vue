@@ -106,7 +106,7 @@ const actions: TableAction<IUser>[] = [
     onClick: editRow
   },
   {
-    icon: 'pencil-simple',
+    icon: 'users',
     label: 'Edit Groups',
     name: 'edit-groups',
     onClick: editGroups
