@@ -15,7 +15,7 @@ services:
     security_opt:
       - seccomp:unconfined
     networks:
-      - taurus-network
+      - vault-network
 
   taurus-manager-back:
     build:
@@ -29,7 +29,7 @@ services:
     volumes:
       - ./backend:/app
     networks:
-      - taurus-network
+      - vault-network
 
   taurus-manager-front:
     build:
@@ -44,8 +44,8 @@ services:
     volumes:
       - ./frontend:/app
     networks:
-      - taurus-network
+      - vault-network
 
 networks:
-    taurus-network:
-      name: taurus-network
+    vault-network:
+      name: vault-network

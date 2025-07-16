@@ -2,13 +2,13 @@
   <div class="flex flex-col justify-start gap-6 mb-5">
     <Breadcrumb />
     <div class="flex flex-row justify-between">
-      <fwb-input v-model="filter" placeholder="Filter in queues">
+      <fwb-input v-model="filter" placeholder="Filter in queues" class="dark:bg-neutral-800 dark:border-neutral-600 dark:placeholder-neutral-400 dark:text-white">
         <template #prefix>
           <i class="ph ph-magnifying-glass text-xl"></i>
         </template>
       </fwb-input>
       <div class="flex items-center gap-3">
-        <fwb-button color="light" :onclick="fetchRows" class="cursor-pointer">
+        <fwb-button color="light" :onclick="fetchRows" class="cursor-pointer hover:bg-gray-700">
           <div class="flex items-center gap-2">
             <i class="ph ph-bold ph-arrow-clockwise"></i>
             Refresh

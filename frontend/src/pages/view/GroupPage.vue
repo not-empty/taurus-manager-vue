@@ -1,7 +1,7 @@
 <template>
   <Breadcrumb :group="group" class="mb-6" />
   <div class="flex justify-between items-center mb-6">
-    <fwb-input v-model="filter" placeholder="Filter in queues">
+    <fwb-input v-model="filter" placeholder="Filter in queues" class="">
       <template #prefix>
         <i class="ph ph-magnifying-glass text-xl"></i>
       </template>

@@ -2,10 +2,10 @@
   <nav class="flex items-center flex-column flex-wrap md:flex-row justify-end pt-4" aria-label="Table navigation">
     <ul class="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
         <li>
-            <a href="#" @click="onChangePage(page - 1)" class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-neutral-500 bg-white border border-neutral-300 rounded-s-lg hover:bg-neutral-100 hover:text-neutral-700 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-white">Previous</a>
+            <a href="#" @click="onChangePage(page - 1)" class="flex items-center justify-center px-3 h-8 ms-0 leading-tight border rounded-s-lg bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700 hover:text-white">Previous</a>
         </li>
         <li v-for="p in visiblePages" :key="p.key" class="page-item">
-          <a href="#" v-if="p.type === 'ellipsis'" :class="['page-link', p.number === page ? 'active' : '']" @click="onChangePage(Number(p.number || 1))" class="flex items-center justify-center px-3 h-8 leading-tight text-neutral-500 bg-white border border-neutral-300 hover:bg-neutral-100 hover:text-neutral-700 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-white">
+          <a href="#" v-if="p.type === 'ellipsis'" :class="['page-link', p.number === page ? 'active' : '']" @click="onChangePage(Number(p.number || 1))" class="flex items-center justify-center px-3 h-8 leading-tight border bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700 hover:text-white">
             ...
           </a>
           <a
@@ -14,14 +14,14 @@
             @click="onChangePage(Number(p.number || 1))"
             :class="[
               'flex items-center justify-center px-3 h-8 leading-tight',
-              p.number === page ? 'text-blue-600 border border-neutral-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-neutral-700 dark:bg-neutral-700 dark:text-white' : 'text-neutral-500 bg-white border border-neutral-300 hover:bg-neutral-100 hover:text-neutral-700 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-white',
+              p.number === page ? 'border border-neutral-700 bg-neutral-700 text-white' : 'border bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700 hover:text-white',
             ]"
           >
             {{ p.number }}
           </a>
         </li>
         <li>
-          <a href="#" @click="onChangePage(page + 1)" class="flex items-center justify-center px-3 h-8 leading-tight text-neutral-500 bg-white border border-neutral-300 rounded-e-lg hover:bg-neutral-100 hover:text-neutral-700 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-white">Next</a>
+          <a href="#" @click="onChangePage(page + 1)" class="flex items-center justify-center px-3 h-8 leading-tight border rounded-e-lg bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700 hover:text-white">Next</a>
         </li>
     </ul>
 </nav>

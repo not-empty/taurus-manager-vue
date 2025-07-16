@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @import "flowbite-vue/index.css";
 
 @plugin "flowbite/plugin";

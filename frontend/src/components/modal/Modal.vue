@@ -11,7 +11,7 @@
           <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
             enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
             leave-to="opacity-0 scale-95">
-            <DialogPanel class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700 w-2xl">
+            <DialogPanel class="relative rounded-lg shadow-sm bg-neutral-800 w-2xl">
               <slot />
             </DialogPanel>
           </TransitionChild>
@@ -19,7 +19,6 @@
       </div>
     </Dialog>
   </TransitionRoot>
-
 </template>
 
 <script setup lang="ts">

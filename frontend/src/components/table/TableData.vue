@@ -1,6 +1,6 @@
 <template>
-  <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-white">
-    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-neutral-900 dark:text-white">
+  <table class="w-full text-sm text-left rtl:text-right text-white">
+    <thead class="text-xs uppercase bg-neutral-900 text-white">
       <tr>
         <th v-if="selectable && data.length > 0" class="px-6 py-3">
           <input type="checkbox" :checked="isAllSelected" @change="toggleAll" class="cursor-pointer" />
@@ -19,7 +19,7 @@
     <tbody>
       <template v-if="data.length > 0">
         <tr v-for="(row, index) in data" :key="index" :class="[
-          'bg-white dark:bg-neutral-800 dark:border-neutral-700 border-gray-200 hover:bg-gray-50 border-b-1 dark:hover:bg-neutral-700',
+          'bg-neutral-800 border-neutral-700 border-b-1 hover:bg-neutral-700',
           applyRowClass ? applyRowClass(row) : ''
         ]" @click="(e) => {
           if (!onRowClick) return;
@@ -32,7 +32,7 @@
           </td>
 
           <td scope="row" v-for="column of columns" :key="column.name" :class="[
-            'px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white',
+            'px-6 py-4 font-medium whitespace-nowrap text-white',
             column.class,
             onRowClick ? 'cursor-pointer' : ''
           ]" style="color: inherit !important; background-color: inherit !important;" @click="(e) => {
@@ -57,7 +57,7 @@
             style="color: inherit !important; background-color: inherit !important;">
             <template v-for="action of actions" :key="action.name">
               <button v-if="!action.hide || !action.hide(row)" type="button"
-                class="text-blue-700 cursor-pointer border border-blue-700 hover:bg-blue-700 hover:text-white font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 dark:border-neutral-500 dark:text-neutral-500 dark:hover:text-white dark:hover:bg-neutral-500"
+                class="cursor-pointer border font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 border-neutral-500 text-neutral-500 hover:text-white hover:bg-neutral-500"
                 @click="(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -72,8 +72,8 @@
       </template>
       <template v-else>
         <tr
-          class="bg-white dark:bg-neutral-800 dark:border-neutral-700 border-gray-200 hover:bg-gray-50 border-b-1 dark:hover:bg-neutral-700">
-          <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          class="bg-neutral-800 border-neutral-700 border-b-1 hover:bg-neutral-700">
+          <td scope="row" class="px-6 py-4 font-medium whitespace-nowrap text-white"
             :colspan="columns.length" style="color: inherit !important; background-color: inherit !important;">
             No data available
           </td>

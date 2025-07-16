@@ -4,7 +4,7 @@
 
     <ModalBody>
       <textarea v-model="jsonInput"
-        class="w-full p-2 border rounded-md text-sm font-mono bg-white dark:bg-neutral-800 dark:text-white dark:border-neutral-700"
+        class="w-full p-2 border rounded-md text-sm font-mono bg-neutral-800 text-white border-neutral-700"
         rows="10" placeholder='Enter JSON Here'></textarea>
       <p v-if="jsonError" class="text-red-500 text-sm mt-1">{{ jsonError }}</p>
     </ModalBody>
@@ -18,46 +18,46 @@
   <Modal :show="detailJobModal" @close="() => (detailJobModal = false)">
     <ModalTitle @close="() => (detailJobModal = false)">Job Information</ModalTitle>
 
-    <ModalBody v-if="selectedJob" class="space-y-4 text-sm text-gray-700 dark:text-white">
+    <ModalBody v-if="selectedJob" class="space-y-4 text-sm text-white">
       <div>
-        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">ID</label>
+        <label class="block text-xs font-medium text-gray-400">ID</label>
         <input type="text"
-          class="w-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded px-3 py-2"
+          class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2"
           :value="selectedJob.id" readonly />
       </div>
 
       <div>
-        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Status</label>
+        <label class="block text-xs font-mediu text-gray-400">Status</label>
         <input type="text"
-          class="w-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded px-3 py-2"
+          class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2"
           :value="selectedJob.state" readonly />
       </div>
 
       <div>
-        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Attempts Made</label>
+        <label class="block text-xs font-medium text-gray-400">Attempts Made</label>
         <input type="text"
-          class="w-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded px-3 py-2"
+          class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2"
           :value="selectedJob.attemptsMade" readonly />
       </div>
 
       <div>
-        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Data</label>
+        <label class="block text-xs font-medium text-gray-400">Data</label>
         <textarea
-          class="w-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded px-3 py-2"
+          class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2"
           :value="JSON.stringify(selectedJob.data, null, 2)" rows="4" readonly></textarea>
       </div>
 
       <div v-if="selectedJob.failedReason">
-        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Failed Reason</label>
+        <label class="block text-xs font-medium text-gray-400">Failed Reason</label>
         <textarea
-          class="w-full bg-red-50 dark:bg-red-950 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 rounded px-3 py-2"
+          class="w-full bg-red-950 borderborder-red-700 text-red-400 rounded px-3 py-2"
           :value="selectedJob.failedReason" rows="2" readonly></textarea>
       </div>
 
       <div v-if="selectedJob.stacktrace">
-        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400">Trace</label>
+        <label class="block text-xs font-medium text-gray-400">Trace</label>
         <textarea
-          class="w-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded px-3 py-2"
+          class="w-full bg-neutral-800 border border-neutral-700 rounded px-3 py-2"
           :value="String(selectedJob.stacktrace)" rows="8" readonly></textarea>
       </div>
     </ModalBody>
@@ -143,16 +143,17 @@
   <div v-if="dashboard" class="flex gap-4 flex-wrap mt-4">
     <div class="flex-auto cursor-pointer" v-for="state in jobStates" :key="state" @click="selectJobState(state, 1)">
       <fwb-card :class="[
+        '!bg-neutral-800 !border-neutral-700',
         'transition duration-200',
         jobState === state
           ? 'ring-2 ring-blue-500'
-          : 'hover:ring-2 hover:ring-gray-300 dark:hover:ring-gray-600'
+          : 'hover:ring-2 hover:ring-gray-600'
       ]">
         <div class="p-5">
-          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+          <h5 class="mb-2 text-2xl font-bold tracking-tight text-white">
             {{ state }}
           </h5>
-          <p class="font-normal text-gray-700 dark:text-gray-400">
+          <p class="font-normal text-gray-400">
             {{ dashboard?.jobCounts[state] ?? 0 }}
           </p>
         </div>
