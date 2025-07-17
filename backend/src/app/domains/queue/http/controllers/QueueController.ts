@@ -1,25 +1,30 @@
+import { container } from 'tsyringe';
 import { instanceToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
-import { container } from 'tsyringe';
+import { getFilters, getOrderBy } from '../../../../core/BaseController';
 import { JobState } from '../../../../providers/QueueProvider/types';
+import { Queue } from '../../repositories/QueueRepository';
+
+import BatchUpdateQueueService from '../../services/BatchUpdateQueueService';
 import CloneJobService from '../../../job/services/CloneJobService';
 import CreateJobService from '../../../job/services/CreateJobService';
+import CreateQueueService from '../../services/CreateQueueService';
 import DeleteJobService from '../../../job/services/DeleteJobService';
+import DeleteQueueService from '../../services/DeleteQueueService';
 import ExportJobService from '../../../job/services/ExportJobService';
 import ListJobService from '../../../job/services/ListJobService';
-import RetryAllJobService from '../../../job/services/RetryAllJobService';
-import RetryJobService from '../../../job/services/RetryJobService';
-import ShowJobService from '../../../job/services/ShowJobService';
-import CreateQueueService from '../../services/CreateQueueService';
-import DeleteQueueService from '../../services/DeleteQueueService';
 import ListQueueService from '../../services/ListQueueService';
 import PauseQueueBulkService from '../../services/PauseQueueBulkService';
 import PauseQueueService from '../../services/PauseQueueService';
 import ResumeQueueBulkService from '../../services/ResumeQueueBulkService';
 import ResumeQueueService from '../../services/ResumeQueueService';
+import RetryAllJobService from '../../../job/services/RetryAllJobService';
+import RetryJobService from '../../../job/services/RetryJobService';
+import ShowJobService from '../../../job/services/ShowJobService';
 import ShowQueueDashboardService from '../../services/ShowQueueDashboardService';
 import ShowQueueService from '../../services/ShowQueueService';
 import UpdateQueueService from '../../services/UpdateQueueService';
+import ImportQueuesService from '../../services/ImportQueuesService';
 
 class QueueController {
   public async cloneJob(
@@ -121,6 +126,13 @@ class QueueController {
     const queues = await listQueue.execute({
       page: page ? Number(page) : undefined,
       size: size ? Number(size) : undefined,
+      filters: getFilters<Queue>(request, ['name']),
+      order: getOrderBy<Queue>(request, [
+        'id',
+        'createdAt',
+        'updatedAt',
+        'deletedAt',
+      ]),
     });
     return response.json(instanceToInstance(queues));
   }
@@ -263,6 +275,55 @@ class QueueController {
       compliance,
       host,
       port,
+      healthValue,
+      groupId,
+    });
+    return response.json(instanceToInstance(queue));
+  }
+
+  public async batchUpdate(
+    request: Request,
+    response: Response,
+  ): Promise<Response> {
+    const { ids, data } = request.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return response.status(400).json({ error: 'No IDs provided for batch update.' });
+    }
+
+    const allowedFields = ['groupId', 'healthValue', 'host', 'port'];
+    const updateData: Record<string, any> = {};
+
+    for (const key of allowedFields) {
+      if (Object.prototype.hasOwnProperty.call(data, key) && data[key] !== undefined) {
+        updateData[key] = data[key];
+      }
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return response.status(400).json({ error: 'No valid fields to update.' });
+    }
+
+    const batchUpdateQueue = container.resolve(BatchUpdateQueueService);
+    const result = await batchUpdateQueue.execute({ ids, data: updateData });
+    return response.json(result);
+  }
+
+  public async import(request: Request, response: Response): Promise<Response> {
+    const {
+      host,
+      port,
+      healthValue,
+      groupId,
+      password,
+    } = request.body;
+
+    const importQueues = container.resolve(ImportQueuesService);
+    const queue = await importQueues.execute({
+      host,
+      port,
+      userId: request.user.id,
+      password,
       healthValue,
       groupId,
     });

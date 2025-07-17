@@ -9,6 +9,8 @@ import ListGroupService from '../../services/ListGroupService';
 import ShowGroupDashboardService from '../../services/ShowGroupDashboardService';
 import ShowGroupService from '../../services/ShowGroupService';
 import UpdateGroupService from '../../services/UpdateGroupService';
+import { getFilters, getOrderBy } from '../../../../core/BaseController';
+import { Group } from '../../repositories/GroupRepository';
 
 class GroupController {
   public async create(request: Request, response: Response): Promise<Response> {
@@ -34,6 +36,13 @@ class GroupController {
     const groups = await listGroup.execute({
       page: page ? Number(page) : undefined,
       size: size ? Number(size) : undefined,
+      filters: getFilters<Group>(request, ['name']),
+      order: getOrderBy<Group>(request, [
+        'id',
+        'createdAt',
+        'updatedAt',
+        'deletedAt',
+      ]),
     });
     return response.json(groups);
   }

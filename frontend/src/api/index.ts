@@ -1,17 +1,20 @@
-import axios, {
+import axios from 'axios';
+import router from '@/router';
+
+import type {
   AxiosInstance,
   AxiosResponse,
 } from 'axios';
 
-import { EntityModule } from './EntityModule';
-import { IUser, IUserAdd, IUserValidate } from 'src/types/user';
-import { ILogin } from 'src/types/auth';
-import { IGroup } from 'src/types/group';
-import { GroupEntityModule } from './EntityGroupModule';
-import { IQueue } from 'src/types/queues';
-import { QueueEntityModule } from './EntityQueueModule';
+import type { IUser, IUserAdd, IUserValidate } from '@/types/user';
+import type { ILogin } from '@/types/auth';
+import type { IGroup } from '@/types/group';
+import type { IQueue } from '@/types/queues';
 
-import sessionMixin from 'src/mixins/sessionMixin';
+import { GroupEntityModule } from './EntityGroupModule';
+import { QueueEntityModule } from './EntityQueueModule';
+import { EntityModule } from './EntityModule';
+import { API_URL } from '@/config/api';
 
 export class Api {
   private client: AxiosInstance;
@@ -24,7 +27,7 @@ export class Api {
 
   constructor() {
     this.client = axios.create({
-      baseURL: process.env.VUE_APP_API_URL,
+      baseURL: API_URL,
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -58,9 +61,8 @@ export class Api {
     this.client.interceptors.response.use(
       (response) => response,
       (error) => {
-        console.log(error);
         if (error.response && error.response.status === 401) {
-          sessionMixin().logoff();
+          router.push('/logout');
           return;
         }
 

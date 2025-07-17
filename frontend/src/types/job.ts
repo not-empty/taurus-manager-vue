@@ -4,16 +4,17 @@ export interface IJob {
   attemptsMade: number;
   name: string;
   timestamp: number;
-  createdAt?: string;
   processedAt?: string;
   finishedAt?: string;
   state: IJobState;
   canRetry: boolean;
   failedReason?: string;
   stacktrace?: IJobStacktrace[] | string;
+  createdAt: Date;
 };
 
-export type IJobState = 'waiting' | 'active' | 'delayed' | 'failed' | 'completed';
+export const jobStates = ['waiting', 'paused', 'active', 'delayed', 'failed', 'completed'] as const;
+export type IJobState = typeof jobStates[number];
 
 type IJobStacktrace = {
   order: number;

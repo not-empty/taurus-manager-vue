@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  taurus-manager-back:
+    build:
+      context: ./backend/
+      dockerfile: ./ops/docker/prod/Dockerfile
+    container_name: taurus-manager-back
+    ports:
+      - "3333:3333"
+    restart: always
+
+  taurus-manager-front:
+    build:
+      context: ./frontend/
+      dockerfile: ./ops/docker/prod/Dockerfile
+    container_name: taurus-manager-front
+    ports:
+      - "9000:80"
+    restart: always

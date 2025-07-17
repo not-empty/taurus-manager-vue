@@ -1,7 +1,7 @@
 import { Module } from './Module';
 import { prepareQuery } from './query';
 
-import {
+import type {
   ApiAddResponse,
   ApiDetailResponse,
   ApiListResponse,
@@ -25,7 +25,7 @@ export class EntityModule<T> extends Module {
   }
 
   public async getPaginate(
-    payload: PaginationPayload = {
+    payload: PaginationPayload<T> = {
       page: 1,
       size: 25,
     },

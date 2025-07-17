@@ -1,48 +1,44 @@
 <template>
-  <q-page class="bg-external" style="position: relative; height: 100vh">
-    <div class="absolute-full row flex-center">
-      <q-card :class="{ 'shake-animation': shakeError }" class="login-card q-pa-lg" style="width: 350px">
-        <q-card-section class="q-pb-none">
-          <img :src="'/taurus.png'" :style="{
-            display: 'block',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            marginBottom: '35px'
-          }" />
-          <div class="text-h6 text-center q-mb-md taurus-login-title">
-            Taurus Manager <span class="taurus-login-version">v2.0.0</span>
+  <section class="bg-gray-900 h-full w-full">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto h-full w-full">
+      <div
+        class="w-full rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0 bg-gray-800 border-gray-700">
+        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+          <div class="flex justify-center items-center">
+            <img class="w-32 h-32 mr-2" src="/taurus.svg" alt="logo">
           </div>
-        </q-card-section>
-        <form @submit.prevent="handleLogin">
-          <q-card-section class="q-pt-none">
-            <q-input filled v-model="login" placeholder="Login" class="q-mb-md" ref="loginInput" autofocus
-              autocomplete="current-username" @keyup.enter="focusOnPass" />
-            <q-input filled v-model="password" placeholder="Password" type="password" ref="passInput"
-              autocomplete="current-password" @keyup.enter="handleLogin" />
-          </q-card-section>
-        </form>
-        <q-card-section class="q-pt-none">
-          <q-btn label="LOGIN" color="primary" class="full-width" @click="handleLogin" />
-        </q-card-section>
-      </q-card>
-    </div>
-    <div class="footer">
-      <div>© 2023 - made with ♥ by Not Empty Free Software Foundation.</div>
-      <div class="q-mt-xs">
-        <a href="https://github.com/not-empty" target="_blank" class="text-white q-mr-md">Not Empty</a>
-        <a href="https://github.com/not-empty/taurus-manager-vue" target="_blank" class="text-white">Github
-          Repository</a>
+          <form class="space-y-4 md:space-y-6" action="#" @submit="handleLogin">
+            <div>
+              <label for="login" class="block mb-2 text-sm font-medium text-white">Login</label>
+              <input type="text" name="login" id="login" v-model="login"
+                class="border rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Login" required=true>
+            </div>
+            <div>
+              <label for="password"
+                class="block mb-2 text-sm font-mediu text-white">Password</label>
+              <input type="password" name="password" v-model="password" id="password" placeholder="••••••••"
+                class="border rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                required=true>
+            </div>
+            <button type="submit"
+              class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 text-center bg-primary-600 hover:bg-primary-700 focus:ring-primary-800">
+              Sign in
+            </button>
+          </form>
+        </div>
       </div>
     </div>
-  </q-page>
+  </section>
 </template>
 
 <script setup lang="ts">
-import Cookies from 'js-cookie';
+import { Api } from '@/api';
 import { nextTick, ref } from 'vue';
-import { Notify } from 'quasar';
+import { toast } from 'vue3-toastify';
 import { useRouter } from 'vue-router';
-import { Api } from 'src/api';
+
+import Cookies from 'js-cookie';
 
 const api = new Api();
 
@@ -53,23 +49,18 @@ const password = ref<string>('');
 const shakeError = ref<boolean>(false);
 
 const loginInput = ref();
-const passInput = ref();
 
-async function handleLogin() {
+async function handleLogin(event: Event) {
+  event.stopPropagation();
+  event.preventDefault();
+
   shakeError.value = false;
 
   if (!login.value || !password.value) {
-    Notify.create({
-      color: 'negative',
-      position: 'top',
-      message: '<span class="nofification">All fields are required.</span>',
-      html: true,
-      timeout: 2000
-    })
-
+    toast.warn('All fields are required.');
     nextTick(() => {
       shakeError.value = true;
-    })
+    });
 
     loginInput.value.focus();
     return;
@@ -79,15 +70,9 @@ async function handleLogin() {
   if (!res) {
     nextTick(() => {
       shakeError.value = true;
-    })
-
-    Notify.create({
-      color: 'negative',
-      position: 'top',
-      message: 'Incorrect login or password',
-      html: true,
-      timeout: 2500
     });
+
+    toast.error('Incorrect login or password');
 
     login.value = '';
     password.value = '';
@@ -103,10 +88,6 @@ async function handleLogin() {
   const expires = new Date(new Date().getTime() + 8 * 60 * 59 * 1000);
   Cookies.set('isLogged', 'true', { expires });
 
-  router.push('/view/dashboard');
-}
-
-function focusOnPass() {
-  passInput.value.focus();
+  router.push('/');
 }
 </script>

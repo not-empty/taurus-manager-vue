@@ -1,4 +1,4 @@
-import { IGroup } from './group';
+import type { IGroup } from "./group";
 
 export interface IQueue {
   id: string;
@@ -43,7 +43,7 @@ export interface INewQueue {
   healthValue: number
 }
 
-type IQueueStatus = 'running' | 'paused';
+type IQueueStatus = 'running' | 'paused' | 'unavailable';
 
 export interface IQueueJobCounts {
   waiting: number;
@@ -53,3 +53,10 @@ export interface IQueueJobCounts {
   failed: number;
   completed: number;
 };
+
+export interface IQueueBatchEdit {
+  groupId?: string;
+  healthValue?: number;
+  host?: string;
+  port?: number;
+}

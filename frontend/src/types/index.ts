@@ -1,3 +1,3 @@
-export interface errorRequest {
+export interface ErrorRequest {
   message: string;
 }

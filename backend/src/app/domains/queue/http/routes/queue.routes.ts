@@ -36,6 +36,20 @@ router.post(
 );
 
 router.post(
+  '/import',
+  celebrate({
+    [Segments.BODY]: {
+      host: Joi.string().required(),
+      port: Joi.number().required(),
+      groupId: Joi.string().required(),
+      password: Joi.string().required(),
+      healthValue: Joi.number().optional(),
+    },
+  }),
+  queueController.import,
+);
+
+router.post(
   '/:id/job',
   celebrate({
     [Segments.PARAMS]: {
@@ -85,10 +99,15 @@ router.get(
 router.get(
   '/',
   celebrate({
-    [Segments.QUERY]: {
-      page: Joi.number(),
-      size: Joi.number(),
-    },
+    [Segments.QUERY]: Joi.object({
+      page: Joi.number().optional(),
+      size: Joi.number().optional(),
+      order: Joi.string()
+        .pattern(/^[a-zA-Z0-9_]+,(asc|desc)$/)
+        .optional(),
+    })
+      .pattern(/^filter_/, Joi.string().required())
+      .unknown(false),
   }),
   queueController.list,
 );
@@ -222,6 +241,22 @@ router.put(
     allowUnknown: true,
   }),
   queueController.update,
+);
+
+router.post(
+  '/batch',
+  celebrate({
+    [Segments.BODY]: Joi.object({
+      ids: Joi.array().items(Joi.string().required()).required(),
+      data: Joi.object({
+        groupId: Joi.string().allow(null, ''),
+        healthValue: Joi.number().allow(null, ''),
+        host: Joi.string(),
+        port: Joi.number(),
+      }),
+    }),
+  }),
+  queueController.batchUpdate,
 );
 
 export default router;

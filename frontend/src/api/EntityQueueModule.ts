@@ -1,8 +1,8 @@
-import { IJob, IJobState } from 'src/types/job';
+import type { IJob, IJobState } from '@/types/job';
+import type { INewQueue, IQueue, IQueueBatchEdit, IQueueDash } from '@/types/queues';
+import type { ApiAddResponse, ApiDetailResponse, ApiListResponse, PaginationPayload, PaginationResult } from './types';
 import { EntityModule } from './EntityModule';
-import { ApiAddResponse, ApiDetailResponse, ApiListResponse, PaginationPayload, PaginationResult } from './types';
 import { prepareQuery } from './query';
-import { INewQueue, IQueue, IQueueDash } from 'src/types/queues';
 
 interface dataChangeQueueStatus {
   ids: string[];
@@ -12,8 +12,16 @@ interface dataRetryJobs {
   jobIds: string[];
 }
 
-interface JobPaginationPayload extends PaginationPayload {
+interface JobPaginationPayload extends PaginationPayload<IJob> {
   state: IJobState,
+}
+
+interface ImportQueuesPayload {
+  host: string;
+  port: number;
+  groupId: string;
+  password: string;
+  healthValue?: number;
 }
 
 export class QueueEntityModule<T> extends EntityModule<T> {
@@ -24,6 +32,15 @@ export class QueueEntityModule<T> extends EntityModule<T> {
     );
 
     return result.data;
+  }
+
+  public async importQueues(payload: ImportQueuesPayload): Promise<IQueue[]> {
+    const response = await this.api.post<IQueue[]>(
+      `/${this.path}/import`,
+      payload,
+    );
+
+    return response.data;
   }
 
   public async getQueueDashboard(queueId: string): Promise<IQueueDash> {
@@ -139,6 +156,18 @@ export class QueueEntityModule<T> extends EntityModule<T> {
     const result = await this.api.post<boolean>(
       `/${this.path}/${queueId}/job/retry-all`,
       {}
+    );
+
+    return result.data;
+  }
+
+  public async batchUpdate(ids: string[], data: IQueueBatchEdit) : Promise<IQueue[]> {
+    const result = await this.api.post<IQueue[]>(
+      `/${this.path}/batch`,
+      {
+        ids,
+        data,
+      },
     );
 
     return result.data;

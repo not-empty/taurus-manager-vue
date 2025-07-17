@@ -1,6 +1,6 @@
 {
   "name": "taurus-manager-back",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -21,6 +21,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
+    "ioredis": "^5.6.1",
     "jsonwebtoken": "^9.0.2",
     "knex": "^3.1.0",
     "moment": "^2.29.4",
