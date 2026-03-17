@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 import CustomError from '../../../errors/CustomError';
-import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
-import { DescribedQueue } from '../../../providers/QueueProvider/models/IQueueProvider';
-import QueueRepository, { Queue } from '../repositories/QueueRepository';
+import { DescribedQueue } from '../../../providers/QueueProvider/QueueProvider';
+import QueueRepository from '../repositories/QueueRepository';
+import getQueueProvider from '../../../providers/QueueProvider';
 
 interface IRequest {
   id: string;
@@ -25,15 +25,11 @@ class ShowQueueDashboardService {
       throw new CustomError('Queue not found', 404);
     }
 
-    const queueProvider = this.newQueueProvider(queue);
+    const queueProvider = getQueueProvider(queue);
     const describedQueue = await queueProvider.describe();
     await queueProvider.close();
 
     return describedQueue;
-  }
-
-  public newQueueProvider(queue: Queue): BullQueueProvider {
-    return new BullQueueProvider(queue);
   }
 }
 

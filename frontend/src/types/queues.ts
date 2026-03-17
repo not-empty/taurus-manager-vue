@@ -3,6 +3,7 @@ import type { IGroup } from "./group";
 export interface IQueue {
   id: string;
   name: string;
+  engine: string;
   description: string;
   compliance: string;
   host: string;
@@ -18,6 +19,7 @@ export interface IQueue {
 export interface IQueueDash {
   id: string;
   name: string;
+  engine: string;
   description: string;
   compliance: string;
   host: string;
@@ -35,6 +37,7 @@ export interface IQueueDash {
 
 export interface INewQueue {
   name: string,
+  engine: string,
   description: string,
   groupId: string,
   group?: IGroup,

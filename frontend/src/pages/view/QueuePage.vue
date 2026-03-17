@@ -87,6 +87,7 @@
 
       <fwb-badge v-if="dashboard?.status === 'running'" type="green" class="rounded-full">Running</fwb-badge>
       <fwb-badge v-if="dashboard?.status === 'paused'" type="yellow" class="rounded-full">Paused</fwb-badge>
+      <fwb-badge v-if="dashboard?.engine" type="purple" class="rounded-full">{{ dashboard.engine }}</fwb-badge>
     </div>
 
     <div class="flex flex-auto items-center justify-end-safe gap-2">

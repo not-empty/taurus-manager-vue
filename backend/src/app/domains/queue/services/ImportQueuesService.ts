@@ -83,6 +83,7 @@ class ImportQueuesService {
         healthValue,
         host,
         name: prefix,
+        engine: 'bull',
         port,
       }));
 

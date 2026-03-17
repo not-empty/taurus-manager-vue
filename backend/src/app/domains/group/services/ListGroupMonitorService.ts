@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe';
-import IQueueProvider, { DescribedQueue } from '../../../providers/QueueProvider/models/IQueueProvider';
-import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
+import { DescribedQueue } from '../../../providers/QueueProvider/QueueProvider';
 import GroupRepository, { Group } from '../repositories/GroupRepository';
-import QueueRepository, { Queue } from '../../queue/repositories/QueueRepository';
+import QueueRepository from '../../queue/repositories/QueueRepository';
+import getQueueProvider from '../../../providers/QueueProvider';
 
 interface IRequest {
   user: Express.IUserSession;
@@ -39,7 +39,7 @@ class ListGroupMonitorService {
       const describedQueues: DescribedQueue[] = [];
 
       for (const queue of queues.data) {
-        const queueProvider = this.newBullQueueProvider(queue);
+        const queueProvider = getQueueProvider(queue);
         let describedQueue;
         try {
           describedQueue = await Promise.race([
@@ -93,10 +93,6 @@ class ListGroupMonitorService {
       return this.groupRepository.listAll();
     }
     return this.groupRepository.getBulk(user.groups);
-  }
-
-  public newBullQueueProvider(queue: Queue): IQueueProvider {
-    return new BullQueueProvider(queue);
   }
 }
 

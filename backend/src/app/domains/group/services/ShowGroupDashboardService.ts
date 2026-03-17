@@ -1,9 +1,8 @@
 import { inject, injectable } from 'tsyringe';
-import IQueueProvider from '../../../providers/QueueProvider/models/IQueueProvider';
-import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
 import CustomError from '../../../errors/CustomError';
 import GroupRepository, { Group } from '../repositories/GroupRepository';
 import QueueRepository, { Queue } from '../../queue/repositories/QueueRepository';
+import getQueueProvider from '../../../providers/QueueProvider';
 
 interface IRequest {
   groupId: string;
@@ -52,7 +51,7 @@ class ShowGroupDashboardService {
     const queues = await this.queueRepository.listByGroup(group.id);
     const describedQueues = await Promise.all(
       queues.map(async (queue) => {
-        const queueProvider = this.newBullQueueProvider(queue);
+        const queueProvider = getQueueProvider(queue);
         let describedQueue;
         try {
           describedQueue = await Promise.race([
@@ -89,10 +88,6 @@ class ShowGroupDashboardService {
       group,
       queues: describedQueues,
     };
-  }
-
-  public newBullQueueProvider(queue: Queue): IQueueProvider {
-    return new BullQueueProvider(queue);
   }
 }
 

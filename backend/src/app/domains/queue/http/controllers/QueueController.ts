@@ -43,6 +43,7 @@ class QueueController {
   public async create(request: Request, response: Response): Promise<Response> {
     const {
       name,
+      engine,
       description,
       compliance,
       host,
@@ -54,6 +55,7 @@ class QueueController {
     const createQueue = container.resolve(CreateQueueService);
     const queue = await createQueue.execute({
       name,
+      engine,
       description,
       compliance,
       host,

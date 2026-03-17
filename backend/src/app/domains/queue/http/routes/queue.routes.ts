@@ -24,6 +24,7 @@ router.post(
   celebrate({
     [Segments.BODY]: {
       name: Joi.string().required(),
+      engine: Joi.string().required(),
       host: Joi.string().required(),
       port: Joi.number().required(),
       healthValue: Joi.number().required(),

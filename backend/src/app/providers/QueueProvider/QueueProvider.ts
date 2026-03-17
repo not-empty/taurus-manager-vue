@@ -1,8 +1,8 @@
-import { Group } from '../../../domains/group/repositories/GroupRepository';
-import { Queue } from '../../../domains/queue/repositories/QueueRepository';
+import { Group } from '../../domains/group/repositories/GroupRepository';
+import { Queue } from '../../domains/queue/repositories/QueueRepository';
 import {
   Job, JobStacktrace, JobState, QueueJobCounts, QueueStatus,
-} from '../types';
+} from './types';
 
 export interface DescribedQueue extends Queue {
   status: QueueStatus;

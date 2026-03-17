@@ -1,8 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import CustomError from '../../../errors/CustomError';
-import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
-import IQueueProvider from '../../../providers/QueueProvider/models/IQueueProvider';
-import QueueRepository, { Queue } from '../repositories/QueueRepository';
+import QueueRepository from '../repositories/QueueRepository';
+import getQueueProvider from '../../../providers/QueueProvider';
 
 interface IRequest {
   ids: string[];
@@ -28,7 +27,7 @@ class ResumeQueueBulkService {
 
     for await (const queue of queues) {
       try {
-        const queueProvider = this.newQueueProvider(queue);
+        const queueProvider = getQueueProvider(queue);
         await queueProvider.resume();
         await queueProvider.close();
       } catch (error) {
@@ -37,10 +36,6 @@ class ResumeQueueBulkService {
     }
 
     return true;
-  }
-
-  private newQueueProvider(queue: Queue): IQueueProvider {
-    return new BullQueueProvider(queue);
   }
 }
 
