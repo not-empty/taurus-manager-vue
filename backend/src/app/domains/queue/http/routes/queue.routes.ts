@@ -231,6 +231,7 @@ router.put(
     },
     [Segments.BODY]: {
       name: Joi.string(),
+      engine: Joi.string(),
       host: Joi.string(),
       port: Joi.number(),
       groupId: Joi.string(),
@@ -250,6 +251,7 @@ router.post(
     [Segments.BODY]: Joi.object({
       ids: Joi.array().items(Joi.string().required()).required(),
       data: Joi.object({
+        engine: Joi.string(),
         groupId: Joi.string().allow(null, ''),
         healthValue: Joi.number().allow(null, ''),
         host: Joi.string(),

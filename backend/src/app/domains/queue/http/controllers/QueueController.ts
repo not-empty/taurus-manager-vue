@@ -261,6 +261,7 @@ class QueueController {
     const { id } = request.params;
     const {
       name,
+      engine,
       description,
       compliance,
       host,
@@ -273,6 +274,7 @@ class QueueController {
     const queue = await updateQueue.execute({
       id,
       name,
+      engine,
       description,
       compliance,
       host,
@@ -293,7 +295,7 @@ class QueueController {
       return response.status(400).json({ error: 'No IDs provided for batch update.' });
     }
 
-    const allowedFields = ['groupId', 'healthValue', 'host', 'port'];
+    const allowedFields = ['engine', 'groupId', 'healthValue', 'host', 'port'];
     const updateData: Record<string, any> = {};
 
     for (const key of allowedFields) {

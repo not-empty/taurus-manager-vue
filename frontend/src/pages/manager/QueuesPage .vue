@@ -41,6 +41,9 @@
       <Select label="Group" name="group" v-model="batchEditSafe.groupId"
         :options="groups.map(g => ({ value: g.id, label: g.name }))" />
 
+      <Select label="Engine*" name="engine" v-model="batchEditSafe.engine"
+        :options="engines.map(engine => ({ value: engine, label: engine }))" />
+
       <Input label="Host*" name="host" v-model="batchEditSafe.host" type="text" />
 
       <Input label="Port*" name="port" v-model="batchEditSafe.port" type="number" />
@@ -121,6 +124,7 @@ const showDialogBatchEdit = ref(false);
 const batchEdit = ref<IQueueBatchEdit>({});
 
 const batchEditSafe = computed(() => ({
+  engine: batchEdit.value.engine ?? '',
   groupId: batchEdit.value.groupId ?? '',
   healthValue: batchEdit.value.healthValue ?? '',
   host: batchEdit.value.host ?? '',
