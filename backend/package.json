@@ -28,7 +28,7 @@
     "mysql": "^2.18.1",
     "mysql2": "^3.9.7",
     "objection": "^3.1.4",
-    "omniq": "^1.0.0",
+    "omniq": "2.0.0",
     "reflect-metadata": "^0.1.13",
     "tsyringe": "^4.8.0",
     "typeorm": "^0.3.17",
