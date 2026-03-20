@@ -6,6 +6,21 @@ import {
   Job, JobStacktrace, JobState, QueueJobCounts, QueueStatus,
 } from '../types';
 
+type OmniqQueueStats = {
+    waiting: string;
+    waiting_total: string;
+    last_activity_ms: string;
+    last_enqueue_ms: string;
+    group_waiting: string;
+    groups_ready: string;
+    active: string;
+    last_reserve_ms: string;
+    last_finish_ms: string;
+    completed_kept: string;
+    delayed: string;
+    failed: string;
+}
+
 export class OmniqQueueProvider implements IQueueProvider {
   private redis: Redis;
 
@@ -95,24 +110,16 @@ export class OmniqQueueProvider implements IQueueProvider {
 
   async getJobCounts(): Promise<QueueJobCounts> {
     const base = this.base();
-
-    const [waiting, active, delayed, completed, failed] = await Promise.all([
-      this.redis.llen(`${base}:wait`),
-      this.redis.zcard(`${base}:active`),
-      this.redis.zcard(`${base}:delayed`),
-      this.redis.llen(`${base}:completed`),
-      this.redis.llen(`${base}:failed`),
-    ]);
-
+    const stats = await this.redis.hgetall(`${base}:stats`) as OmniqQueueStats | null;
     const queueStatus = await this.getStatus();
 
     return {
-      waiting: queueStatus === 'running' ? waiting : 0,
-      paused: queueStatus === 'paused' ? waiting : 0,
-      active,
-      delayed,
-      completed,
-      failed,
+      waiting: queueStatus === 'running' ? Number(stats?.waiting_total || '0') : 0,
+      paused: queueStatus === 'paused' ? Number(stats?.waiting_total || '0') : 0,
+      active: Number(stats?.active || '0'),
+      delayed: Number(stats?.delayed || '0'),
+      completed: Number(stats?.completed_kept || '0'),
+      failed: Number(stats?.failed || '0'),
     };
   }
 
@@ -165,20 +172,42 @@ export class OmniqQueueProvider implements IQueueProvider {
 
     switch (state) {
       case 'waiting':
-        if (queueStatus === 'paused') {
-          return [];
+      case 'paused': {
+        const isPaused = queueStatus !== 'running';
+
+        if (state === 'waiting' && isPaused) return [];
+        if (state === 'paused' && !isPaused) return [];
+
+        const globalIds = await this.redis.lrange(`${base}:wait`, 0, -1);
+
+        const groups = await this.redis.zrange(`${base}:groups:ready`, 0, -1);
+
+        const groupIds: string[] = [];
+
+        if (groups.length) {
+          const pipeline = this.redis.pipeline();
+
+          groups.forEach((group) => {
+            pipeline.lrange(`${base}:g:${group}:wait`, 0, -1);
+          });
+
+          const results = await pipeline.exec();
+
+          if (results) {
+            for (const r of results) {
+              const list = r[1] as string[];
+              if (list?.length) {
+                groupIds.push(...list);
+              }
+            }
+          }
         }
 
-        ids = await this.redis.lrange(`${base}:wait`, start, end);
-        break;
+        const allIds = [...globalIds, ...groupIds];
+        ids = allIds.slice(start, end + 1);
 
-      case 'paused':
-        if (queueStatus === 'running') {
-          return [];
-        }
-
-        ids = await this.redis.lrange(`${base}:wait`, start, end);
         break;
+      }
 
       case 'active':
         ids = await this.redis.zrange(`${base}:active`, start, end);
