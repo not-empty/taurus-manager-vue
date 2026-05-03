@@ -5,6 +5,7 @@ import QueueRepository, { Queue } from '../repositories/QueueRepository';
 interface IRequest {
   id: string;
   name?: string;
+  engine?: string;
   description?: string;
   compliance?: string;
   host?: string;
@@ -25,6 +26,7 @@ class UpdateQueueService {
   public async execute({
     id,
     name,
+    engine,
     description,
     compliance,
     host,
@@ -38,6 +40,7 @@ class UpdateQueueService {
     }
 
     queue.name = name || queue.name;
+    queue.engine = engine || queue.engine;
     queue.description = description || '';
     queue.compliance = compliance || '';
     queue.host = host || queue.host;

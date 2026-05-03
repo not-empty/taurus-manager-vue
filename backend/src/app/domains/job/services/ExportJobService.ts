@@ -1,8 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import CustomError from '../../../errors/CustomError';
-import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
-import IQueueProvider from '../../../providers/QueueProvider/models/IQueueProvider';
-import QueueRepository, { Queue } from '../../queue/repositories/QueueRepository';
+import QueueRepository from '../../queue/repositories/QueueRepository';
+import getQueueProvider from '../../../providers/QueueProvider';
 
 interface ITokenSubject {
   id: string;
@@ -38,7 +37,7 @@ class ExportJobService {
       throw new CustomError('Queue not found', 404);
     }
 
-    const queueProvider = this.newQueueProvider(queue);
+    const queueProvider = getQueueProvider(queue);
     const content = await queueProvider.exportJob(jobId, user.role);
 
     await queueProvider.close();
@@ -53,10 +52,6 @@ class ExportJobService {
       filename,
       content,
     };
-  }
-
-  private newQueueProvider(queue: Queue): IQueueProvider {
-    return new BullQueueProvider(queue);
   }
 }
 

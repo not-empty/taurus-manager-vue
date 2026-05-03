@@ -91,6 +91,14 @@ const columns: TableColumn<IQueueDash>[] = [
     icon: 'heart-straight ph-fill',
   },
   {
+    name: 'engine',
+    align: 'center',
+    label: 'Engine',
+    field: 'engine',
+    sortable: true,
+    icon: 'gear ph-fill',
+  },
+  {
     name: 'name',
     align: 'center',
     label: 'Name',

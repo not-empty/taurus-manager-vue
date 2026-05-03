@@ -87,6 +87,7 @@
 
       <fwb-badge v-if="dashboard?.status === 'running'" type="green" class="rounded-full">Running</fwb-badge>
       <fwb-badge v-if="dashboard?.status === 'paused'" type="yellow" class="rounded-full">Paused</fwb-badge>
+      <fwb-badge v-if="dashboard?.engine" type="purple" class="rounded-full">{{ dashboard.engine }}</fwb-badge>
     </div>
 
     <div class="flex flex-auto items-center justify-end-safe gap-2">
@@ -148,7 +149,7 @@
         jobState === state
           ? 'ring-2 ring-blue-500'
           : 'hover:ring-2 hover:ring-gray-600'
-      ]">
+      ].join(' ')">
         <div class="p-5">
           <h5 class="mb-2 text-2xl font-bold tracking-tight text-white">
             {{ state }}

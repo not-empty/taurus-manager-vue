@@ -1,12 +1,12 @@
 import Bull from 'bull';
 import { ulid } from 'ulid';
-import IQueueProvider, { DescribedQueue } from './models/IQueueProvider';
-import { timestampToDate } from '../../utils/dateUtils';
-import { queueCompliance } from '../../utils/compliceUtils';
-import { Queue } from '../../domains/queue/repositories/QueueRepository';
+import IQueueProvider, { DescribedQueue } from '../QueueProvider';
+import { timestampToDate } from '../../../utils/dateUtils';
+import { queueCompliance } from '../../../utils/compliceUtils';
+import { Queue } from '../../../domains/queue/repositories/QueueRepository';
 import {
   Job, JobStacktrace, JobState, QueueJobCounts, QueueStatus,
-} from './types';
+} from '../types';
 
 export class BullQueueProvider implements IQueueProvider {
   private queue: Queue;

@@ -9,6 +9,9 @@
 
       <Input label="Name*" name="name" v-model="row.name" type="text" />
 
+      <Select label="Engine*" name="engine" v-model="row.engine"
+        :options="engines.map(engine => ({ value: engine, label: engine }))" />
+
       <Select label="Group*" name="group" v-model="groupId"
         :options="groups.map(g => ({ value: g.id, label: g.name }))" />
 
@@ -37,6 +40,9 @@
     <ModalBody>
       <Select label="Group" name="group" v-model="batchEditSafe.groupId"
         :options="groups.map(g => ({ value: g.id, label: g.name }))" />
+
+      <Select label="Engine*" name="engine" v-model="batchEditSafe.engine"
+        :options="engines.map(engine => ({ value: engine, label: engine }))" />
 
       <Input label="Host*" name="host" v-model="batchEditSafe.host" type="text" />
 
@@ -118,6 +124,7 @@ const showDialogBatchEdit = ref(false);
 const batchEdit = ref<IQueueBatchEdit>({});
 
 const batchEditSafe = computed(() => ({
+  engine: batchEdit.value.engine ?? '',
   groupId: batchEdit.value.groupId ?? '',
   healthValue: batchEdit.value.healthValue ?? '',
   host: batchEdit.value.host ?? '',
@@ -126,6 +133,7 @@ const batchEditSafe = computed(() => ({
 
 const row = ref<INewQueue | IQueue>({
   name: '',
+  engine: 'bull',
   description: '',
   host: '',
   port: 6379,
@@ -144,6 +152,8 @@ const groupId = computed({
     }
   }
 });
+
+const engines = ['bull', 'omniq'];
 
 const actions: TableAction<IQueue>[] = [
   {
@@ -166,6 +176,13 @@ const columns: TableColumn<IQueue>[] = [
     align: 'left',
     label: 'Name',
     field: 'name',
+    sortable: true
+  },
+  {
+    name: 'engine',
+    align: 'left',
+    label: 'Engine',
+    field: 'engine',
     sortable: true
   },
   {

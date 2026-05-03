@@ -14,7 +14,7 @@ export type JobStacktrace = {
   content: string;
 };
 
-export type JobState = 'waiting' | 'active' | 'delayed' | 'failed' | 'completed';
+export type JobState = 'waiting' | 'paused' | 'active' | 'delayed' | 'failed' | 'completed';
 
 export type Job = {
   id: string;

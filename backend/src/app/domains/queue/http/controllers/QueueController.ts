@@ -43,6 +43,7 @@ class QueueController {
   public async create(request: Request, response: Response): Promise<Response> {
     const {
       name,
+      engine,
       description,
       compliance,
       host,
@@ -54,6 +55,7 @@ class QueueController {
     const createQueue = container.resolve(CreateQueueService);
     const queue = await createQueue.execute({
       name,
+      engine,
       description,
       compliance,
       host,
@@ -259,6 +261,7 @@ class QueueController {
     const { id } = request.params;
     const {
       name,
+      engine,
       description,
       compliance,
       host,
@@ -271,6 +274,7 @@ class QueueController {
     const queue = await updateQueue.execute({
       id,
       name,
+      engine,
       description,
       compliance,
       host,
@@ -291,7 +295,7 @@ class QueueController {
       return response.status(400).json({ error: 'No IDs provided for batch update.' });
     }
 
-    const allowedFields = ['groupId', 'healthValue', 'host', 'port'];
+    const allowedFields = ['engine', 'groupId', 'healthValue', 'host', 'port'];
     const updateData: Record<string, any> = {};
 
     for (const key of allowedFields) {

@@ -1,8 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import CustomError from '../../../errors/CustomError';
-import BullQueueProvider from '../../../providers/QueueProvider/BullQueueProvider';
-import IQueueProvider from '../../../providers/QueueProvider/models/IQueueProvider';
-import QueueRepository, { Queue } from '../../queue/repositories/QueueRepository';
+import QueueRepository from '../../queue/repositories/QueueRepository';
+import getQueueProvider from '../../../providers/QueueProvider';
 
 interface IRequest {
   queueId: string;
@@ -27,15 +26,11 @@ class CreateJobService {
       throw new CustomError('Queue not found', 404);
     }
 
-    const queueProvider = this.newQueueProvider(queue);
+    const queueProvider = getQueueProvider(queue);
     const result = await queueProvider.addJob(data);
     await queueProvider.close();
 
     return result;
-  }
-
-  private newQueueProvider(queue: Queue): IQueueProvider {
-    return new BullQueueProvider(queue);
   }
 }
 

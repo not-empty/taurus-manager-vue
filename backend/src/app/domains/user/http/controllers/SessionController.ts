@@ -18,8 +18,9 @@ class SessionController {
     const cookieOptions: CookieOptions = {
       httpOnly: true,
       secure: nodeEnvConfig.environment === 'production',
-      maxAge: maxAge,
+      maxAge,
       sameSite: 'strict' as const,
+      path: '/',
     };
     response.cookie('token', token, cookieOptions);
 

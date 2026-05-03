@@ -9,6 +9,7 @@ import { Group } from '../../group/repositories/GroupRepository';
 
 export interface Queue extends BaseEntity {
   name: string,
+  engine: string,
   description?: string,
   host: string,
   port: number,

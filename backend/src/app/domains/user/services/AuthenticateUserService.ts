@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { sign } from 'jsonwebtoken';
+import { sign, type Secret, type SignOptions } from 'jsonwebtoken';
 import CustomError from '../../../errors/CustomError';
 import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 import authConfig from '../../../../config/auth';
@@ -60,10 +60,10 @@ class AuthenticateUserService {
       subject.groups = JSON.parse(user.groups || '[]');
     }
 
-    const token = sign({}, secret, {
+    const token = sign({}, secret as Secret, {
       subject: JSON.stringify(subject),
-      expiresIn,
-    });
+      expiresIn: expiresIn as SignOptions['expiresIn'],
+    } satisfies SignOptions);
 
     return {
       user,

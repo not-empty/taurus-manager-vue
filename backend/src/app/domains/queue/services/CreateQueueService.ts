@@ -3,6 +3,7 @@ import QueueRepository, { Queue } from '../repositories/QueueRepository';
 
 interface IRequest {
   name: string;
+  engine: string;
   description?: string;
   compliance?: string;
   host: string;
@@ -22,6 +23,7 @@ class CreateQueueService {
 
   public async execute({
     name,
+    engine,
     description,
     compliance,
     host,
@@ -31,6 +33,7 @@ class CreateQueueService {
   }: IRequest): Promise<Queue> {
     const queueId = await this.queueRepository.insert({
       name,
+      engine,
       description,
       compliance,
       host,

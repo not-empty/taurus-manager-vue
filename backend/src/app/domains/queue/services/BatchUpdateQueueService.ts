@@ -5,6 +5,7 @@ import QueueRepository, { Queue } from '../repositories/QueueRepository';
 interface IRequest {
   ids: string[];
   data: {
+    engine?: string;
     groupId?: string;
     healthValue?: number;
     host?: string;
@@ -30,6 +31,7 @@ class BatchUpdateQueueService {
     const updatedQueues: Queue[] = [];
     for await (const queue of queues) {
       const updated: Partial<Queue> = { ...queue };
+      if (data.engine) updated.engine = data.engine;
       if (data.groupId) updated.groupId = data.groupId;
       if (data.healthValue) updated.healthValue = data.healthValue;
       if (data.host !== undefined) updated.host = data.host;
