@@ -149,7 +149,7 @@
         jobState === state
           ? 'ring-2 ring-blue-500'
           : 'hover:ring-2 hover:ring-gray-600'
-      ]">
+      ].join(' ')">
         <div class="p-5">
           <h5 class="mb-2 text-2xl font-bold tracking-tight text-white">
             {{ state }}
