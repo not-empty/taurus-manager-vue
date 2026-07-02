@@ -36,7 +36,7 @@ class ListJobService {
       throw new CustomError('Queue not found', 404);
     }
 
-    const queueProvider = getQueueProvider(queue);
+    const queueProvider = await getQueueProvider(queue);
     const total = await queueProvider.getJobCountsByState(state);
     const start = (page - 1) * size;
     const end = (page * size) - 1;

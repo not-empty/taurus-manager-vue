@@ -28,6 +28,12 @@ export class BullQueueProvider implements IQueueProvider {
     });
   }
 
+  async connect(): Promise<void> {
+    /*
+      do nothing
+    */
+  }
+
   public async addJob(data: any): Promise<boolean> {
     await this.bullQueue.add(
       'process',

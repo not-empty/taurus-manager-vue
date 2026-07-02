@@ -24,7 +24,7 @@ class RetryAllJobService {
       throw new CustomError('Queue not found', 404);
     }
 
-    const queueProvider = getQueueProvider(queue);
+    const queueProvider = await getQueueProvider(queue);
     const result = await queueProvider.retryAllJobs();
     await queueProvider.close();
 

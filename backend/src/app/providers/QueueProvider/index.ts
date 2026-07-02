@@ -10,12 +10,15 @@ const queueProviderRegistry: Record<QueueEngine, (queue: Queue) => IQueueProvide
   bull: (queue) => new BullQueueProvider(queue),
 };
 
-export default function getQueueProvider(queue: Queue): IQueueProvider {
+export default async function getQueueProvider(queue: Queue): Promise<IQueueProvider> {
   const factory = queueProviderRegistry[queue.engine as QueueEngine];
 
   if (!factory) {
     throw new Error(`Unsupported queue engine: ${queue.engine}`);
   }
 
-  return factory(queue);
+  const queueProvider = factory(queue);
+  await queueProvider.connect();
+
+  return queueProvider;
 }

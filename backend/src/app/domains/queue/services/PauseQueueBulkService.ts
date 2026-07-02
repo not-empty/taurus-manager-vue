@@ -27,7 +27,7 @@ class PauseQueueBulkService {
 
     for await (const queue of queues) {
       try {
-        const queueProvider = getQueueProvider(queue);
+        const queueProvider = await getQueueProvider(queue);
         await queueProvider.pause();
         await queueProvider.close();
       } catch (error) {

@@ -39,7 +39,7 @@ class ListGroupMonitorService {
       const describedQueues: DescribedQueue[] = [];
 
       for (const queue of queues.data) {
-        const queueProvider = getQueueProvider(queue);
+        const queueProvider = await getQueueProvider(queue);
         let describedQueue;
         try {
           describedQueue = await Promise.race([

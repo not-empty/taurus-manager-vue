@@ -14,6 +14,7 @@ export interface IQueueProvider {
   addJob(data: any): Promise<boolean>;
   cloneJob(jobId: string): Promise<boolean>;
   close(): Promise<void>;
+  connect(): Promise<void>;
   deleteJobs(jobIds: string[]): Promise<boolean>;
   describe(): Promise<DescribedQueue>;
   exportJob(jobId: string, role: string): Promise<string | null>;

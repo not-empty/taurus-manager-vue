@@ -51,7 +51,7 @@ class ShowGroupDashboardService {
     const queues = await this.queueRepository.listByGroup(group.id);
     const describedQueues = await Promise.all(
       queues.map(async (queue) => {
-        const queueProvider = getQueueProvider(queue);
+        const queueProvider = await getQueueProvider(queue);
         let describedQueue;
         try {
           describedQueue = await Promise.race([

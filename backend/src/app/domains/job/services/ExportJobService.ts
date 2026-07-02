@@ -37,7 +37,7 @@ class ExportJobService {
       throw new CustomError('Queue not found', 404);
     }
 
-    const queueProvider = getQueueProvider(queue);
+    const queueProvider = await getQueueProvider(queue);
     const content = await queueProvider.exportJob(jobId, user.role);
 
     await queueProvider.close();

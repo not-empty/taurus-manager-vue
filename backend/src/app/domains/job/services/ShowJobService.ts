@@ -28,7 +28,7 @@ class ShowJobService {
       throw new CustomError('Queue not found', 404);
     }
 
-    const queueProvider = getQueueProvider(queue);
+    const queueProvider = await getQueueProvider(queue);
     const job = await queueProvider.getJob(jobId);
     queueCompliance(job, queue);
     await queueProvider.close();

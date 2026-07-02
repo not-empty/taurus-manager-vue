@@ -27,7 +27,7 @@ class ResumeQueueBulkService {
 
     for await (const queue of queues) {
       try {
-        const queueProvider = getQueueProvider(queue);
+        const queueProvider = await getQueueProvider(queue);
         await queueProvider.resume();
         await queueProvider.close();
       } catch (error) {

@@ -1,30 +1,63 @@
 import Redis from 'ioredis';
-import { OmniqClient } from 'omniq';
+import { OmniqClient, QueueMonitor } from 'omniq';
 import IQueueProvider, { DescribedQueue } from '../QueueProvider';
 import { Queue } from '../../../domains/queue/repositories/QueueRepository';
 import {
   Job, JobStacktrace, JobState, QueueJobCounts, QueueStatus,
 } from '../types';
 
-type OmniqQueueStats = {
-    waiting: string;
-    waiting_total: string;
-    last_activity_ms: string;
-    last_enqueue_ms: string;
-    group_waiting: string;
-    groups_ready: string;
-    active: string;
-    last_reserve_ms: string;
-    last_finish_ms: string;
-    completed_kept: string;
-    delayed: string;
-    failed: string;
+type LaneName = 'wait' | 'active' | 'delayed' | 'failed' | 'completed';
+
+interface LaneJob {
+  lane: LaneName;
+  job_id: string;
+  idx_score_ms: number;
+  state: string;
+  gid: string;
+  attempt: number;
+  max_attempts: number;
+  due_ms: number;
+  lock_until_ms: number;
+  queued_ms: number;
+  first_started_ms: number;
+  last_started_ms: number;
+  completed_ms: number;
+  failed_ms: number;
+  updated_ms: number;
+  last_error: string;
+}
+
+interface JobInfo {
+  job_id: string;
+  state: string;
+  gid: string;
+  attempt: number;
+  max_attempts: number;
+  timeout_ms: number;
+  backoff_ms: number;
+  lease_token: string;
+  lock_until_ms: number;
+  due_ms: number;
+  payload: string;
+  last_error: string;
+  last_error_ms: number;
+  created_ms: number;
+  updated_ms: number;
+  queued_ms: number;
+  first_started_ms: number;
+  last_started_ms: number;
+  completed_ms: number;
+  failed_ms: number;
 }
 
 export class OmniqQueueProvider implements IQueueProvider {
   private redis: Redis;
 
   private queue: Queue;
+
+  private omniq: OmniqClient;
+
+  private monitor: QueueMonitor;
 
   constructor(queue: Queue) {
     this.queue = queue;
@@ -34,16 +67,20 @@ export class OmniqQueueProvider implements IQueueProvider {
     });
   }
 
+  async connect() {
+    this.omniq = await OmniqClient.create({
+      redis: this.redis,
+    });
+
+    this.monitor = new QueueMonitor(this.omniq);
+  }
+
   private base() {
     return `{${this.queue.name}}`;
   }
 
   async addJob(data: any): Promise<boolean> {
-    const omniq = await OmniqClient.create({
-      redis: this.redis,
-    });
-
-    await omniq.publish({
+    await this.omniq.publish({
       queue: this.queue.name,
       payload: data,
     });
@@ -70,11 +107,7 @@ export class OmniqQueueProvider implements IQueueProvider {
       return true;
     }
 
-    const omniq = await OmniqClient.create({
-      redis: this.redis,
-    });
-
-    await omniq.remove_jobs_batch({
+    await this.omniq.remove_jobs_batch({
       queue: this.queue.name,
       job_ids: jobIds,
       lane: job.state,
@@ -102,20 +135,21 @@ export class OmniqQueueProvider implements IQueueProvider {
   }
 
   async getJob(jobId: string): Promise<Job | undefined> {
-    const data = await this.redis.hgetall(`${this.base()}:job:${jobId}`);
-    if (!data || Object.keys(data).length === 0) return undefined;
+    const job = await this.monitor.get_job(this.queue.name, jobId);
 
-    return this.mapOmniqToJob(jobId, data);
+    if (!job) {
+      return undefined;
+    }
+
+    return this.jobInfoToJob(job);
   }
 
   async getJobCounts(): Promise<QueueJobCounts> {
-    const base = this.base();
-    const stats = await this.redis.hgetall(`${base}:stats`) as OmniqQueueStats | null;
-    const queueStatus = await this.getStatus();
+    const stats = await this.monitor.stats(this.queue.name);
 
     return {
-      waiting: queueStatus === 'running' ? Number(stats?.waiting_total || '0') : 0,
-      paused: queueStatus === 'paused' ? Number(stats?.waiting_total || '0') : 0,
+      waiting: !stats.paused ? Number(stats?.waiting_total || '0') : 0,
+      paused: stats.paused ? Number(stats?.waiting_total || '0') : 0,
       active: Number(stats?.active || '0'),
       delayed: Number(stats?.delayed || '0'),
       completed: Number(stats?.completed_kept || '0'),
@@ -124,35 +158,34 @@ export class OmniqQueueProvider implements IQueueProvider {
   }
 
   async getJobCountsByState(state: JobState): Promise<number> {
-    const base = this.base();
-    const queueStatus = await this.getStatus();
+    const stats = await this.monitor.stats(this.queue.name);
 
     switch (state) {
       case 'waiting':
-        if (queueStatus === 'paused') {
+        if (stats.paused) {
           return 0;
         }
 
-        return this.redis.llen(`${base}:wait`);
+        return stats.waiting;
 
       case 'paused':
-        if (queueStatus === 'running') {
+        if (!stats.paused) {
           return 0;
         }
 
-        return this.redis.llen(`${base}:wait`);
+        return stats.waiting;
 
       case 'active':
-        return this.redis.zcard(`${base}:active`);
+        return stats.active;
 
       case 'delayed':
-        return this.redis.zcard(`${base}:delayed`);
+        return stats.delayed;
 
       case 'failed':
-        return this.redis.llen(`${base}:failed`);
+        return stats.failed;
 
       case 'completed':
-        return this.redis.llen(`${base}:completed`);
+        return stats.completed_kept;
 
       default:
         return 0;
@@ -160,15 +193,13 @@ export class OmniqQueueProvider implements IQueueProvider {
   }
 
   async getStatus(): Promise<QueueStatus> {
-    const paused = await this.redis.exists(`${this.base()}:paused`);
-    return paused === 1 ? 'paused' : 'running';
+    const stats = await this.monitor.stats(this.queue.name);
+    return stats.paused ? 'paused' : 'running';
   }
 
   async listJobs(state: JobState, start: number, end: number): Promise<Job[]> {
-    const base = this.base();
     const queueStatus = await this.getStatus();
-
-    let ids: string[] = [];
+    const limit = end - start;
 
     switch (state) {
       case 'waiting':
@@ -178,96 +209,43 @@ export class OmniqQueueProvider implements IQueueProvider {
         if (state === 'waiting' && isPaused) return [];
         if (state === 'paused' && !isPaused) return [];
 
-        const globalIds = await this.redis.lrange(`${base}:wait`, 0, -1);
+        const result = await this.monitor.lane_page({
+          queue: this.queue.name,
+          lane: 'wait',
+          offset: start,
+          limit,
+        });
 
-        const groups = await this.redis.zrange(`${base}:groups:ready`, 0, -1);
-
-        const groupIds: string[] = [];
-
-        if (groups.length) {
-          const pipeline = this.redis.pipeline();
-
-          groups.forEach((group) => {
-            pipeline.lrange(`${base}:g:${group}:wait`, 0, -1);
-          });
-
-          const results = await pipeline.exec();
-
-          if (results) {
-            for (const r of results) {
-              const list = r[1] as string[];
-              if (list?.length) {
-                groupIds.push(...list);
-              }
-            }
-          }
-        }
-
-        const allIds = [...globalIds, ...groupIds];
-        ids = allIds.slice(start, end + 1);
-
-        break;
+        return result.map((job) => this.mapOmniqToJob(job));
       }
 
-      case 'active':
-        ids = await this.redis.zrange(`${base}:active`, start, end);
-        break;
+      default: {
+        const result = await this.monitor.lane_page({
+          queue: this.queue.name,
+          lane: state,
+          offset: start,
+          limit,
+        });
 
-      case 'delayed':
-        ids = await this.redis.zrange(`${base}:delayed`, start, end);
-        break;
-
-      case 'failed':
-        ids = await this.redis.lrange(`${base}:failed`, start, end);
-        break;
-
-      case 'completed':
-        ids = await this.redis.lrange(`${base}:completed`, start, end);
-        break;
-
-      default:
-        return [];
+        return result.map((job) => this.mapOmniqToJob(job));
+      }
     }
-
-    if (!ids.length) return [];
-
-    const pipeline = this.redis.pipeline();
-
-    ids.forEach((id) => {
-      pipeline.hgetall(`${base}:job:${id}`);
-    });
-
-    const results = await pipeline.exec();
-    if (!results) return [];
-
-    return results
-      .map((r, i) => {
-        const data = r[1] as any;
-        if (!data || Object.keys(data).length === 0) return null;
-
-        return this.mapOmniqToJob(ids[i], data);
-      })
-      .filter(Boolean) as Job[];
   }
 
   async pause(): Promise<boolean> {
-    await this.redis.set(`${this.base()}:paused`, '1');
+    await this.omniq.pause({ queue: this.queue.name });
     return true;
   }
 
   async resume(): Promise<boolean> {
-    await this.redis.del(`${this.base()}:paused`);
+    await this.omniq.resume({ queue: this.queue.name });
     return true;
   }
 
   async retryJobs(jobIds: string[]): Promise<boolean> {
     if (!jobIds.length) return true;
 
-    const omniq = await OmniqClient.create({
-      redis: this.redis,
-    });
-
-    await omniq.retry_failed_batch({
+    await this.omniq.retry_failed_batch({
       queue: this.queue.name,
       job_ids: jobIds,
     });
@@ -276,25 +254,26 @@ export class OmniqQueueProvider implements IQueueProvider {
   }
 
   async retryAllJobs(): Promise<boolean> {
-    const base = this.base();
-
-    const omniq = await OmniqClient.create({
-      redis: this.redis,
-    });
-
     let failedIds: string[] = [];
     let offset = 0;
     const limit = 100;
 
     do {
-      failedIds = await this.redis.lrange(`${base}:failed`, offset, offset + limit);
+      const failed = await this.monitor.lane_page({
+        queue: this.queue.name,
+        lane: 'failed',
+        offset,
+        limit,
+      });
+
+      failedIds = failed.map((job) => job.job_id);
       if (!failedIds.length) {
         return true;
       }
 
       offset += limit;
 
-      await omniq.retry_failed_batch({
+      await this.omniq.retry_failed_batch({
         queue: this.queue.name,
         job_ids: failedIds,
       });
@@ -314,32 +293,66 @@ export class OmniqQueueProvider implements IQueueProvider {
     }));
   }
 
-  private mapOmniqToJob(id: string, data: any): Job {
-    const payload = data.payload ? JSON.parse(data.payload) : undefined;
-
-    const attempt = Number(data.attempt ?? 0);
-    const maxAttempts = Number(data.max_attempts ?? 0);
+  private mapOmniqToJob(job: LaneJob): Job {
+    const attempt = Number(job.attempt ?? 0);
+    const maxAttempts = Number(job.max_attempts ?? 0);
+    const state = this.laneStateToJobState(job.state as LaneName);
 
     return {
-      id,
-      name: payload?.name ?? 'default',
-      data: payload,
+      id: job.job_id,
+      name: 'default',
       attemptsMade: attempt,
-      timestamp: Number(data.updated_ms ?? Date.now()),
-      createdAt: data.created_at
-        ? new Date(Number(data.created_at)).toISOString()
+      timestamp: Number(job.updated_ms ?? Date.now()),
+      createdAt: job.queued_ms
+        ? new Date(Number(job.queued_ms)).toISOString()
         : undefined,
-      processedAt: data.processed_at
-        ? new Date(Number(data.processed_at)).toISOString()
+      processedAt: job.last_started_ms
+        ? new Date(Number(job.last_started_ms)).toISOString()
         : undefined,
-      finishedAt: data.finished_at
-        ? new Date(Number(data.finished_at)).toISOString()
+      finishedAt: job.completed_ms
+        ? new Date(Number(job.completed_ms)).toISOString()
         : undefined,
-      state: data.state,
+      state,
       canRetry: attempt < maxAttempts,
-      failedReason: data.last_error || undefined,
+      failedReason: job.last_error || undefined,
       stacktrace: [],
     };
+  }
+
+  private jobInfoToJob(jobInfo: JobInfo): Job {
+    const attempt = Number(jobInfo.attempt ?? 0);
+    const maxAttempts = Number(jobInfo.max_attempts ?? 0);
+    const state = this.laneStateToJobState(jobInfo.state as LaneName);
+    const payload = jobInfo.payload ? JSON.parse(jobInfo.payload) : undefined;
+
+    return {
+      id: jobInfo.job_id,
+      name: 'default',
+      data: payload,
+      attemptsMade: attempt,
+      timestamp: Number(jobInfo.updated_ms ?? Date.now()),
+      createdAt: jobInfo.queued_ms
+        ? new Date(Number(jobInfo.queued_ms)).toISOString()
+        : undefined,
+      processedAt: jobInfo.last_started_ms
+        ? new Date(Number(jobInfo.last_started_ms)).toISOString()
+        : undefined,
+      finishedAt: jobInfo.completed_ms
+        ? new Date(Number(jobInfo.completed_ms)).toISOString()
+        : undefined,
+      state,
+      canRetry: attempt < maxAttempts,
+      failedReason: jobInfo.last_error || undefined,
+      stacktrace: [],
+    };
+  }
+
+  private laneStateToJobState(state: LaneName): JobState {
+    if (state === 'wait') {
+      return 'paused';
+    }
+
+    return state;
   }
 }
 
